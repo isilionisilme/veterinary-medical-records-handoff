@@ -63,7 +63,7 @@ The project's canonical documentation (`docs/projects/veterinary-medical-records
 
 ### Phase 4 — Navigation
 
-- [ ] D4-A 🔄 — Build sitemap, TOCs, breadcrumbs for canonical docs · tool: `doctoc` (Codex)
+- [x] D4-A 🔄 — Build sitemap, TOCs, breadcrumbs for canonical docs · tool: `doctoc` (Codex) — ✅ `01375f23`
 - [ ] D4-B 🚧 — User validation of navigation quality (Claude)
 
 ### Phase 5 — Format and Markdown standardization
