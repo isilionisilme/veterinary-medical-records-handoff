@@ -211,6 +211,51 @@ def _format_scorecard(snapshot: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
+def _resolve_config_float(
+    *,
+    cli_value: float | None,
+    cases_payload: dict[str, object],
+    key: str,
+    default_value: float,
+) -> float:
+    if cli_value is not None:
+        return float(cli_value)
+
+    gates_obj = cases_payload.get("gates")
+    if isinstance(gates_obj, dict):
+        gate_value = gates_obj.get(key)
+        if isinstance(gate_value, int | float):
+            return float(gate_value)
+
+    top_level_value = cases_payload.get(key)
+    if isinstance(top_level_value, int | float):
+        return float(top_level_value)
+
+    return default_value
+
+
+def _resolve_optional_path(
+    *,
+    cli_value: str | None,
+    cases_payload: dict[str, object],
+    payload_key: str,
+    cases_path: Path,
+) -> Path | None:
+    selected = cli_value
+    if selected is None:
+        payload_value = cases_payload.get(payload_key)
+        if isinstance(payload_value, str) and payload_value.strip():
+            selected = payload_value.strip()
+
+    if not selected:
+        return None
+
+    candidate = Path(selected)
+    if candidate.is_absolute():
+        return candidate
+    return (cases_path.parent / candidate).resolve()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -241,19 +286,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--min-exact-match-rate",
         type=float,
-        default=0.0,
+        default=None,
         help="Minimum allowed exact_match_rate (0..1).",
     )
     parser.add_argument(
         "--max-null-miss-rate",
         type=float,
-        default=1.0,
+        default=None,
         help="Maximum allowed null_miss_rate (0..1).",
     )
     parser.add_argument(
         "--max-false-positive-rate",
         type=float,
-        default=1.0,
+        default=None,
         help="Maximum allowed false_positive_rate (0..1).",
     )
     parser.add_argument(
@@ -280,6 +325,38 @@ def main() -> int:
     if not isinstance(cases_obj, list) or not cases_obj:
         raise ValueError("cases JSON must include a non-empty 'cases' array")
 
+    min_exact_match_rate = _resolve_config_float(
+        cli_value=args.min_exact_match_rate,
+        cases_payload=cases_payload,
+        key="min_exact_match_rate",
+        default_value=0.0,
+    )
+    max_null_miss_rate = _resolve_config_float(
+        cli_value=args.max_null_miss_rate,
+        cases_payload=cases_payload,
+        key="max_null_miss_rate",
+        default_value=1.0,
+    )
+    max_false_positive_rate = _resolve_config_float(
+        cli_value=args.max_false_positive_rate,
+        cases_payload=cases_payload,
+        key="max_false_positive_rate",
+        default_value=1.0,
+    )
+
+    baseline_path = _resolve_optional_path(
+        cli_value=args.baseline,
+        cases_payload=cases_payload,
+        payload_key="baseline",
+        cases_path=cases_path,
+    )
+    output_path = _resolve_optional_path(
+        cli_value=args.output,
+        cases_payload=cases_payload,
+        payload_key="snapshot_output",
+        cases_path=cases_path,
+    )
+
     metrics = evaluate_cases(
         cases=cases_obj,
         field_key=field_key,
@@ -287,8 +364,8 @@ def main() -> int:
     )
 
     baseline_metrics: dict[str, object] | None = None
-    if args.baseline:
-        baseline_payload = _load_json(Path(args.baseline))
+    if baseline_path is not None:
+        baseline_payload = _load_json(baseline_path)
         loaded = baseline_payload.get("metrics")
         if isinstance(loaded, dict):
             baseline_metrics = loaded
@@ -300,8 +377,7 @@ def main() -> int:
         baseline_metrics=baseline_metrics,
     )
 
-    if args.output:
-        output_path = Path(args.output)
+    if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(
             json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n",
@@ -313,9 +389,9 @@ def main() -> int:
     failures = evaluate_gates(
         metrics=metrics,
         baseline_metrics=baseline_metrics,
-        min_exact_match_rate=args.min_exact_match_rate,
-        max_null_miss_rate=args.max_null_miss_rate,
-        max_false_positive_rate=args.max_false_positive_rate,
+        min_exact_match_rate=min_exact_match_rate,
+        max_null_miss_rate=max_null_miss_rate,
+        max_false_positive_rate=max_false_positive_rate,
         allow_regression=bool(args.allow_regression),
     )
     if failures:

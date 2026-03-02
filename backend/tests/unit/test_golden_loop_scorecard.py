@@ -103,3 +103,62 @@ def test_evaluate_gates_allows_regression_when_opted_in() -> None:
     )
 
     assert failures == []
+
+
+def test_resolve_config_float_prefers_cli_then_gates_then_top_level() -> None:
+    module = _load_module()
+
+    payload = {
+        "min_exact_match_rate": 0.6,
+        "gates": {
+            "min_exact_match_rate": 0.7,
+        },
+    }
+
+    assert (
+        module._resolve_config_float(
+            cli_value=0.8,
+            cases_payload=payload,
+            key="min_exact_match_rate",
+            default_value=0.0,
+        )
+        == 0.8
+    )
+    assert (
+        module._resolve_config_float(
+            cli_value=None,
+            cases_payload=payload,
+            key="min_exact_match_rate",
+            default_value=0.0,
+        )
+        == 0.7
+    )
+    assert (
+        module._resolve_config_float(
+            cli_value=None,
+            cases_payload={"max_null_miss_rate": 0.2},
+            key="max_null_miss_rate",
+            default_value=1.0,
+        )
+        == 0.2
+    )
+
+
+def test_resolve_optional_path_handles_relative_paths_from_cases_dir() -> None:
+    module = _load_module()
+
+    cases_path = Path("D:/repo/backend/tests/fixtures/field/cases.golden-loop.json")
+
+    resolved = module._resolve_optional_path(
+        cli_value=None,
+        cases_payload={"baseline": "./baselines/pet_name.baseline.json"},
+        payload_key="baseline",
+        cases_path=cases_path,
+    )
+
+    assert resolved is not None
+    assert (
+        str(resolved)
+        .replace("\\", "/")
+        .endswith("/backend/tests/fixtures/field/baselines/pet_name.baseline.json")
+    )
