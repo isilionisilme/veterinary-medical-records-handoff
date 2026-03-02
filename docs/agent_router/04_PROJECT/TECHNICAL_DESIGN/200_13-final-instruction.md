@@ -2,7 +2,7 @@
 
 Follow:
 - this document for **architecture and behavior**
-- `IMPLEMENTATION_PLAN.md` for **scope and sequencing**
+- `implementation-plan.md` for **scope and sequencing**
 
 If any conflict exists, **STOP and ask for clarification**.
 

@@ -21,10 +21,10 @@ As a veterinarian, I want the review view to always use the full Global Schema t
 - Confidence payload naming follows the hard-rename contract: `field_mapping_confidence`, `text_extraction_reliability`, and `field_review_history_adjustment`.
 
 **Authoritative References**
-- Product: Global schema authority and field list: [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md) section **Global Schema (Canonical Field List)**.
-- UX: Rendering and placeholder behavior: [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md) section **Review UI Rendering Rules (Global Schema Template)**.
-- Tech: Structured interpretation schema and partial payload boundary: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D.
-- Frontend implementation notes: [`docs/projects/veterinary-medical-records/tech/FRONTEND_IMPLEMENTATION.md`](../FRONTEND_IMPLEMENTATION/00_entry.md) section **Review Rendering Backbone (Global Schema)**.
+- Product: Global schema authority and field list: [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md) section **Global Schema (Canonical Field List)**.
+- UX: Rendering and placeholder behavior: [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md) section **Review UI Rendering Rules (Global Schema Template)**.
+- Tech: Structured interpretation schema and partial payload boundary: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D.
+- Frontend implementation notes: [`docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md`](../FRONTEND_IMPLEMENTATION/00_entry.md) section **Review Rendering Backbone (Global Schema)**.
 
 **Test Expectations**
 - Review screens always show the same section/key structure, independent of extraction completeness.
@@ -33,8 +33,8 @@ As a veterinarian, I want the review view to always use the full Global Schema t
 
 **Definition of Done (DoD)**
 - Acceptance criteria satisfied.
-- Unit + integration tests per [docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
-- Follow UX guidance from [docs/shared/UX_GUIDELINES.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/design/UX_DESIGN.md](../UX_DESIGN/00_entry.md), if applicable.
-- Apply [docs/shared/BRAND_GUIDELINES.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
+- Unit + integration tests per [docs/projects/veterinary-medical-records/02-tech/technical-design.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
+- Follow UX guidance from [docs/shared/01-product/ux-guidelines.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/01-product/ux-design.md](../UX_DESIGN/00_entry.md), if applicable.
+- Apply [docs/shared/01-product/brand-guidelines.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
 
 ---

@@ -19,11 +19,11 @@ As a veterinarian, I want to edit structured information extracted from a docume
 - Editing applies to runs that have an active interpretation; this is expected for PDFs (see Technical Design Appendix E).
 
 **Authoritative References**
-- Tech: Versioning invariants (append-only interpretations): [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A3 + Appendix B2.4
-- Tech: Field change log contract: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B2.5
-- Tech: Edit endpoint contract: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3.1
-- UX: Immediate local correction, no extra feedback steps: [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md) Section 4
-- Tech: Extraction/interpretation scope (PDF): [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix E
+- Tech: Versioning invariants (append-only interpretations): [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A3 + Appendix B2.4
+- Tech: Field change log contract: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B2.5
+- Tech: Edit endpoint contract: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3.1
+- UX: Immediate local correction, no extra feedback steps: [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md) Section 4
+- Tech: Extraction/interpretation scope (PDF): [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix E
 
 **Test Expectations**
 - Each edit produces a new interpretation version and appends change-log entries.
@@ -31,8 +31,8 @@ As a veterinarian, I want to edit structured information extracted from a docume
 
 **Definition of Done (DoD)**
 - Acceptance criteria satisfied.
-- Unit + integration tests per [docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
-- Follow UX guidance from [docs/shared/UX_GUIDELINES.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/design/UX_DESIGN.md](../UX_DESIGN/00_entry.md), if applicable.
-- Apply [docs/shared/BRAND_GUIDELINES.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
+- Unit + integration tests per [docs/projects/veterinary-medical-records/02-tech/technical-design.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
+- Follow UX guidance from [docs/shared/01-product/ux-guidelines.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/01-product/ux-design.md](../UX_DESIGN/00_entry.md), if applicable.
+- Apply [docs/shared/01-product/brand-guidelines.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
 
 ---

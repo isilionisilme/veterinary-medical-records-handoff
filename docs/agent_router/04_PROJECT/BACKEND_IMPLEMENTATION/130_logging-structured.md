@@ -8,4 +8,4 @@ Each log entry MUST include:
 - `timestamp`
 - `error_code` (nullable)
 
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A8.1 (Event Type Taxonomy).
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A8.1 (Event Type Taxonomy).

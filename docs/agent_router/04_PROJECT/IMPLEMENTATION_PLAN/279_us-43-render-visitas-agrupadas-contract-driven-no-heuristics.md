@@ -33,15 +33,15 @@ Out of scope:
 9) For documents without visit structure, the current experience remains without visible regressions.
 
 ## Story-specific technical requirements
-- Mantener la autoridad de contrato en `docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md` Appendix D9; no redefinir payloads en esta historia.
-- Contract-driven rendering and placement boundaries must follow `docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md` Appendix D9.
+- Mantener la autoridad de contrato en `docs/projects/veterinary-medical-records/02-tech/technical-design.md` Appendix D9; no redefinir payloads en esta historia.
+- Contract-driven rendering and placement boundaries must follow `docs/projects/veterinary-medical-records/02-tech/technical-design.md` Appendix D9.
 - Implementar render sin heurísticas: no crear, fusionar, reasignar ni inferir visitas desde frontend.
 - Mantener reglas de separación entre datos de documento y datos de visita según D9.
 - Mantener comportamiento de search/filter de US-34 sin reagrupación.
 - Añadir cobertura de pruebas para orden estable, bloque sin asignar, estado vacío de visitas y regresión de experiencia vigente.
 
 ## Authoritative References
-- `docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md` Appendix D9
-- `docs/projects/veterinary-medical-records/design/UX_DESIGN.md`
+- `docs/projects/veterinary-medical-records/02-tech/technical-design.md` Appendix D9
+- `docs/projects/veterinary-medical-records/01-product/ux-design.md`
 
 ---

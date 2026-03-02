@@ -9,4 +9,4 @@ It does not define:
 - learning mechanisms.
 
 If a UX decision cannot be resolved using this document and
-[`docs/shared/UX_GUIDELINES.md`](../../03_SHARED/UX_GUIDELINES/00_entry.md), it must be escalated to Product Design.
+[`docs/shared/01-product/ux-guidelines.md`](../../03_SHARED/UX_GUIDELINES/00_entry.md), it must be escalated to Product Design.

@@ -11,7 +11,7 @@ PDF.js must be configured with an explicit worker (required for production build
 In Vite, use a worker URL import and assign it to `GlobalWorkerOptions.workerSrc`.
 
 ## Paging and navigation rules
-- Evidence `page` values are **1-based** (as defined in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md)). Keep viewer navigation 1-based.
+- Evidence `page` values are **1-based** (as defined in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md)). Keep viewer navigation 1-based.
 - "Next" / "Previous" scroll within the viewer's scroll container only (no global page scroll hijacking).
 - Track active page based on scroll position (IntersectionObserver), keeping the page index in sync with what is visible.
 - Show placeholders while a page is loading/rendering; empty/blank content must be treated as a normal transient state.

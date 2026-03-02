@@ -32,12 +32,12 @@ E) Información del informe
 - `language` (string)
 
 Visit-level fields:
-- Visit-level clinical data is canonical in `canonical contract` under `visits[]` and `visits[].fields[]` (see Appendix D9 in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](TECHNICAL_DESIGN.md)).
+- Visit-level clinical data is canonical in `canonical contract` under `visits[]` and `visits[].fields[]` (see Appendix D9 in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md)).
 - Visit fields are not part of the document-level top-level list above.
 
 Panel boundary (Medical Record MVP):
 - Non-clinical claim concepts are not part of this canonical panel field-set by definition.
-- Classification and taxonomy boundaries are defined by contract metadata in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](TECHNICAL_DESIGN.md), not by frontend denylists.
+- Classification and taxonomy boundaries are defined by contract metadata in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md), not by frontend denylists.
 
 Product compatibility rule:
 - `age` and `dob` may coexist; any derived display behavior is defined by UX and does not imply new extraction requirements.
@@ -51,4 +51,4 @@ Canonical source note:
 - The panel renders a **contract-defined Medical Record field-set and taxonomy** (document-level, visit-level, and explicit other/unmapped bucket).
 - In `canonical contract`, required document-level panel fields (including missing-value slots) are defined by the Technical contract template (`medical_record_view.field_slots[]`, Appendix D9).
 - Non-clinical claim concepts are out of scope for this panel.
-- Labels/copy and empty-states for this panel are defined in [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](UX_DESIGN.md).
+- Labels/copy and empty-states for this panel are defined in [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](ux-design.md).

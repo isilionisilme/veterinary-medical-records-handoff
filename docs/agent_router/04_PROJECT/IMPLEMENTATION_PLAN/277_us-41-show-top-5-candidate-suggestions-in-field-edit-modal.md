@@ -5,7 +5,7 @@ As a veterinarian reviewer, I want to see a small list of alternative extracted 
 
 **Acceptance Criteria**
 Data contract (standard review payload)
-- The standard review payload includes optional per-field `candidate_suggestions` as defined in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) section **Field Candidate Suggestions (standard review payload)**.
+- The standard review payload includes optional per-field `candidate_suggestions` as defined in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) section **Field Candidate Suggestions (standard review payload)**.
 - Backwards compatible: clients MAY ignore `candidate_suggestions`.
 
 UI (existing edit modal only)
@@ -29,10 +29,10 @@ No layout disruption
 - Candidates may be derived from existing debug candidate logic, but must be surfaced via the standard payload contract referenced above (not gated by debug env flag).
 
 **Authoritative References**
-- [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md)
-- [`docs/projects/veterinary-medical-records/design/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM/00_entry.md)
-- [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md)
-- [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) section **Field Candidate Suggestions (standard review payload)**
+- [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md)
+- [`docs/projects/veterinary-medical-records/01-product/design-system.md`](../DESIGN_SYSTEM/00_entry.md)
+- [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md)
+- [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) section **Field Candidate Suggestions (standard review payload)**
 
 **Test Expectations**
 Backend:

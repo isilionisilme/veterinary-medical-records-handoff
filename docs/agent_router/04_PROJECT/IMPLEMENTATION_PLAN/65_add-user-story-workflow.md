@@ -2,7 +2,7 @@
 
 Use this workflow when asked to add a new User Story to the plan.
 
-## Required updates in `docs/projects/veterinary-medical-records/delivery/IMPLEMENTATION_PLAN.md`
+## Required updates in `docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`
 
 Update the plan in exactly two places:
 

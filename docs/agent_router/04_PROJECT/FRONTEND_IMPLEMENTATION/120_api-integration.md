@@ -3,8 +3,8 @@
 Server state is managed exclusively via **TanStack Query**.
 
 ## Contract authority (backend)
-- Endpoint paths, payload shapes, and error semantics are owned by [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) (Appendix B3/B3.2).
-- This document references contracts for implementation convenience only; if any conflict exists, [`TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) wins.
+- Endpoint paths, payload shapes, and error semantics are owned by [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) (Appendix B3/B3.2).
+- This document references contracts for implementation convenience only; if any conflict exists, [`technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) wins.
 
 ## Error handling (authoritative rule)
 The frontend MUST branch on `error_code` (and optional `details.reason`) only.

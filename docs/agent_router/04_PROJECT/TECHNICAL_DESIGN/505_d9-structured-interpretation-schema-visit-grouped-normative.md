@@ -194,6 +194,6 @@ Sufficient evidence boundary for assigned VisitGroup creation (US-45, determinis
 
 - This appendix is the technical source of truth for payload taxonomy and deterministic buckets (`fields[]`, `visits[]`, `other_fields[]`, and classification metadata).
 - Frontend consumers MUST render Medical Record structure from contract metadata only; they MUST NOT infer grouping/classification heuristically.
-- UX labels/copy are defined in [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md); this appendix defines contract semantics only.
+- UX labels/copy are defined in [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md); this appendix defines contract semantics only.
 
 ---

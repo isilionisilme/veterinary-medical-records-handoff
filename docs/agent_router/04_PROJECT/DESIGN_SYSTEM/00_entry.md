@@ -3,7 +3,7 @@
 Use this module for project-level design system rules.
 
 Source of truth:
-- `docs/projects/veterinary-medical-records/design/DESIGN_SYSTEM.md`
+- `docs/projects/veterinary-medical-records/01-product/design-system.md`
 
 Propagation note:
 - Confidence tooltip content standard includes optional breakdown lines and positive/negative/neutral adjustment styling using existing semantic tokens.

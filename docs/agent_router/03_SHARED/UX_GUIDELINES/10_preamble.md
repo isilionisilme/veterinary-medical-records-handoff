@@ -7,6 +7,6 @@ It is **project-agnostic** and must not contain product- or initiative-specific
 flows, behaviors, roles, or domain assumptions.
 
 If any UX decision depends on product context, it must be defined in the
-corresponding **project-level UX document** (e.g. [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../../04_PROJECT/UX_DESIGN/00_entry.md)).
+corresponding **project-level UX document** (e.g. [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../04_PROJECT/UX_DESIGN/00_entry.md)).
 
 ---

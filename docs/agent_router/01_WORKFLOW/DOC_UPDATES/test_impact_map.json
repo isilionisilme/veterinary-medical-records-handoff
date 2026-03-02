@@ -7,8 +7,8 @@
     "docs/shared/**/*.md"
   ],
   "exclude_doc_globs": [
-    "docs/projects/veterinary-medical-records/delivery/plans/*",
-    "docs/projects/veterinary-medical-records/delivery/plans/**/*"
+    "docs/projects/veterinary-medical-records/04-delivery/plans/*",
+    "docs/projects/veterinary-medical-records/04-delivery/plans/**/*"
   ],
   "rules": [
     {
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "doc_glob": "docs/shared/BRAND_GUIDELINES.md",
+      "doc_glob": "docs/shared/01-product/brand-guidelines.md",
       "description": "Shared BRAND_GUIDELINES changes require propagation to its owner module and brand guard alignment.",
       "owner_any": [
         "docs/agent_router/03_SHARED/BRAND_GUIDELINES/*.md",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "doc_glob": "docs/shared/ENGINEERING_PLAYBOOK.md",
+      "doc_glob": "docs/shared/03-ops/engineering-playbook.md",
       "description": "Shared ENGINEERING_PLAYBOOK changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/*.md",
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "doc_glob": "docs/shared/UX_GUIDELINES.md",
+      "doc_glob": "docs/shared/01-product/ux-guidelines.md",
       "description": "Shared UX_GUIDELINES changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/03_SHARED/UX_GUIDELINES/*.md",
@@ -81,17 +81,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/README.md",
-      "description": "Project root README changes require doc-updates guard alignment.",
-      "required_any": [
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
-      ]
-    },
-    {
-      "doc_glob": "docs/shared/LLM_BENCHMARKS.md",
+      "doc_glob": "docs/shared/02-tech/llm-benchmarks.md",
       "description": "Shared LLM_BENCHMARKS changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -101,7 +91,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/ops/MANUAL_QA_REGRESSION_CHECKLIST.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/manual-qa-regression-checklist.md",
       "description": "Project MANUAL_QA_REGRESSION_CHECKLIST changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -111,7 +101,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/archive/DOCS_IMPROVEMENT_PLAN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/99-archive/DOCS_IMPROVEMENT_PLAN.md",
       "description": "DOCS_IMPROVEMENT_PLAN changes require doc-updates guard alignment for this documentation refactor stream.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -120,7 +110,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/archive/AI_ITERATIVE_EXECUTION_PLAN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/99-archive/AI_ITERATIVE_EXECUTION_PLAN.md",
       "description": "Project AI_ITERATIVE_EXECUTION_PLAN changes (including new execution phases like F8/F9+, canonical STOP handoff guardrails, and token-efficiency policy) require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/AI_ITERATIVE_EXECUTION_PLAN/*.md",
@@ -134,7 +124,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/delivery/FUTURE_IMPROVEMENTS.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/future-improvements.md",
       "description": "Project FUTURE_IMPROVEMENTS changes require propagation to its owner module and doc-updates guards.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/FUTURE_IMPROVEMENTS/*.md",
@@ -148,7 +138,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/ARCHITECTURE.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/architecture.md",
       "description": "Project ARCHITECTURE changes require doc-updates mapping/guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -158,7 +148,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/adr/**/*.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/adr/**/*.md",
       "description": "Project ADR nested changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -167,7 +157,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/adr/*.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/adr/*.md",
       "description": "Project ADR root-level changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -176,7 +166,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/delivery/DELIVERY_SUMMARY.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/delivery-summary.md",
       "description": "Project DELIVERY_SUMMARY changes require propagation to its owner module; guard infrastructure updates required only for rule-level changes.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/DELIVERY_SUMMARY/*.md",
@@ -192,7 +182,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/archive/12_FACTOR_AUDIT.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/99-archive/12-factor-audit.md",
       "description": "Project 12_FACTOR_AUDIT changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/12_FACTOR_AUDIT/*.md",
@@ -206,7 +196,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/archive/codebase_audit.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/99-archive/codebase-audit.md",
       "description": "Project codebase_audit changes (including finding status updates such as SQLite concurrency remediation) require doc sync/parity guard alignment.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/CODEBASE_AUDIT/*.md",
@@ -220,7 +210,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/archive/CTO_REVIEW_VERDICT.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/99-archive/cto-review-verdict.md",
       "description": "Project CTO_REVIEW_VERDICT changes require propagation to its owner module and doc-updates guards.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/00_entry.md",
@@ -235,7 +225,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/ops/PLAN_E2E_TEST_COVERAGE.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-e2e-test-coverage.md",
       "description": "Project testing plans require doc-updates mapping/guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -245,7 +235,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/BACKEND_IMPLEMENTATION.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/backend-implementation.md",
       "description": "Project BACKEND_IMPLEMENTATION changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/BACKEND_IMPLEMENTATION/*.md",
@@ -261,7 +251,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/design/DESIGN_SYSTEM.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/01-product/design-system.md",
       "description": "Project DESIGN_SYSTEM changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/DESIGN_SYSTEM/*.md",
@@ -275,7 +265,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/FRONTEND_IMPLEMENTATION.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md",
       "description": "Project FRONTEND_IMPLEMENTATION changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/FRONTEND_IMPLEMENTATION/*.md",
@@ -289,7 +279,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/delivery/IMPLEMENTATION_PLAN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md",
       "description": "Project IMPLEMENTATION_PLAN changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/*.md",
@@ -303,7 +293,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/01-product/product-design.md",
       "description": "Project PRODUCT_DESIGN changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/PRODUCT_DESIGN/*.md",
@@ -317,7 +307,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/delivery/IMPLEMENTATION_HISTORY.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/implementation-history.md",
       "description": "Project IMPLEMENTATION_HISTORY changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -327,7 +317,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/ops/EXECUTION_RULES.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
       "description": "Project EXECUTION_RULES changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -337,7 +327,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/metrics/COPILOT_USAGE.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/copilot-usage.md",
       "description": "Project COPILOT_USAGE changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -347,7 +337,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/ops/PLAN_E2E_TEST_COVERAGE.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-e2e-test-coverage.md",
       "description": "Project testing plan changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
@@ -357,7 +347,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/02-tech/technical-design.md",
       "description": "Project TECHNICAL_DESIGN changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/*.md",
@@ -371,7 +361,7 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/design/UX_DESIGN.md",
+      "doc_glob": "docs/projects/veterinary-medical-records/01-product/ux-design.md",
       "description": "Project UX_DESIGN changes require propagation to its owner module.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/UX_DESIGN/*.md",

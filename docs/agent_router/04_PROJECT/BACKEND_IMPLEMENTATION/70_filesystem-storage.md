@@ -1,7 +1,7 @@
 # Filesystem storage
 
 ## Deterministic paths (authoritative)
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B5 (Filesystem Management Rules).
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B5 (Filesystem Management Rules).
 
 Store the original upload under:
 - `/storage/{document_id}/original{ext}`
@@ -39,4 +39,4 @@ Environment knobs (current codebase):
 If DB references an artifact but the filesystem is missing, return:
 - `410 Gone` with `error_code = ARTIFACT_MISSING`
 
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3.2 + Appendix B5.
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3.2 + Appendix B5.

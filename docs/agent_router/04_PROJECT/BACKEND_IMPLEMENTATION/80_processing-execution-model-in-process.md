@@ -5,7 +5,7 @@
 - Processing runs in background, in-process (task runner / executor / internal loop).
 
 ## Scheduler semantics
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.5 + B1.5.1.
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.5 + B1.5.1.
 
 Implementation guidance:
 - Use a fixed tick with sleep (no busy-loop).
@@ -29,10 +29,10 @@ On application startup:
 - Transition it to `FAILED` with `failure_type = PROCESS_TERMINATED`.
 - Emit log event `RUN_RECOVERED_AS_FAILED`.
 
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.3 + Appendix C3.
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.3 + Appendix C3.
 
 ## Retry + timeout policy
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.4 + B1.4.1.
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B1.4 + B1.4.1.
 
 Implementation guidance:
 - Retries are local to a single run and limited to the fixed default (no new runs).

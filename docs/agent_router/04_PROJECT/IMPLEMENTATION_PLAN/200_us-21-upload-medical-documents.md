@@ -21,17 +21,17 @@ As a user, I want to upload a medical document so that the system can start proc
 - This story does not add preview/rendering, raw-text visibility, or review/edit experiences.
 
 **Authoritative References**
-- Tech: API surface + upload requirements + errors: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3/B3.2
-- Tech: Processing model and run invariants: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Sections 3–4 + Appendix A2
-- UX: Global upload experience and feedback heuristics: [`docs/shared/UX_GUIDELINES.md`](../../03_SHARED/UX_GUIDELINES/00_entry.md)
-- UX: Project interaction contract: [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md) Sections 1–4
-- UX: User-facing copy tone: [`docs/shared/BRAND_GUIDELINES.md`](../../03_SHARED/BRAND_GUIDELINES/00_entry.md)
+- Tech: API surface + upload requirements + errors: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3/B3.2
+- Tech: Processing model and run invariants: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Sections 3–4 + Appendix A2
+- UX: Global upload experience and feedback heuristics: [`docs/shared/01-product/ux-guidelines.md`](../../03_SHARED/UX_GUIDELINES/00_entry.md)
+- UX: Project interaction contract: [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md) Sections 1–4
+- UX: User-facing copy tone: [`docs/shared/01-product/brand-guidelines.md`](../../03_SHARED/BRAND_GUIDELINES/00_entry.md)
 
 **Story-specific technical requirements**
-- Reuse the existing upload contract and backend validation rules as defined in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3/B3.2.
+- Reuse the existing upload contract and backend validation rules as defined in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B3/B3.2.
 - Do not introduce new ingestion endpoints, domain logic, or workflow states; rely only on the API response for UI behavior.
-- Preserve existing observability contracts (events/metrics/log taxonomy) as defined in [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md).
-- Follow implementation conventions in [`docs/projects/veterinary-medical-records/tech/BACKEND_IMPLEMENTATION.md`](../BACKEND_IMPLEMENTATION/00_entry.md) and [`docs/projects/veterinary-medical-records/tech/FRONTEND_IMPLEMENTATION.md`](../FRONTEND_IMPLEMENTATION/00_entry.md).
+- Preserve existing observability contracts (events/metrics/log taxonomy) as defined in [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md).
+- Follow implementation conventions in [`docs/projects/veterinary-medical-records/02-tech/backend-implementation.md`](../BACKEND_IMPLEMENTATION/00_entry.md) and [`docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md`](../FRONTEND_IMPLEMENTATION/00_entry.md).
 
 **Test Expectations**
 - Upload succeeds for supported PDFs and provides the expected user-facing feedback states.
@@ -40,8 +40,8 @@ As a user, I want to upload a medical document so that the system can start proc
 
 **Definition of Done (DoD)**
 - Acceptance criteria satisfied.
-- Unit + integration tests per [docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
-- Follow UX guidance from [docs/shared/UX_GUIDELINES.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/design/UX_DESIGN.md](../UX_DESIGN/00_entry.md), if applicable.
-- Apply [docs/shared/BRAND_GUIDELINES.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
+- Unit + integration tests per [docs/projects/veterinary-medical-records/02-tech/technical-design.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
+- Follow UX guidance from [docs/shared/01-product/ux-guidelines.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/01-product/ux-design.md](../UX_DESIGN/00_entry.md), if applicable.
+- Apply [docs/shared/01-product/brand-guidelines.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
 
 ---

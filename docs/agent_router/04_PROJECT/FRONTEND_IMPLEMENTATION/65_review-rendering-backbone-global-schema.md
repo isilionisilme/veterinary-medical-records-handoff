@@ -1,7 +1,7 @@
 # Review Rendering Backbone (Global Schema)
 
 Rendering authority for the full key universe, ordering, section grouping, repeatability, and fallback rules is
-[`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md) (Global Schema).
+[`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md) (Global Schema).
 
 Frontend implementation guidance:
 - Use Global Schema as the review rendering backbone.

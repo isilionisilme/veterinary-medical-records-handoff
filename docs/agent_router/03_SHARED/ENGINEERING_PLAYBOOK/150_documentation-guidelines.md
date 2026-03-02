@@ -133,7 +133,7 @@ A change is not complete if implementation and documentation diverge.
 
 ## How to add a new User Story
 
-When asked to add a new User Story, update [`docs/projects/veterinary-medical-records/delivery/IMPLEMENTATION_PLAN.md`](../../../projects/veterinary-medical-records/delivery/IMPLEMENTATION_PLAN.md) in two places:
+When asked to add a new User Story, update [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](../../../projects/veterinary-medical-records/04-delivery/implementation-plan.md) in two places:
 
 1) Add the story in the relevant **User Stories (in order)** list for its release.
 2) Add or update the full **User Story Details** section for that story.

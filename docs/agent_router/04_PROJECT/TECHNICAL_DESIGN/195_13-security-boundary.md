@@ -21,4 +21,4 @@ This preserves low-friction local evaluation while enabling a minimal access gat
 4. Audit logging on protected resources.
 5. Streaming upload with early size rejection (roadmap #9).
 
-Architecture supports this: hexagonal ports/adapters allow inserting auth without domain changes. Roadmap: FUTURE_IMPROVEMENTS.md #15.
+Architecture supports this: hexagonal ports/adapters allow inserting auth without domain changes. Roadmap: future-improvements.md #15.

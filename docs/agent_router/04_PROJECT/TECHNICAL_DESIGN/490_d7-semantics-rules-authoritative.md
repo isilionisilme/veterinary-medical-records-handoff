@@ -22,7 +22,7 @@ Rules (technical, authoritative):
 - This designation MUST NOT block workflows; it only drives UI signaling and internal flags.
 
 Source of truth for `CRITICAL_KEYS`:
-- Defined in [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md) (product authority).
-- The complete Global Schema key list, fixed ordering, section grouping, repeatability rules, and cross-key fallback rules (including `document_date` fallback to `visit_date`) are also governed by [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md).
+- Defined in [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md) (product authority).
+- The complete Global Schema key list, fixed ordering, section grouping, repeatability rules, and cross-key fallback rules (including `document_date` fallback to `visit_date`) are also governed by [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md).
 
 ---

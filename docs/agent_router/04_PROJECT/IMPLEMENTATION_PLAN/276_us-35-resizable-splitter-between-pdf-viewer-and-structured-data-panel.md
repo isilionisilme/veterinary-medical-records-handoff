@@ -41,9 +41,9 @@ As a veterinarian reviewer, I want to resize the PDF and structured-data panels 
 - Pinned source panel mode must keep splitter behavior stable for PDF vs Structured Data.
 
 **Authoritative References**
-- UX: Side-by-side review interaction baseline: [`docs/projects/veterinary-medical-records/design/UX_DESIGN.md`](../UX_DESIGN/00_entry.md) Sections 2–4.
-- Product: Global Schema canonical ordering invariants: [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md) section **Global Schema (Canonical Field List)**.
-- Frontend context: review rendering backbone and deterministic structure: [`docs/projects/veterinary-medical-records/tech/FRONTEND_IMPLEMENTATION.md`](../FRONTEND_IMPLEMENTATION/00_entry.md) section **Review Rendering Backbone (Global Schema)**.
+- UX: Side-by-side review interaction baseline: [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../UX_DESIGN/00_entry.md) Sections 2–4.
+- Product: Global Schema canonical ordering invariants: [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md) section **Global Schema (Canonical Field List)**.
+- Frontend context: review rendering backbone and deterministic structure: [`docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md`](../FRONTEND_IMPLEMENTATION/00_entry.md) section **Review Rendering Backbone (Global Schema)**.
 
 **Test Expectations**
 - Splitter drag updates panel widths while honoring min/max constraints.
@@ -53,8 +53,8 @@ As a veterinarian reviewer, I want to resize the PDF and structured-data panels 
 
 **Definition of Done (DoD)**
 - Acceptance criteria satisfied.
-- Unit + integration tests per [docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
-- Follow UX guidance from [docs/shared/UX_GUIDELINES.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/design/UX_DESIGN.md](../UX_DESIGN/00_entry.md), if applicable.
-- Apply [docs/shared/BRAND_GUIDELINES.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
+- Unit + integration tests per [docs/projects/veterinary-medical-records/02-tech/technical-design.md](../TECHNICAL_DESIGN/00_entry.md) Appendix B7.
+- Follow UX guidance from [docs/shared/01-product/ux-guidelines.md](../../03_SHARED/UX_GUIDELINES/00_entry.md) and [docs/projects/veterinary-medical-records/01-product/ux-design.md](../UX_DESIGN/00_entry.md), if applicable.
+- Apply [docs/shared/01-product/brand-guidelines.md](../../03_SHARED/BRAND_GUIDELINES/00_entry.md), if applicable.
 
 ---

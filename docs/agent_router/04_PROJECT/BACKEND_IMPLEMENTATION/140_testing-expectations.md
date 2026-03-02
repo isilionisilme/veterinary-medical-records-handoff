@@ -1,5 +1,5 @@
 # Testing expectations 
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B7 (Testability Expectations).
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B7 (Testability Expectations).
 
 ## Unit tests (minimum)
 - `document_status` derivation from latest run state

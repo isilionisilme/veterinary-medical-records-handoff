@@ -1,5 +1,5 @@
 # Structured interpretation schema 
-Authority: [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D (Structured Interpretation Schema visit-grouped canonical contract).
+Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D (Structured Interpretation Schema visit-grouped canonical contract).
 
 Alignment note:
 - Interpretation output may be partial with respect to the full Global Schema key universe.
@@ -7,9 +7,9 @@ Alignment note:
 
 ## Storage contract
 Authority:
-- [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D3 (Relationship to Persistent Model)
-- [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B2.4 (InterpretationVersion)
-- [`docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A3 (Interpretation & Versioning Invariants)
+- [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix D3 (Relationship to Persistent Model)
+- [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix B2.4 (InterpretationVersion)
+- [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../TECHNICAL_DESIGN/00_entry.md) Appendix A3 (Interpretation & Versioning Invariants)
 
 Implementation responsibility:
 - Store the structured interpretation JSON as `InterpretationVersion.data`.
@@ -18,7 +18,7 @@ Implementation responsibility:
 
 ## Critical keys
 `StructuredField.is_critical` MUST be derived from `key ∈ CRITICAL_KEYS`.
-Source of truth: [`docs/projects/veterinary-medical-records/design/PRODUCT_DESIGN.md`](../PRODUCT_DESIGN/00_entry.md).
+Source of truth: [`docs/projects/veterinary-medical-records/01-product/product-design.md`](../PRODUCT_DESIGN/00_entry.md).
 
 Backend responsibility:
 - Apply deterministic derivation at write-time (or validate on write).

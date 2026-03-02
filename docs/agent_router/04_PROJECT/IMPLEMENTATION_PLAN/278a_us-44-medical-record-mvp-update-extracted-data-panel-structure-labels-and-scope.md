@@ -51,14 +51,14 @@ so that I can review and edit clinical information quickly in a clinical-only pa
 8) The reviewer sees “Visitas” grouped by visit, without mixed data between different visits.
 
 ## Story-specific technical requirements
-- Keep contract authority in `docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md` (Appendix D9 or equivalent authoritative section); do not redefine contract structure in this plan.
-- Keep copy/labels/empty states aligned with `docs/projects/veterinary-medical-records/design/UX_DESIGN.md`.
+- Keep contract authority in `docs/projects/veterinary-medical-records/02-tech/technical-design.md` (Appendix D9 or equivalent authoritative section); do not redefine contract structure in this plan.
+- Keep copy/labels/empty states aligned with `docs/projects/veterinary-medical-records/01-product/ux-design.md`.
 - Use contract-driven rendering for visit grouping and “Otros campos detectados”; no UI-side heuristics or reclassification.
 - If required contract capabilities are missing (e.g., explicit “other” bucket or owner address concept), this story is blocked until TECHNICAL_DESIGN is updated and backend output is aligned.
 - Add/adjust UI tests for section order, clinical-only scope, NHC behavior, and owner address labeling.
 
 ## Dependencies / Placement
-- Depends on UX copy/spec being updated in `docs/projects/veterinary-medical-records/design/UX_DESIGN.md`.
+- Depends on UX copy/spec being updated in `docs/projects/veterinary-medical-records/01-product/ux-design.md`.
 - **Placement:** implement **US-44 before US-43** (US-44 remains separate).
 
 ---

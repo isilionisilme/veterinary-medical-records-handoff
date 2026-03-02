@@ -37,7 +37,7 @@ from .routes_common import _request_content_length, error_response, log_event
 router = APIRouter(tags=["Documents"])
 
 # Normative default: 20 MB (see
-# docs/projects/veterinary-medical-records/tech/TECHNICAL_DESIGN.md Appendix B3.2).
+# docs/projects/veterinary-medical-records/02-tech/technical-design.md Appendix B3.2).
 MAX_UPLOAD_SIZE = 20 * 1024 * 1024  # 20 MB
 ALLOWED_CONTENT_TYPES = {
     "application/pdf",

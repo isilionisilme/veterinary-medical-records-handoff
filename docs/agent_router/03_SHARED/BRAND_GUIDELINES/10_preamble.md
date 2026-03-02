@@ -5,4 +5,6 @@ Single source of truth for **visual identity** (colors/typography/layout primiti
 
 **Note:** This is the canonical location.
 
+Canonical source path: `docs/shared/01-product/brand-guidelines.md`.
+
 ---
