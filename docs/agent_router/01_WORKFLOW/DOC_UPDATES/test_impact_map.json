@@ -308,7 +308,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/implementation-history.md",
-      "description": "Project IMPLEMENTATION_HISTORY changes require doc-updates guard alignment.",
+      "description": "Project IMPLEMENTATION_HISTORY changes (including iteration close-out entries) require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
