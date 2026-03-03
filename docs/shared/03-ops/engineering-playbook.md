@@ -1,73 +1,4 @@
----
-title: "Engineering Guidelines"
-type: reference
-status: active
-audience: contributor
-last-updated: 2026-03-02
----
-
 # Engineering Guidelines
-
-
-**Breadcrumbs:** [Docs](../../README.md) / Shared / 03-ops
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-  - [Change discipline](#change-discipline)
-  - [Code style & consistency](#code-style--consistency)
-  - [Structure & separation of concerns](#structure--separation-of-concerns)
-  - [Explicit contracts & schemas](#explicit-contracts--schemas)
-  - [State management & workflow safety](#state-management--workflow-safety)
-  - [Traceability & human control](#traceability--human-control)
-  - [Error handling & observability](#error-handling--observability)
-  - [Observability & metrics](#observability--metrics)
-  - [Testing discipline](#testing-discipline)
-  - [Data handling & safety](#data-handling--safety)
-  - [Configuration & environment separation](#configuration--environment-separation)
-  - [Versioning & evolution](#versioning--evolution)
-  - [Dependency management](#dependency-management)
-  - [Documentation Guidelines](#documentation-guidelines)
-    - [Purpose](#purpose)
-    - [Documentation layers](#documentation-layers)
-    - [In-code documentation rules](#in-code-documentation-rules)
-    - [Types and contracts](#types-and-contracts)
-    - [API documentation rules](#api-documentation-rules)
-    - [Public interface documentation](#public-interface-documentation)
-    - [Architecture and design documentation](#architecture-and-design-documentation)
-    - [Commenting rules](#commenting-rules)
-    - [Documentation maintenance rule](#documentation-maintenance-rule)
-    - [How to add a new User Story](#how-to-add-a-new-user-story)
-  - [Naming conventions](#naming-conventions)
-    - [Git and delivery workflow](#git-and-delivery-workflow)
-    - [API and endpoints](#api-and-endpoints)
-    - [Domain concepts and models](#domain-concepts-and-models)
-    - [Lifecycle states](#lifecycle-states)
-    - [Persistence artifacts](#persistence-artifacts)
-- [Way of Working](#way-of-working)
-  - [Starting New Work (Branch First)](#starting-new-work-branch-first)
-    - [Procedure](#procedure)
-  - [Delivery Model (Releases)](#delivery-model-releases)
-  - [Branching Strategy](#branching-strategy)
-  - [Commit Discipline](#commit-discipline)
-  - [Pull Requests](#pull-requests)
-    - [Plan-level PR Roadmap](#plan-level-pr-roadmap)
-    - [Pull Request Automation (AI Assistants)](#pull-request-automation-ai-assistants)
-    - [Pull Request Procedure](#pull-request-procedure)
-    - [Pull Request review visibility](#pull-request-review-visibility)
-    - [Post-merge Cleanup (AI Assistants)](#post-merge-cleanup-ai-assistants)
-      - [Post-merge cleanup checklist](#post-merge-cleanup-checklist)
-  - [Code Reviews](#code-reviews)
-    - [Code Review stance](#code-review-stance)
-    - [Code Review Guidelines](#code-review-guidelines)
-    - [Code Review Output Format](#code-review-output-format)
-    - [Code Review Safety rule](#code-review-safety-rule)
-  - [User Story kickoff checklist](#user-story-kickoff-checklist)
-  - [Definition of Done](#definition-of-done)
-  - [Execution Rule](#execution-rule)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 **Purpose**  
 These guidelines define the **mandatory engineering standards** for this project.  
@@ -646,6 +577,7 @@ Only STOP and ask for confirmation if the repository state is unsafe or ambiguou
      - If unique commits exist, STOP and ask what to do.
 
 By default, this procedure deletes only local state (local branches and stashes). Do not delete remote branches unless explicitly requested.
+
 
 ## Code Reviews
 

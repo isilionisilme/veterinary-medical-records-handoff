@@ -1,30 +1,6 @@
----
-title: "Manual QA Regression Checklist"
-type: how-to
-status: active
-audience: all
-last-updated: 2026-03-02
----
-
 # Manual QA Regression Checklist
 
-
-**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 03-ops
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [Goal](#goal)
-- [Environment Blocks](#environment-blocks)
-- [QA Template (recommended execution order)](#qa-template-recommended-execution-order)
-- [Run Header Template](#run-header-template)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Goal
-
-Use a user-centered manual regression checklist grouped by shared environment to minimize context switching between test cases.
+Purpose: user-centered manual regression checklist grouped by shared environment to minimize context switching between test cases.
 
 ## Environment Blocks
 
@@ -78,3 +54,4 @@ Use a user-centered manual regression checklist grouped by shared environment to
 | Environment | Local / Docker / Staging |
 | Tester |  |
 | Dataset |  |
+
