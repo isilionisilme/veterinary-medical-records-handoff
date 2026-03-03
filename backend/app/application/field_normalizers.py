@@ -12,6 +12,23 @@ _DATE_PATTERN = re.compile(
 )
 _MICROCHIP_DIGITS_PATTERN = re.compile(r"(?<!\d)(\d{9,15})(?!\d)")
 
+# pet_name normalization helpers
+_PET_NAME_TRAILING_NOISE = re.compile(
+    r"\s*[-–—]\s*(?:nacimiento|nac\.?|dob|birth|f\.?\s*nac).*$",
+    re.IGNORECASE,
+)
+_PET_NAME_NUMERIC_ONLY = re.compile(r"^\d+$")
+_PET_NAME_LOOKS_LIKE_LABEL = re.compile(
+    r"(?i)^(?:especie|raza|sexo|peso|edad|chip|fecha|breed|species|sex|age|weight)"
+    r"\s*[:\-|]",
+)
+_CLINIC_NAME_LEADING_LABEL = re.compile(
+    r"(?i)^(?:cl[ií]nica|centro\s+veterinari[oa]|hospital\s+veterinari[oa])\s*[:\-|]\s*"
+)
+_CLINIC_NAME_ADDRESS_LIKE = re.compile(
+    r"(?i)\b(?:c/|calle|av\.?|avenida|cp\b|portal|piso|puerta|direcci[oó]n|domicilio)\b"
+)
+
 CANONICAL_SPECIES: frozenset[str] = frozenset({"canino", "felino"})
 
 SPECIES_TOKEN_TO_CANONICAL: dict[str, str] = {
@@ -34,6 +51,8 @@ def normalize_canonical_fields(
 
     normalized = dict(values)
 
+    normalized["pet_name"] = _normalize_pet_name_value(normalized.get("pet_name"))
+    normalized["clinic_name"] = _normalize_clinic_name_value(normalized.get("clinic_name"))
     normalized["species"] = _normalize_species_value(normalized.get("species"))
     normalized["breed"] = _normalize_scalar_with_labels(normalized.get("breed"), ("raza", "breed"))
     normalized = _normalize_species_and_breed_pair(normalized, evidence_map)
@@ -69,6 +88,48 @@ def _normalize_whitespace(value: str) -> str:
     return _WHITESPACE_PATTERN.sub(" ", value).strip()
 
 
+def _normalize_pet_name_value(value: object) -> str | None:
+    """Normalize a raw pet_name candidate.
+
+    Steps:
+    1. Strip trailing date/birth fragments (e.g. "ALYA - Nacimiento: 05/07/2018" → "ALYA").
+    2. Reject purely numeric values ("12345" → None).
+    3. Reject values that look like a field label ("Especie: Canina" → None).
+    4. Title-case the result for presentation consistency.
+    """
+    if not isinstance(value, str):
+        return None
+
+    cleaned = _normalize_whitespace(value)
+    if not cleaned:
+        return None
+
+    # Strip trailing birth-date / date-of-birth fragments
+    cleaned = _PET_NAME_TRAILING_NOISE.sub("", cleaned).strip(" -:;,.")
+
+    # Strip stray label echoes (e.g. "Paciente:" prefix leaking)
+    cleaned = re.sub(
+        r"(?i)^(?:paciente|nombre(?:\s+del\s+(?:paciente|animal))?|patient|animal|mascota)\s*[:\-|]\s*",
+        "",
+        cleaned,
+    ).strip()
+
+    cleaned = _normalize_whitespace(cleaned)
+    if not cleaned:
+        return None
+
+    # Reject numeric-only
+    if _PET_NAME_NUMERIC_ONLY.match(cleaned):
+        return None
+
+    # Reject values that look like another field's label: value
+    if _PET_NAME_LOOKS_LIKE_LABEL.match(cleaned):
+        return None
+
+    # Title-case for consistency (ALYA → Alya, luna → Luna)
+    return cleaned.title()
+
+
 def _normalize_scalar_with_labels(value: object, labels: tuple[str, ...]) -> str | None:
     if not isinstance(value, str):
         return None
@@ -86,6 +147,26 @@ def _normalize_scalar_with_labels(value: object, labels: tuple[str, ...]) -> str
 
     cleaned = _normalize_whitespace(cleaned.strip(" -:;,."))
     return cleaned or None
+
+
+def _normalize_clinic_name_value(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+
+    cleaned = _normalize_whitespace(value)
+    if not cleaned:
+        return None
+
+    cleaned = _CLINIC_NAME_LEADING_LABEL.sub("", cleaned).strip(" -:;,.")
+    cleaned = _normalize_whitespace(cleaned)
+    if not cleaned:
+        return None
+
+    lower_cleaned = cleaned.casefold()
+    if _CLINIC_NAME_ADDRESS_LIKE.search(lower_cleaned) and re.search(r"\d", lower_cleaned):
+        return None
+
+    return cleaned
 
 
 def _normalize_species_value(value: object) -> str | None:

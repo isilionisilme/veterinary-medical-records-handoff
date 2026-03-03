@@ -327,6 +327,32 @@ def test_vet_name_heuristic_rejects_address_like_line() -> None:
     assert candidates.get("vet_name", []) == []
 
 
+def test_clinic_name_heuristic_rejects_direction_labeled_line() -> None:
+    candidates = _mine_interpretation_candidates(
+        "Direccion de la clinica: Av. Norte 99\nPaciente: Rocky"
+    )
+
+    assert candidates.get("clinic_name", []) == []
+
+
+def test_clinic_name_heuristic_accepts_ocr_zero_label() -> None:
+    candidates = _mine_interpretation_candidates(
+        "CENTR0 VETERINARI0: Vet Plus Sevilla\nPaciente: Max"
+    )
+
+    clinic_candidates = candidates.get("clinic_name", [])
+    assert clinic_candidates
+    assert clinic_candidates[0]["value"] == "Vet Plus Sevilla"
+
+
+def test_clinic_name_heuristic_accepts_pipe_separator() -> None:
+    candidates = _mine_interpretation_candidates("Clinica | Hospital Vet Costa\nEspecie: Canina")
+
+    clinic_candidates = candidates.get("clinic_name", [])
+    assert clinic_candidates
+    assert clinic_candidates[0]["value"] == "Hospital Vet Costa"
+
+
 def test_mvp_coverage_labeled_fields_are_extracted_with_label_confidence() -> None:
     candidates = _mine_interpretation_candidates(
         "NHC: H-7788\n"

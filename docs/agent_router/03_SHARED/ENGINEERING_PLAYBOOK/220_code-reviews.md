@@ -18,6 +18,40 @@ Apply the following rules by default to every future code review in this repo un
 - Avoid overengineering suggestions.
 - Do not propose new dependencies or new architectural patterns unless explicitly required.
 
+## Pre-review checklist
+
+Before reading the code diff, verify:
+- [ ] CI status is green (or failures are explicitly explained)
+- [ ] PR description exists and matches declared scope
+- [ ] PR scope remains a single user story or single technical concern
+- [ ] If plan-linked, each step carries a valid `**[PR-X]**` tag aligned with the PR Roadmap
+
+If any item fails, report it as Must-fix before continuing the code-level review.
+
+## Severity classification criteria
+
+Use these criteria to classify findings consistently:
+
+**Must-fix** (blocks merge):
+- incorrect behavior or logic error
+- security vulnerability or data leak
+- broken contract (API/schema mismatch, missing validation)
+- layer violation (domain imports infra/framework, business logic in API handlers)
+- missing or broken tests for changed behavior
+- data loss risk or silent overwrite of human edits
+
+**Should-fix** (strong recommendation, merge can proceed with explicit acceptance):
+- naming or structure that obscures intent
+- duplicated logic likely to drift
+- missing error handling for realistic failure modes
+- tests that do not validate meaningful behavior
+- documentation drift from implemented behavior
+
+**Nice-to-have** (optional improvements):
+- style-level improvements within existing conventions
+- small readability refinements
+- simplification ideas that do not affect correctness
+
 ## Code Review Guidelines
 
 When performing code reviews in this repository, use a **maintainability-focused** review style.
@@ -49,6 +83,14 @@ Primary review focus (in order):
 5) CI and tooling sanity:
    - workflows valid
    - tests and lint runnable and reproducible
+   - new environment variables documented with safe defaults
+   - dependency changes in `pyproject.toml` / requirements are justified
+   - Docker/container changes do not break local dev or CI
+6) Database migrations and schema changes:
+   - migration is reversible or has explicit rollback plan
+   - schema change does not cause unintended data loss
+   - defaults and nullability choices are explicit and intentional
+   - migration order matches dependency chain
 
 ## Code Review Output Format
 
@@ -66,6 +108,29 @@ Each finding must include:
 - File reference(s)
 - Short rationale
 - Minimal suggested change
+
+## Test review criteria
+
+When evaluating tests in the PR:
+- tests assert externally observable behavior, not implementation details
+- test names clearly describe scenario and expected outcome
+- changed behavior includes happy path and at least one meaningful failure case
+- tests are independent of execution order and shared mutable state
+- mocks/stubs are minimal and concentrated at infrastructure boundaries
+
+## Large diff policy
+
+If the PR diff exceeds approximately 400 lines of non-generated code:
+- report a Should-fix noting reduced review confidence due to size
+- suggest a split strategy when a clear split is visible
+- continue the review and clearly state any confidence limitations
+
+## Pre-existing issues policy
+
+If you find issues that clearly predate the PR:
+- do not classify them as Must-fix for the current PR
+- report them in a separate "Pre-existing issues" section
+- recommend a follow-up issue when impact is significant
 
 ## Code Review Safety rule
 

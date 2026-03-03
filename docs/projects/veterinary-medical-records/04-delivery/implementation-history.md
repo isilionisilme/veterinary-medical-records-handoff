@@ -1,31 +1,10 @@
----
-title: "Implementation History — Iterative Improvement Timeline"
-type: reference
-status: active
-audience: all
-last-updated: 2026-03-02
----
-
 # Implementation History — Iterative Improvement Timeline
-
-
-**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [Active iteration](#active-iteration)
-- [Timeline](#timeline)
-- [Cumulative progress](#cumulative-progress)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 > Consolidated timeline of all improvement iterations. Each row links to a detailed completed file with step-by-step execution logs.
 
 ## Active iteration
 
-**None** — Iteration 14 closed. Next iteration plan pending.
+**None** — Iteration 17 closed. Next iteration plan pending.
 
 ## Timeline
 
@@ -45,7 +24,13 @@ last-updated: 2026-03-02
 | 12 | 2026-02-27 | #169 | E2E Phase 3-4 expansion + WCAG accessibility + architecture docs + project close-out | 65 E2E tests (22 specs), axe-core WCAG audit, architecture.md, README badges, Known Limitations reframe, 47 files changed | [completed-2026-02-27-iter-12-final.md](completed/completed-2026-02-27-iter-12-final.md) |
 | 13 | 2026-02-28 | #171 | AppWorkspace decomposition round 4 + integration hardening | AppWorkspace 2221→726 LOC (−67%), useReviewDataPipeline 875→357 LOC, 318 frontend tests (48 files), 4 new hook suites | [completed-2026-02-28-decompose-app-workspace.md](completed/completed-2026-02-28-decompose-app-workspace.md) |
 | 14 | 2026-02-28 | #174 | PdfViewer decomposition (hooks + debug modules) | PdfViewer 944→199 LOC, 6 extracted modules, 327 frontend tests (52 files), CI stable after extraction | [completed-2026-02-28-decompose-pdf-viewer.md](completed/completed-2026-02-28-decompose-pdf-viewer.md) |
+| 15 | 2026-03-02 | #182 | Golden loop hardening for `pet_name` extraction | Synthetic benchmark 53.3% → 100.0% EM, null misses 26.7% → 0.0%, false positives 13.3% → 0.0%, focused suite 50 passed | [completed-2026-03-02-golden-loop-pet-name.md](completed/completed-2026-03-02-golden-loop-pet-name.md) |
+| 16 | 2026-03-03 | #186 | Golden loop hardening for `clinic_name` extraction | Hard-gate GO: 340/340 tests green, clinic benchmark 11/11, 0 regressions; review follow-ups merged | [completed-2026-03-02-golden-loop-clinic-name.md](plans/completed/completed-2026-03-02-golden-loop-clinic-name.md) |
+| 17 | 2026-03-03 | #192 | L1/L2/L3 preflight rules alignment in execution protocol | `execution-rules.md` now references L1/L2/L3 + `ForceFull`; contract coverage added for doc references; CI green at merge | [COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md](plans/completed/COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md) |
 
 ## Cumulative progress
 
-See [delivery-summary.md](../refactor/delivery-summary.md) for the full cumulative metrics table across all iterations.
+- Iteration 15 cumulative extraction outcome (`pet_name` golden loop): baseline 8/15 exact matches to final 15/15 exact matches with zero null misses and zero false positives on synthetic fixtures.
+- Iteration 16 cumulative extraction outcome (`clinic_name` golden loop): final synthetic benchmark 11/11 exact matches with no benchmark regressions after review follow-ups.
+- Iteration 17 cumulative process-governance outcome: `execution-rules.md` and local preflight policy are aligned on L1/L2/L3 flow, reducing drift between agent protocol and CI/local guardrails.
+- See [delivery-summary.md](delivery-summary.md) for the broader cumulative metrics table across all iterations.

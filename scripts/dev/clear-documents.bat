@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set "ROOT=%~dp0.."
+set "ROOT=%~dp0..\.."
 for %%I in ("%ROOT%") do set "ROOT=%%~fI"
 
 set "DB=%ROOT%\backend\data\documents.db"
@@ -41,7 +41,7 @@ echo - Storage limpiado.
 
 echo.
 echo OK: documentos e historial locales eliminados.
-echo Puedes volver a arrancar con scripts\start-all.bat
+echo Puedes volver a arrancar con scripts\dev\start-all.bat
 echo.
 
 endlocal

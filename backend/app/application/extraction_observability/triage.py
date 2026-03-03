@@ -18,6 +18,8 @@ from .snapshot import (
 logger = logging.getLogger(__name__)
 _uvicorn_logger = logging.getLogger("uvicorn.error")
 _GOAL_FIELDS = (
+    "pet_name",
+    "clinic_name",
     "microchip_id",
     "owner_name",
     "weight",
@@ -81,6 +83,32 @@ def _suspicious_accepted_flags(field_key: str, value: str | None) -> list[str]:
         flags.append("species_outside_allowed_set")
     if normalized_key == "sex" and _normalize_text(normalized_value) not in {"macho", "hembra"}:
         flags.append("sex_outside_allowed_set")
+    if normalized_key == "pet_name":
+        if normalized_value.isdigit():
+            flags.append("pet_name_numeric_only")
+        if len(normalized_value) <= 1:
+            flags.append("pet_name_too_short")
+        if re.search(r"\b(?:especie|raza|sexo|chip|fecha|peso)\b", normalized_value, re.IGNORECASE):
+            flags.append("pet_name_contains_field_label")
+        if re.search(r"\d{2}[/\-.]\d{2}[/\-.]\d{2,4}", normalized_value):
+            flags.append("pet_name_contains_embedded_date")
+        # Stopword-only names (e.g. "Nombre", "Datos")
+        _stop = {"nombre", "datos", "cliente", "historial", "visita"}
+        if _normalize_text(normalized_value) in _stop:
+            flags.append("pet_name_is_stopword")
+    if normalized_key == "clinic_name":
+        compact = _normalize_text(normalized_value)
+        if normalized_value.isdigit():
+            flags.append("clinic_name_numeric_only")
+        if len(normalized_value.strip()) <= 2:
+            flags.append("clinic_name_too_short")
+        if re.search(
+            r"(?i)\b(?:c/|calle|av\.?|avenida|cp\b|portal|piso|puerta|direcci[oó]n|domicilio)\b",
+            normalized_value,
+        ) and re.search(r"\d", normalized_value):
+            flags.append("clinic_name_address_like")
+        if not re.search(r"\b(?:clinica|veterinari|hospital|centro|vet)\b", compact):
+            flags.append("clinic_name_missing_institution_token")
     return flags
 
 

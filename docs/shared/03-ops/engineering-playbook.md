@@ -493,6 +493,39 @@ Each release must result in:
 - A change may be implemented through multiple commits.
 - Commit history must remain readable to support reasoning and review.
 
+### Local preflight levels (mandatory workflow)
+
+Use the local preflight system with three levels:
+
+- **L1 — Quick (before commit):** lightweight checks for fast feedback.
+  - Entry points: `scripts/ci/test-L1.ps1` / `scripts/ci/test-L1.bat`
+  - Purpose: catch obvious lint/format/doc guard failures with minimal delay.
+- **L2 — Push (before every push):** CI-aligned scoped checks.
+  - Entry points: `scripts/ci/test-L2.ps1` / `scripts/ci/test-L2.bat`
+  - Frontend checks run only when frontend-impact paths changed, unless `-ForceFrontend` is provided.
+  - Enforced by git hook: `.githooks/pre-push`.
+- **L3 — Full (before PR creation/update):** broadest local validation.
+  - Entry points: `scripts/ci/test-L3.ps1` / `scripts/ci/test-L3.bat`
+  - Runs path-scoped backend/frontend/docker checks by default.
+  - Use `-ForceFull` to execute full backend/frontend/docker scope regardless of diff.
+  - Use `-ForceFrontend` to force frontend checks even when frontend-impact paths did not change.
+  - E2E runs only for frontend-impact changes, unless `-ForceFrontend` or `-ForceFull` is provided.
+
+Rules:
+- For interactive local commits, run L1 by default.
+- Before every `git push`, L2 must run (automatically via pre-push hook).
+- Before opening/updating a PR, run L3.
+- L3 runs path-scoped by default for day-to-day development branches.
+- Before merge to `main`, verify CI is green. Local L3 is not required when CI has already passed — CI runs a superset of L3 checks (including Docker and E2E).
+- If a level fails, STOP and resolve failures (or explicitly document why a failure is unrelated/pre-existing).
+
+Auto-fix policy when preflight fails:
+- The assistant must attempt focused fixes automatically before proceeding.
+- Auto-fixes must stay within the current change scope and avoid unrelated refactors.
+- Maximum automatic remediation loop: 2 attempts (fix + rerun the failed level).
+- Never bypass quality gates (`--no-verify`, disabling tests/checks, weakening assertions) to force a pass.
+- If failures persist after the limit, STOP and report root cause, impacted files, and next-action options.
+
 ## Pull Requests
 - A pull request is opened for each user story or each technical non user-facing change (refactors, chores, CI, docs, fixes).
 - Pull requests are opened once the change is fully implemented and all automated tests are passing.
@@ -532,6 +565,10 @@ When an AI coding assistant or automation tool is used to create or update a Pul
      - `gh pr create --body-file <path-to-markdown-file>`
      - PowerShell here-string (`@' ... '@`) assigned to a variable and passed to `--body`
 
+2.1) Run local L3 preflight before PR creation/update:
+  - `scripts/ci/test-L3.ps1` (or `scripts/ci/test-L3.bat`)
+   - If L3 fails, STOP and resolve or explicitly document justified exceptions.
+
 3) Check CI status (if configured):
    - Report whether CI is pending, passing, or failing.
    - Include end-user validation steps in the PR description when applicable; if not applicable, state why and provide alternative verification steps.
@@ -553,10 +590,10 @@ When an AI coding assistant or automation tool is used to create or update a Pul
   - Review canonical UX/brand sources before implementation/review: [`docs/shared/UX_GUIDELINES.md`](UX_GUIDELINES.md), [`docs/projects/veterinary-medical-records/01-product/UX_DESIGN.md`](../../projects/veterinary-medical-records/01-product/UX_DESIGN.md), and [`docs/shared/BRAND_GUIDELINES.md`](BRAND_GUIDELINES.md).
    - Add a `UX/Brand compliance` section to the PR description with concrete evidence.
 
-6) Ask the user whether they want a code review:
-   - Ask explicitly for every PR classification (docs-only, code, non-code/non-doc).
-   - For docs-only PRs, recommend skipping the review by policy unless the user explicitly asks for one.
-   - Run the review only after explicit user confirmation.
+6) Code review gate (manual trigger only):
+  - Do not ask by default on every PR classification.
+  - Run a review only when explicitly requested by the user.
+  - For docs-only PRs, review remains skipped by policy unless the user explicitly requests one.
 
 7) Perform a maintainability-focused code review of the PR diff (when user-approved):
    - Use `git diff main...HEAD` as the review input.
@@ -580,6 +617,8 @@ For docs-only PRs, no review comment is required (review is skipped by policy).
 ### Post-merge Cleanup (AI Assistants)
 
 After the user confirms that a Pull Request has been **merged into `main`**, the AI assistant must run the following **post-merge cleanup** procedure automatically.
+
+Before executing a user-requested merge operation, the assistant must verify CI is green on the PR. Local L3 is not required when CI has passed.
 
 Only STOP and ask for confirmation if the repository state is unsafe or ambiguous (examples: uncommitted changes, rebase/merge in progress, conflicts, or unclear stash purpose/ownership).
 
@@ -628,6 +667,40 @@ Apply the following rules by default to every future code review in this repo un
 - Avoid overengineering suggestions.
 - Do not propose new dependencies or new architectural patterns unless explicitly required.
 
+### Pre-review checklist
+
+Before reading the code diff, verify:
+- [ ] CI status is green (or failures are explicitly explained)
+- [ ] PR description exists and matches declared scope
+- [ ] PR scope remains a single user story or single technical concern
+- [ ] If plan-linked, each step carries a valid `**[PR-X]**` tag aligned with the PR Roadmap
+
+If any item fails, report it as Must-fix before continuing the code-level review.
+
+### Severity classification criteria
+
+Use these criteria to classify findings consistently:
+
+**Must-fix** (blocks merge):
+- incorrect behavior or logic error
+- security vulnerability or data leak
+- broken contract (API/schema mismatch, missing validation)
+- layer violation (domain imports infra/framework, business logic in API handlers)
+- missing or broken tests for changed behavior
+- data loss risk or silent overwrite of human edits
+
+**Should-fix** (strong recommendation, merge can proceed with explicit acceptance):
+- naming or structure that obscures intent
+- duplicated logic likely to drift
+- missing error handling for realistic failure modes
+- tests that do not validate meaningful behavior
+- documentation drift from implemented behavior
+
+**Nice-to-have** (optional improvements):
+- style-level improvements within existing conventions
+- small readability refinements
+- simplification ideas that do not affect correctness
+
 ### Code Review Guidelines
 
 When performing code reviews in this repository, use a **maintainability-focused** review style.
@@ -659,6 +732,14 @@ Primary review focus (in order):
 5) CI and tooling sanity:
    - workflows valid
    - tests and lint runnable and reproducible
+  - new environment variables documented with safe defaults
+  - dependency changes in `pyproject.toml` / requirements are justified
+  - Docker/container changes do not break local dev or CI
+6) Database migrations and schema changes:
+  - migration is reversible or has explicit rollback plan
+  - schema change does not cause unintended data loss
+  - defaults and nullability choices are explicit and intentional
+  - migration order matches dependency chain
 
 ### Code Review Output Format
 
@@ -676,6 +757,29 @@ Each finding must include:
 - File reference(s)
 - Short rationale
 - Minimal suggested change
+
+### Test review criteria
+
+When evaluating tests in the PR:
+- tests assert externally observable behavior, not implementation details
+- test names clearly describe scenario and expected outcome
+- changed behavior includes happy path and at least one meaningful failure case
+- tests are independent of execution order and shared mutable state
+- mocks/stubs are minimal and concentrated at infrastructure boundaries
+
+### Large diff policy
+
+If the PR diff exceeds approximately 400 lines of non-generated code:
+- report a Should-fix noting reduced review confidence due to size
+- suggest a split strategy when a clear split is visible
+- continue the review and clearly state any confidence limitations
+
+### Pre-existing issues policy
+
+If you find issues that clearly predate the PR:
+- do not classify them as Must-fix for the current PR
+- report them in a separate "Pre-existing issues" section
+- recommend a follow-up issue when impact is significant
 
 ### Code Review Safety rule
 

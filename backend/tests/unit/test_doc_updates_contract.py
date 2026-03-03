@@ -21,6 +21,18 @@ DOC_UPDATES_TEST_IMPACT_MAP = (
 DOC_UPDATES_ROUTER_PARITY_MAP = (
     REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "DOC_UPDATES" / "router_parity_map.json"
 )
+ENGINEERING_PLAYBOOK = REPO_ROOT / "docs" / "shared" / "03-ops" / "engineering-playbook.md"
+CODE_REVIEW_OWNER = (
+    REPO_ROOT
+    / "docs"
+    / "agent_router"
+    / "03_SHARED"
+    / "ENGINEERING_PLAYBOOK"
+    / "220_code-reviews.md"
+)
+CODE_REVIEW_ENTRY = (
+    REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "CODE_REVIEW" / "00_entry.md"
+)
 EXECUTION_RULES = (
     REPO_ROOT / "docs" / "projects" / "veterinary-medical-records" / "03-ops" / "execution-rules.md"
 )
@@ -30,8 +42,10 @@ BACKEND_IMPLEMENTATION_ROUTER_ENTRY = (
 TECHNICAL_DESIGN_ROUTER_ENTRY = (
     REPO_ROOT / "docs" / "agent_router" / "04_PROJECT" / "TECHNICAL_DESIGN" / "00_entry.md"
 )
-DOC_TEST_SYNC_GUARD = REPO_ROOT / "scripts" / "check_doc_test_sync.py"
-DOC_ROUTER_PARITY_GUARD = REPO_ROOT / "scripts" / "check_doc_router_parity.py"
+DOC_TEST_SYNC_GUARD = REPO_ROOT / "scripts" / "docs" / "check_doc_test_sync.py"
+DOC_ROUTER_PARITY_GUARD = REPO_ROOT / "scripts" / "docs" / "check_doc_router_parity.py"
+PRECOMMIT_HOOK = REPO_ROOT / ".githooks" / "pre-commit"
+PRECOMMIT_INSTALLER = REPO_ROOT / "scripts" / "ci" / "install-pre-commit-hook.ps1"
 DOCS_ROOT = REPO_ROOT / "docs"
 IMPLEMENTATION_PLAN = (
     REPO_ROOT
@@ -67,6 +81,8 @@ def test_doc_updates_core_files_exist() -> None:
     assert DOC_UPDATES_ROUTER_PARITY_MAP.exists(), "Missing DOC_UPDATES router parity map."
     assert DOC_TEST_SYNC_GUARD.exists(), "Missing doc/test sync guard script."
     assert DOC_ROUTER_PARITY_GUARD.exists(), "Missing doc/router parity guard script."
+    assert PRECOMMIT_HOOK.exists(), "Missing pre-commit hook entrypoint."
+    assert PRECOMMIT_INSTALLER.exists(), "Missing pre-commit hook installer."
     assert RULES_INDEX.exists(), "Missing rules index."
 
 
@@ -245,6 +261,65 @@ def test_router_parity_map_has_product_design_rule() -> None:
     assert '"required_terms"' in text
 
 
+def test_code_review_guidance_terms_are_propagated() -> None:
+    source_text = _read_text(ENGINEERING_PLAYBOOK)
+    owner_text = _read_text(CODE_REVIEW_OWNER)
+    entry_text = _read_text(CODE_REVIEW_ENTRY)
+
+    required_terms = (
+        "Pre-review checklist",
+        "Severity classification criteria",
+        "Database migrations and schema changes",
+        "Large diff policy",
+        "Pre-existing issues policy",
+    )
+
+    for term in required_terms:
+        assert term in source_text
+        assert term in owner_text
+
+    assert "Pre-review gate (required before diff reading)" in entry_text
+    assert "Database migrations/schema safety" in entry_text
+    assert "Pre-existing issues" in entry_text
+
+
+def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
+    source_text = _read_text(ENGINEERING_PLAYBOOK)
+    pr_router = (
+        REPO_ROOT
+        / "docs"
+        / "agent_router"
+        / "03_SHARED"
+        / "ENGINEERING_PLAYBOOK"
+        / "210_pull-requests.md"
+    )
+    pr_router_text = _read_text(pr_router)
+    readme_text = _read_text(REPO_ROOT / "README.md")
+
+    required_terms = (
+        "Local preflight levels",
+        "L1 — Quick",
+        "L2 — Push",
+        "L3 — Full",
+        "before PR creation/update",
+        "Auto-fix policy when preflight fails",
+        "Maximum automatic remediation loop: 2 attempts",
+        "ForceFrontend",
+        "ForceFull",
+        "CI is green",
+    )
+
+    for term in required_terms:
+        assert term in source_text
+        assert term in pr_router_text
+
+    assert "test-L1.ps1" in readme_text
+    assert "test-L2.ps1" in readme_text
+    assert "test-L3.ps1" in readme_text
+    assert "install-pre-commit-hook.ps1" in readme_text
+    assert "Maximum automatic remediation loop: 2 attempts" in pr_router_text
+
+
 def test_owner_entries_track_iteration_4_doc_propagation() -> None:
     backend_text = _read_text(BACKEND_IMPLEMENTATION_ROUTER_ENTRY)
     technical_text = _read_text(TECHNICAL_DESIGN_ROUTER_ENTRY)
@@ -316,3 +391,17 @@ def test_execution_rules_exist_and_contain_core_sections() -> None:
     assert "CI GATE" in rules_text
     assert "AUTO-CHAIN" in rules_text
     assert "Commit conventions" in rules_text
+
+
+def test_execution_rules_reference_preflight_levels() -> None:
+    """execution-rules.md must reference L1/L2/L3 preflight levels so agents
+    discover the local preflight system when following the execution protocol."""
+    rules_text = _read_text(EXECUTION_RULES)
+    # Script references (post-reorg paths under scripts/ci/)
+    assert "test-L1" in rules_text
+    assert "test-L2" in rules_text
+    assert "test-L3" in rules_text
+    # Level labels
+    assert "L1 —" in rules_text or "L1 — Quick" in rules_text
+    assert "L2 —" in rules_text or "L2 — Push" in rules_text
+    assert "L3 —" in rules_text or "L3 — Full" in rules_text

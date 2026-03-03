@@ -9,7 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 PARITY_MAP = (
     REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "DOC_UPDATES" / "router_parity_map.json"
 )
-PARITY_SCRIPT = REPO_ROOT / "scripts" / "check_doc_router_parity.py"
+PARITY_SCRIPT = REPO_ROOT / "scripts" / "docs" / "check_doc_router_parity.py"
 
 
 def _load_evaluate_parity():

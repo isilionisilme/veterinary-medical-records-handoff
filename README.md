@@ -234,38 +234,44 @@ npx playwright test --ui
 
 **Specs:** `app-loads`, `upload-smoke`, `review-flow`, `edit-flow`, `mark-reviewed` — see `frontend/e2e/`.
 
-### Local quality gates (before pushing)
+### Local quality gates (3 levels)
 
 > **Prerequisite:** install dev tooling once per venv:
 > `pip install -r requirements-dev.txt`
 
-- Backend lint: `ruff check .`
-- Backend format check: `ruff format --check .`
-- Backend tests: `python -m pytest --tb=short -q`
-- Frontend tests: `cd frontend && npm test`
-- Frontend lint/types: `cd frontend && npm run lint`
-- Frontend format check: `cd frontend && npm run format:check`
-- Optional pre-commit hook run: `pre-commit run --all-files`
+Use the preflight scripts by level:
 
-### Optional local pre-push gate (recommended)
+- **L1 — Quick (before commit):**
+  - PowerShell: `./scripts/ci/test-L1.ps1`
+  - Windows launcher: `scripts\ci\test-L1.bat`
+- **L2 — Push (before every push):**
+  - PowerShell: `./scripts/ci/test-L2.ps1`
+  - Windows launcher: `scripts\ci\test-L2.bat`
+  - Frontend checks run only for frontend-impact changes by default.
+- **L3 — Full (before PR creation/update):**
+  - PowerShell: `./scripts/ci/test-L3.ps1`
+  - Windows launcher: `scripts\ci\test-L3.bat`
+  - Path-scoped by default; use `-ForceFull` to run full backend/frontend/docker scope.
+  - Before merge to `main`, verify CI is green — local L3 is not required when CI has passed.
 
-To reduce invalid commits reaching PR checks, install the repository pre-push hook:
+Optional arguments:
+- `-BaseRef main` (default for all levels)
+- `-SkipDocker` (push/full)
+- `-SkipE2E` (full)
+- `-ForceFrontend` (push/full)
+- `-ForceFull` (full) — useful for broad local validation when CI is unavailable
 
-- PowerShell (Windows): `./scripts/install-pre-push-hook.ps1`
+### Hooks installation (recommended)
 
-What it does:
+Install local hooks so the correct level runs automatically at the correct moment:
 
-- Runs scoped checks based on changed paths vs upstream:
-  - Backend changes: `python -m pytest backend/tests/unit -q -o addopts=""`
-  - Frontend changes: `npm --prefix frontend run lint` and `npm --prefix frontend run test`
-  - Docs changes: `npm run docs:lint` and `npm run docs:format:check`
-- Blocks `git push` if any command fails.
+- Pre-commit quick gate: `./scripts/ci/install-pre-commit-hook.ps1`
+- Pre-push gate: `./scripts/ci/install-pre-push-hook.ps1`
 
 Files:
-
-- Hook entrypoint: `.githooks/pre-push`
-- Gate logic: `scripts/pre_push_quality_gate.py`
-- Installer: `scripts/install-pre-push-hook.ps1`
+- Hook entrypoints: `.githooks/pre-commit`, `.githooks/pre-push`
+- Core runner: `scripts/ci/preflight-ci-local.ps1`
+- Level wrappers: `scripts/ci/test-L1.ps1`, `scripts/ci/test-L2.ps1`, `scripts/ci/test-L3.ps1`
 
 ### Administrative commands
 

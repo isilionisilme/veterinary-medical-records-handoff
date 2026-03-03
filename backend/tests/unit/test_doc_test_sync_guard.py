@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SCRIPT_PATH = REPO_ROOT / "scripts" / "check_doc_test_sync.py"
+SCRIPT_PATH = REPO_ROOT / "scripts" / "docs" / "check_doc_test_sync.py"
 
 
 def _load_guard_module():
@@ -45,7 +45,7 @@ def test_evaluate_sync_fails_when_mapped_doc_changes_without_related_file() -> N
         rules=[
             {
                 "doc_glob": "docs/shared/01-product/brand-guidelines.md",
-                "required_any": ["scripts/check_brand_compliance.py"],
+                "required_any": ["scripts/quality/check_brand_compliance.py"],
             }
         ],
         fail_on_unmapped_docs=True,
@@ -95,7 +95,7 @@ def test_evaluate_sync_fails_on_unmapped_doc_in_required_scope() -> None:
         rules=[
             {
                 "doc_glob": "docs/shared/01-product/brand-guidelines.md",
-                "required_any": ["scripts/check_brand_compliance.py"],
+                "required_any": ["scripts/quality/check_brand_compliance.py"],
             }
         ],
         fail_on_unmapped_docs=True,
@@ -112,7 +112,7 @@ def test_evaluate_sync_ignores_unmapped_doc_outside_required_scope() -> None:
         rules=[
             {
                 "doc_glob": "docs/shared/01-product/brand-guidelines.md",
-                "required_any": ["scripts/check_brand_compliance.py"],
+                "required_any": ["scripts/quality/check_brand_compliance.py"],
             }
         ],
         fail_on_unmapped_docs=True,
@@ -128,7 +128,7 @@ def test_evaluate_sync_excludes_doc_matching_required_and_excluded_globs() -> No
         rules=[
             {
                 "doc_glob": "docs/shared/01-product/brand-guidelines.md",
-                "required_any": ["scripts/check_brand_compliance.py"],
+                "required_any": ["scripts/quality/check_brand_compliance.py"],
             }
         ],
         fail_on_unmapped_docs=True,

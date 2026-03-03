@@ -1,15 +1,15 @@
 #!/usr/bin/env sh
 set -eu
 
-if command -v python >/dev/null 2>&1; then
-  python scripts/pre_push_quality_gate.py
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ci/test-L2.ps1
   exit $?
 fi
 
-if command -v py >/dev/null 2>&1; then
-  py -3 scripts/pre_push_quality_gate.py
+if command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ci/test-L2.ps1
   exit $?
 fi
 
-echo "pre-push quality gate: Python is required (python or py command not found)." >&2
+echo "pre-push quality gate: requires PowerShell (pwsh or powershell)." >&2
 exit 1

@@ -76,6 +76,10 @@ def test_doc_a_golden_goal_fields_regression(monkeypatch) -> None:
     microchip = schema.get("microchip_id")
     assert isinstance(microchip, str) and _DIGIT_LIKE_PATTERN.search(microchip)
 
+    # pet_name — docA first line follows "<NAME> - Nacimiento" pattern.
+    pet_name = schema.get("pet_name")
+    assert pet_name == "Alya", f"pet_name regression: expected 'Alya', got {pet_name!r}"
+
     _assert_owner_or_vet_invariant(
         schema=schema,
         candidates=candidates,
@@ -92,6 +96,11 @@ def test_doc_a_golden_goal_fields_regression(monkeypatch) -> None:
 
     discharge_date = schema.get("discharge_date")
     assert discharge_date in ("", None)
+
+    clinic_name = schema.get("clinic_name")
+    assert clinic_name == "CENTRO COSTA AZAHAR", (
+        f"clinic_name regression: expected 'CENTRO COSTA AZAHAR', got {clinic_name!r}"
+    )
 
     _assert_owner_or_vet_invariant(
         schema=schema,
@@ -117,6 +126,13 @@ def test_doc_b_golden_goal_fields_regression(monkeypatch) -> None:
     microchip_candidates = candidates.get("microchip_id", [])
     assert microchip_candidates == []
 
+    # pet_name — docB has "NOMBRE DEMO" (actually owner name) picked up by
+    # unlabeled heuristic near "chip" context. Known false positive.
+    pet_name = schema.get("pet_name")
+    assert pet_name == "Nombre Demo", (
+        f"pet_name regression: expected 'Nombre Demo', got {pet_name!r}"
+    )
+
     _assert_owner_or_vet_invariant(
         schema=schema,
         candidates=candidates,
@@ -133,6 +149,9 @@ def test_doc_b_golden_goal_fields_regression(monkeypatch) -> None:
 
     discharge_date = schema.get("discharge_date")
     assert discharge_date in ("", None)
+
+    clinic_name = schema.get("clinic_name")
+    assert clinic_name in ("", None)
 
     _assert_owner_or_vet_invariant(
         schema=schema,
@@ -152,6 +171,65 @@ def test_owner_name_trim_uses_fixture_owner_and_address_lines() -> None:
     owner_candidates = candidates.get("owner_name", [])
     assert owner_candidates
     assert owner_candidates[0]["value"] == "NOMBRE DEMO"
+
+
+def test_doc_b_hidden_header_clinic_name_is_detected(monkeypatch) -> None:
+    raw_text = "HV COSTA AZAHAR\n" + _load_fixture("docB.txt")
+    data = _build_with_candidates(
+        monkeypatch,
+        doc_id="golden-doc-b-hidden-clinic",
+        raw_text=raw_text,
+    )
+
+    schema = data["global_schema"]
+    assert isinstance(schema, dict)
+    assert schema.get("clinic_name") == "HV COSTA AZAHAR"
+
+
+def test_doc_b_header_context_clinic_name_is_detected(monkeypatch) -> None:
+    raw_text = "\n".join(
+        [
+            "PARQUE OESTE",
+            "AVDA EUROPA",
+            "28922 ALCORCÓN",
+            "Datos de la Mascota",
+            "Datos del Cliente",
+            "Nº Chip",
+            "941000024967769",
+        ]
+    )
+    data = _build_with_candidates(
+        monkeypatch,
+        doc_id="golden-doc-b-header-context-clinic",
+        raw_text=raw_text,
+    )
+
+    schema = data["global_schema"]
+    assert isinstance(schema, dict)
+    assert schema.get("clinic_name") == "PARQUE OESTE"
+
+
+def test_generic_uppercase_header_is_not_detected_as_clinic_name(monkeypatch) -> None:
+    raw_text = "\n".join(
+        [
+            "INFORME",
+            "AVDA EUROPA",
+            "28922 ALCORCÓN",
+            "Datos de la Mascota",
+            "Datos del Cliente",
+            "Nº Chip",
+            "941000024967769",
+        ]
+    )
+    data = _build_with_candidates(
+        monkeypatch,
+        doc_id="golden-doc-generic-header-not-clinic",
+        raw_text=raw_text,
+    )
+
+    schema = data["global_schema"]
+    assert isinstance(schema, dict)
+    assert schema.get("clinic_name") in ("", None)
 
 
 def test_owner_name_trim_does_not_convert_pure_address_into_owner() -> None:

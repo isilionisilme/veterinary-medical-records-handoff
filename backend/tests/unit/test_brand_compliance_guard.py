@@ -4,7 +4,7 @@ import importlib.util
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SCRIPT_PATH = REPO_ROOT / "scripts" / "check_brand_compliance.py"
+SCRIPT_PATH = REPO_ROOT / "scripts" / "quality" / "check_brand_compliance.py"
 
 
 def _load_guard_module():

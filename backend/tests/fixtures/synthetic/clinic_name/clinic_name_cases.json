@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "id": "clinic_label_centro_simple",
+      "text": "Centro Veterinario: Clínica Norte\nPaciente: Luna",
+      "expected_clinic_name": "Clínica Norte"
+    },
+    {
+      "id": "clinic_label_clinica_simple",
+      "text": "Clínica: VetSalud Madrid\nPaciente: Toby",
+      "expected_clinic_name": "VetSalud Madrid"
+    },
+    {
+      "id": "clinic_label_hospital_simple",
+      "text": "Hospital Veterinario: Hospital Animalia\nPaciente: Kira",
+      "expected_clinic_name": "Hospital Animalia"
+    },
+    {
+      "id": "clinic_with_tilde_and_punctuation",
+      "text": "Clínica: Centro Médico Veterinario Ágora.\nMicrochip: 941000024967769",
+      "expected_clinic_name": "Centro Médico Veterinario Ágora"
+    },
+    {
+      "id": "clinic_with_hyphen_separator",
+      "text": "Clinica - VetCare Sur\nPropietario: Ana López",
+      "expected_clinic_name": "VetCare Sur"
+    },
+    {
+      "id": "clinic_name_absent_should_be_null",
+      "text": "Paciente: Mía\nEspecie: Felina\nRaza: Europeo",
+      "expected_clinic_name": null
+    },
+    {
+      "id": "address_line_not_clinic_name",
+      "text": "Dirección de la clínica: Av. Norte 99\nPaciente: Rocky",
+      "expected_clinic_name": null
+    },
+    {
+      "id": "noise_word_clinica_not_label",
+      "text": "Animal activo y alerta. Corre por la clínica y salta.\nPaciente: Alya",
+      "expected_clinic_name": null
+    },
+    {
+      "id": "multiline_header_value_next_line",
+      "text": "Centro Veterinario:\nClínica San Jorge\nPaciente: Nala",
+      "expected_clinic_name": "Clínica San Jorge"
+    },
+    {
+      "id": "ocr_noisy_label_with_zero",
+      "text": "CENTR0 VETERINARI0: Vet Plus Sevilla\nPaciente: Max",
+      "expected_clinic_name": "Vet Plus Sevilla"
+    },
+    {
+      "id": "clinic_label_with_extra_spaces",
+      "text": "Clínica   :    Hospital Vet Costa\nEspecie: Canina",
+      "expected_clinic_name": "Hospital Vet Costa"
+    }
+  ]
+}

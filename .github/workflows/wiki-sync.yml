@@ -8,7 +8,7 @@ on:
       - "docs/README.md"
       - "docs/projects/veterinary-medical-records/**"
       - "docs/shared/**"
-      - "scripts/sync_docs_to_wiki.py"
+      - "scripts/docs/sync_docs_to_wiki.py"
       - ".github/workflows/wiki-sync.yml"
   workflow_dispatch:
 
@@ -43,7 +43,7 @@ jobs:
 
       - name: Generate wiki pages from canonical docs
         run: |
-          python scripts/sync_docs_to_wiki.py \
+          python scripts/docs/sync_docs_to_wiki.py \
             --wiki-dir wiki-repo \
             --repo "${{ github.repository }}" \
             --ref "${{ github.ref_name }}"

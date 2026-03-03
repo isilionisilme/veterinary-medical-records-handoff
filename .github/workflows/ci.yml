@@ -19,7 +19,6 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
       docs: ${{ steps.filter.outputs.docs }}
-      golden_loop: ${{ steps.filter.outputs.golden_loop }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -37,116 +36,6 @@ jobs:
               - 'docs/**'
               - '*.md'
               - 'scripts/**'
-            golden_loop:
-              - 'backend/tests/benchmarks/**'
-              - 'backend/tests/fixtures/**'
-              - 'backend/tests/unit/test_golden_extraction_regression.py'
-              - 'scripts/golden_loop_scorecard.py'
-
-  detect_golden_loop:
-    needs: changes
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    outputs:
-      is_golden_loop: ${{ steps.detect.outputs.is_golden_loop }}
-      reason: ${{ steps.detect.outputs.reason }}
-    steps:
-      - name: Detect golden loop context
-        id: detect
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          labels="${{ join(github.event.pull_request.labels.*.name, ',') }}"
-          head_ref="${{ github.head_ref }}"
-          golden_paths="${{ needs.changes.outputs.golden_loop }}"
-
-          by_label=0
-          by_branch=0
-          by_paths=0
-
-          if [[ "$labels" == *"golden-loop"* ]]; then
-            by_label=1
-          fi
-
-          if [[ "$head_ref" =~ ^feature/golden-loop- ]]; then
-            by_branch=1
-          fi
-
-          if [[ "$golden_paths" == "true" ]]; then
-            by_paths=1
-          fi
-
-          reason="none"
-          if [[ "$by_label" == "1" ]]; then
-            reason="label"
-          elif [[ "$by_branch" == "1" ]]; then
-            reason="branch"
-          elif [[ "$by_paths" == "1" ]]; then
-            reason="paths"
-          fi
-
-          if [[ "$by_label" == "1" || "$by_branch" == "1" || "$by_paths" == "1" ]]; then
-            echo "is_golden_loop=true" >> "$GITHUB_OUTPUT"
-            echo "reason=$reason" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_golden_loop=false" >> "$GITHUB_OUTPUT"
-            echo "reason=none" >> "$GITHUB_OUTPUT"
-          fi
-
-  golden_loop_scorecard:
-    needs: [changes, detect_golden_loop]
-    if: github.event_name == 'pull_request' && needs.detect_golden_loop.outputs.is_golden_loop == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-
-      - name: Install dev dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-
-      - name: Detect case files
-        id: cases
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t files < <(find backend/tests/fixtures -type f -name "*.golden-loop.json" | sort)
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "has_cases=false" >> "$GITHUB_OUTPUT"
-            echo "No *.golden-loop.json files found. Skipping scorecard run."
-            exit 0
-          fi
-
-          echo "has_cases=true" >> "$GITHUB_OUTPUT"
-          {
-            echo "case_files<<EOF"
-            printf '%s\n' "${files[@]}"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Run golden loop scorecards
-        if: steps.cases.outputs.has_cases == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r case_file; do
-            if [ -n "$case_file" ]; then
-              echo "Running scorecard for $case_file"
-              python scripts/golden_loop_scorecard.py --cases "$case_file"
-            fi
-          done <<< "${{ steps.cases.outputs.case_files }}"
-
-      - name: Report detection context
-        run: |
-          echo "Golden loop detection reason: ${{ needs.detect_golden_loop.outputs.reason }}"
   frontend_test_build:
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true'
@@ -198,7 +87,7 @@ jobs:
           python-version: 3.11
       - name: Run canonical docs guard
         run: |
-          python scripts/check_no_canonical_router_refs.py
+          python scripts/docs/check_no_canonical_router_refs.py
 
   doc_test_sync_guard:
     if: github.event_name == 'pull_request'
@@ -214,10 +103,10 @@ jobs:
           python-version: 3.11
       - name: Classify doc changes
         run: |
-          python scripts/classify_doc_change.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/classify_doc_change.py --base-ref "${{ github.event.pull_request.base.sha }}"
       - name: Run doc/test sync guard
         run: |
-          python scripts/check_doc_test_sync.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/check_doc_test_sync.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   doc_router_parity_guard:
     if: github.event_name == 'pull_request'
@@ -233,7 +122,7 @@ jobs:
           python-version: 3.11
       - name: Run doc/router parity guard
         run: |
-          python scripts/check_doc_router_parity.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/check_doc_router_parity.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   brand_guard:
     needs: changes
@@ -250,7 +139,7 @@ jobs:
           python-version: 3.11
       - name: Run brand compliance guard (frontend added lines)
         run: |
-          python scripts/check_brand_compliance.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/quality/check_brand_compliance.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   frontend_design_system_guard:
     needs: changes

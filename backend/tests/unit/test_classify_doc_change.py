@@ -12,8 +12,8 @@ from typing import Any
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-CLASSIFIER_PATH = REPO_ROOT / "scripts" / "classify_doc_change.py"
-DOC_SYNC_GUARD_PATH = REPO_ROOT / "scripts" / "check_doc_test_sync.py"
+CLASSIFIER_PATH = REPO_ROOT / "scripts" / "docs" / "classify_doc_change.py"
+DOC_SYNC_GUARD_PATH = REPO_ROOT / "scripts" / "docs" / "check_doc_test_sync.py"
 
 
 def _load_module(path: Path, module_name: str):

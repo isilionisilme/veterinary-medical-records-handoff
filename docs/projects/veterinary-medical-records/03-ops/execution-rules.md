@@ -1,78 +1,4 @@
----
-title: "Execution Rules — Shared Operational Rules for AI Plan Execution"
-type: how-to
-status: active
-audience: contributor
-last-updated: 2026-03-02
----
-
 # Execution Rules — Shared Operational Rules for AI Plan Execution
-
-
-**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 03-ops
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [File structure](#file-structure)
-- [Strengths — DO NOT MODIFY WITHOUT EXPLICIT JUSTIFICATION](#strengths--do-not-modify-without-explicit-justification)
-- [Operational rules](#operational-rules)
-  - [Semi-unattended execution (default mode — hard rule)](#semi-unattended-execution-default-mode--hard-rule)
-  - [Atomic iterations](#atomic-iterations)
-  - [Extended execution state (pending / in-progress / blocked / completed)](#extended-execution-state-pending--in-progress--blocked--completed)
-  - [Agent identity rule (hard rule — applies before any other)](#agent-identity-rule-hard-rule--applies-before-any-other)
-  - ["Continúa-only" rule](#contin%C3%BAa-only-rule)
-  - [Rollback](#rollback)
-  - [Plan = agents only](#plan--agents-only)
-  - [Plan scope principle (hard rule)](#plan-scope-principle-hard-rule)
-  - [PR progress tracking (mandatory)](#pr-progress-tracking-mandatory)
-  - [CI verification (mandatory — hard rule)](#ci-verification-mandatory--hard-rule)
-- [Step completion integrity (hard rules — added 2026-02-26)](#step-completion-integrity-hard-rules--added-2026-02-26)
-  - [NO-BATCH (hard rule)](#no-batch-hard-rule)
-  - [CI-PIPELINE (pipeline execution for 🔄 auto-chain steps)](#ci-pipeline-pipeline-execution-for--auto-chain-steps)
-    - [Core principle](#core-principle)
-    - [Flow](#flow)
-    - [Rules](#rules)
-    - [Cancelled CI runs](#cancelled-ci-runs)
-    - [CI-FIRST still required for](#ci-first-still-required-for)
-  - [PLAN-UPDATE-IMMEDIATO (hard rule)](#plan-update-immediato-hard-rule)
-  - [STEP-LOCK (explicit state — hard rule)](#step-lock-explicit-state--hard-rule)
-  - [EVIDENCE BLOCK (mandatory on every step close)](#evidence-block-mandatory-on-every-step-close)
-  - [AUTO-HANDOFF GUARD (hard rule)](#auto-handoff-guard-hard-rule)
-  - [Format-before-commit (mandatory — hard rule)](#format-before-commit-mandatory--hard-rule)
-  - [Iteration boundary (mandatory — hard rule)](#iteration-boundary-mandatory--hard-rule)
-  - [Next-step message (mandatory — hard rule)](#next-step-message-mandatory--hard-rule)
-  - [Token-efficiency policy (mandatory)](#token-efficiency-policy-mandatory)
-- [Plan-edit-last (hard constraint)](#plan-edit-last-hard-constraint)
-  - [Hard-gates: structured decision protocol](#hard-gates-structured-decision-protocol)
-- [Prompt strategy](#prompt-strategy)
-  - ["Continúa" protocol](#contin%C3%BAa-protocol)
-  - [Next-step instructions (rule for all agents)](#next-step-instructions-rule-for-all-agents)
-  - [Routing de "Continúa" for Codex](#routing-de-contin%C3%BAa-for-codex)
-- [SCOPE BOUNDARY template (two-commit strategy)](#scope-boundary-template-two-commit-strategy)
-  - [STEP 0 — BRANCH VERIFICATION (before any code change)](#step-0--branch-verification-before-any-code-change)
-  - [STEP A — Commit code (plan file untouched)](#step-a--commit-code-plan-file-untouched)
-  - [STEP B — Commit plan update (only after code is committed)](#step-b--commit-plan-update-only-after-code-is-committed)
-  - [STEP C — Push both commits](#step-c--push-both-commits)
-  - [STEP D — Update active PR description](#step-d--update-active-pr-description)
-  - [STEP E — CI GATE (mandatory — do NOT skip)](#step-e--ci-gate-mandatory--do-not-skip)
-  - [STEP F — CHAIN OR HANDOFF (mandatory)](#step-f--chain-or-handoff-mandatory)
-- [Iteration lifecycle protocol](#iteration-lifecycle-protocol)
-  - [Branch creation (mandatory — before ANY plan step)](#branch-creation-mandatory--before-any-plan-step)
-  - [PR readiness (automatic — not a plan step)](#pr-readiness-automatic--not-a-plan-step)
-  - [Merge + post-merge cleanup (automatic — not a plan step)](#merge--post-merge-cleanup-automatic--not-a-plan-step)
-  - [Iteration close-out protocol (automatic — not a plan step)](#iteration-close-out-protocol-automatic--not-a-plan-step)
-    - [1. Plan reconciliation (mandatory if any steps are `[ ]`)](#1-plan-reconciliation-mandatory-if-any-steps-are--)
-    - [2. Update IMPLEMENTATION_HISTORY.md (mandatory)](#2-update-implementation_historymd-mandatory)
-    - [3. Rename plan → completed archive (mandatory)](#3-rename-plan-%E2%86%92-completed-archive-mandatory)
-    - [4. DOC_UPDATES normalization (conditional)](#4-doc_updates-normalization-conditional)
-    - [5. Commit + push + PR](#5-commit--push--pr)
-    - [6. Mirror to docs repository (if applicable)](#6-mirror-to-docs-repository-if-applicable)
-- [Commit conventions](#commit-conventions)
-- [Output format (per iteration finding)](#output-format-per-iteration-finding)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 > **Canonical source:** This file governs how AI agents execute plan steps across all iterations.
 > Referenced by `AGENTS.md`. Do not duplicate these rules elsewhere.
@@ -260,11 +186,20 @@ Commit A → push → start working on B locally (do NOT wait for CI of A)
      After pushing the fix, **resume immediately** with step N+1 (do not wait for the fix CI).
      The fix will be validated at the next CI checkpoint (before committing step N+2).
 3. **A step is NOT marked `[x]` until its CI run is green.** The plan-update commit happens after CI green, per PLAN-UPDATE-IMMEDIATO below.
-4. **Always run targeted local tests** for step N+1's area before committing, regardless of CI result.
-   Run only the tests affected by the change — CI runs the full suite after push.
+4. **Always run the targeted preflight level** for step N+1's area before committing, regardless of CI result.
+   Use the **L1/L2/L3 preflight system** (see [Engineering Playbook § Local preflight levels](../../../shared/03-ops/engineering-playbook.md#local-preflight-levels-mandatory-workflow)) as the primary validation tool. The table below lists the individual commands that each level covers — use them for focused debugging, but prefer running the appropriate preflight level as a single command.
 
-   | Change type | Local validation command |
-   |-------------|------------------------|
+   | Preflight level | When to run | Command |
+   |-----------------|-------------|---------|
+   | **L1 — Quick** | Before each commit | `scripts/ci/test-L1.ps1 -BaseRef HEAD` |
+   | **L2 — Push** | Before each push | `scripts/ci/test-L2.ps1 -BaseRef main` |
+   | **L3 — Full** | Before PR creation/update | `scripts/ci/test-L3.ps1 -BaseRef main` |
+
+   <details>
+   <summary>Individual commands (for targeted debugging)</summary>
+
+   | Change type | Command |
+   |-------------|---------|
    | Backend — single module | `cd backend && python -m pytest tests/test_<module>.py -x -q --tb=short` |
    | Backend — benchmarks | `cd backend && python -m pytest tests/benchmarks/ -v --benchmark-enable` |
    | Frontend — single component | `cd frontend && npx vitest run src/components/<Component>.test.tsx` |
@@ -272,6 +207,8 @@ Commit A → push → start working on B locally (do NOT wait for CI of A)
    | E2E — single spec | `cd frontend && npx playwright test <spec-name>.spec.ts --project=core` |
    | E2E — extended spec | `cd frontend && npx playwright test <spec-name>.spec.ts --project=extended` |
    | Docs/CI only | No local tests needed |
+
+   </details>
 
    **Exceptions — run the full suite locally when:**
    - The change touches shared infrastructure (`conftest.py`, test helpers, `vite.config.ts`, `playwright.config.ts`).
@@ -297,7 +234,7 @@ cancels CI-A before it finishes. This is **expected and safe**:
 
 - Handoffs between agents (Codex ↔ Claude)
 - Hard-gate (🚧) steps
-- The last step of an iteration (before merge)
+- The last step of an iteration (before merge — verify CI green)
 
 ### PLAN-UPDATE-IMMEDIATO (hard rule)
 **After CI green for a step, the very next commit MUST be the plan update
@@ -365,6 +302,25 @@ are met.** This is the final safety net against premature handoffs.
 2. `ruff check backend/ --fix --quiet && ruff format backend/ --quiet`
 3. If `git commit` fails (pre-commit hook rejects): re-run formatters, re-add, retry ONCE.
 4. If it fails a second time: STOP and report to the user.
+
+> **Tip:** Running `scripts/ci/test-L1.ps1 -BaseRef HEAD` covers formatting, linting, and doc guards in a single command. Agents may use L1 instead of the two manual commands above.
+
+### Local preflight integration (mandatory — maps SCOPE BOUNDARY to L1/L2/L3)
+
+The local preflight system (defined in [Engineering Playbook § Local preflight levels](../../../shared/03-ops/engineering-playbook.md#local-preflight-levels-mandatory-workflow)) provides three validation levels. Each SCOPE BOUNDARY moment has a **minimum required preflight level**:
+
+| SCOPE BOUNDARY moment | Min. level | Command |
+|---|---|---|
+| Before STEP A (commit) | L1 | `scripts/ci/test-L1.ps1 -BaseRef HEAD` |
+| Before STEP C (push) | L2 | `scripts/ci/test-L2.ps1 -BaseRef main` |
+| Before creating/updating PR | L3 | `scripts/ci/test-L3.ps1 -BaseRef main` |
+| Before merge to main | Verify CI green | No local run needed — CI is a superset of L3 |
+
+**Rules:**
+- Each higher level is a superset: L2 includes L1 checks, L3 includes L2 checks.
+- "Relevant change" is defined in the Engineering Playbook — any change that touches backend, frontend, E2E, or infrastructure.
+- The pre-commit and pre-push hooks enforce L1/L2 automatically. L3 must be run manually.
+- If a preflight level fails, fix the issues before proceeding. Do NOT bypass with `--no-verify`.
 
 ### Iteration boundary (mandatory — hard rule)
 **Auto-chain NEVER crosses from one Fase/iteration to another.** When all tasks of the current Fase are `[x]`, the agent stops and returns control to the user, even if the next Fase already has prompts written. Starting a new iteration requires explicit user approval.
