@@ -323,7 +323,8 @@
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
         "scripts/docs/check_doc_test_sync.py",
-        "scripts/docs/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py",
+        "backend/tests/unit/test_doc_updates_contract.py"
       ]
     },
     {

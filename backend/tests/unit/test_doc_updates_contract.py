@@ -396,3 +396,19 @@ def test_execution_rules_exist_and_contain_core_sections() -> None:
     assert "CI GATE" in rules_text
     assert "AUTO-CHAIN" in rules_text
     assert "Commit conventions" in rules_text
+
+
+def test_execution_rules_reference_preflight_levels() -> None:
+    """execution-rules.md must reference L1/L2/L3 preflight levels so agents
+    discover the local preflight system when following the execution protocol."""
+    rules_text = _read_text(EXECUTION_RULES)
+    # Script references (post-reorg paths under scripts/ci/)
+    assert "test-L1" in rules_text
+    assert "test-L2" in rules_text
+    assert "test-L3" in rules_text
+    # Level labels
+    assert "L1 —" in rules_text or "L1 — Quick" in rules_text
+    assert "L2 —" in rules_text or "L2 — Push" in rules_text
+    assert "L3 —" in rules_text or "L3 — Full" in rules_text
+    # ForceFull merge policy
+    assert "ForceFull" in rules_text
