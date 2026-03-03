@@ -1,4 +1,44 @@
+---
+title: "Frontend Implementation Notes"
+type: reference
+status: active
+audience: contributor
+last-updated: 2026-03-02
+---
+
 # Frontend Implementation Notes
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 02-tech
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Purpose](#purpose)
+- [Frontend Stack](#frontend-stack)
+- [Project Structure](#project-structure)
+- [Frontend Architecture](#frontend-architecture)
+- [PDF Review and Evidence Rendering](#pdf-review-and-evidence-rendering)
+- [Review Rendering Backbone (Global Schema)](#review-rendering-backbone-global-schema)
+- [Continuous Scroll Preview](#continuous-scroll-preview)
+  - [PDF.js wiring (Vite)](#pdfjs-wiring-vite)
+  - [Paging and navigation rules](#paging-and-navigation-rules)
+- [File-Type Support](#file-type-support)
+- [Additional File Types](#additional-file-types)
+- [Highlight Strategy (Progressive Enhancement)](#highlight-strategy-progressive-enhancement)
+- [Confidence Rendering](#confidence-rendering)
+  - [Confidence rendering rules (UX contract)](#confidence-rendering-rules-ux-contract)
+  - [Confidence tooltip breakdown rendering (MVP)](#confidence-tooltip-breakdown-rendering-mvp)
+  - [Reviewed toggle UI behavior](#reviewed-toggle-ui-behavior)
+- [API Integration](#api-integration)
+  - [Contract authority (backend)](#contract-authority-backend)
+  - [Error handling (authoritative rule)](#error-handling-authoritative-rule)
+- [Sequencing (Authority)](#sequencing-authority)
+- [Testing Strategy](#testing-strategy)
+- [Implementation note](#implementation-note)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Purpose
 
@@ -286,4 +326,3 @@ Keep the review experience explainable and non-blocking; introduce additional to
 For deterministic CI and local builds, keep test/setup files out of the production TypeScript compilation scope and validate them through Vitest in the test job.
 
 Repository operations recommendation: protect `main` and require both `quality` and `frontend_test_build` checks before merge.
-

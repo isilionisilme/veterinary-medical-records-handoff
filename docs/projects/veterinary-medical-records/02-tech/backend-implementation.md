@@ -1,10 +1,72 @@
+---
+title: "Backend Implementation Notes"
+type: reference
+status: active
+audience: contributor
+last-updated: 2026-03-02
+---
+
 # Note for readers
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 02-tech
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Purpose](#purpose)
+- [Scope](#scope)
+  - [In scope](#in-scope)
+- [Running The Backend](#running-the-backend)
+- [Backend architecture](#backend-architecture)
+  - [Layering (mandatory)](#layering-mandatory)
+- [Persistence model (SQLite)](#persistence-model-sqlite)
+  - [Minimum entities (authoritative)](#minimum-entities-authoritative)
+  - [Document status derivation (authoritative)](#document-status-derivation-authoritative)
+  - [Run invariants (authoritative)](#run-invariants-authoritative)
+  - [SQLite guard pattern (authoritative)](#sqlite-guard-pattern-authoritative)
+- [Filesystem storage](#filesystem-storage)
+  - [Deterministic paths (authoritative)](#deterministic-paths-authoritative)
+  - [Run-scoped artifacts (implementation)](#run-scoped-artifacts-implementation)
+  - [Atomicity rules](#atomicity-rules)
+  - [Missing artifacts](#missing-artifacts)
+- [Processing execution model (in-process)](#processing-execution-model-in-process)
+  - [Asynchronous behavior](#asynchronous-behavior)
+  - [Scheduler semantics](#scheduler-semantics)
+  - [Runner lifecycle (implementation)](#runner-lifecycle-implementation)
+  - [Crash recovery (startup)](#crash-recovery-startup)
+  - [Retry + timeout policy](#retry--timeout-policy)
+- [Step model](#step-model)
+  - [Step names (closed set)](#step-names-closed-set)
+  - [Step tracking via artifacts](#step-tracking-via-artifacts)
+  - [Failure mapping](#failure-mapping)
+- [Structured interpretation schema](#structured-interpretation-schema)
+  - [Storage contract](#storage-contract)
+  - [Critical keys](#critical-keys)
+  - [Review Events (contract)](#review-events-contract)
+  - [Calibration Store (contract)](#calibration-store-contract)
+  - [Confidence calibration & policy (MVP contracts)](#confidence-calibration--policy-mvp-contracts)
+  - [Tooltip breakdown data sourcing (MVP)](#tooltip-breakdown-data-sourcing-mvp)
+  - [Reviewed toggle persistence (MVP contract)](#reviewed-toggle-persistence-mvp-contract)
+- [API implementation](#api-implementation)
+  - [Authoritative API contracts (do not duplicate)](#authoritative-api-contracts-do-not-duplicate)
+  - [Editing while active run exists](#editing-while-active-run-exists)
+- [Text extraction + language detection](#text-extraction--language-detection)
+  - [PDF extraction](#pdf-extraction)
+  - [Language detection](#language-detection)
+- [Logging (structured)](#logging-structured)
+- [Testing expectations](#testing-expectations)
+  - [Unit tests (minimum)](#unit-tests-minimum)
+  - [Integration tests (minimum)](#integration-tests-minimum)
+- [STOP rule](#stop-rule)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 This document is intended to provide **implementation guidance for backend work** and to provide structured context to an AI Coding Assistant during implementation.
 
 Reading order, document responsibilities, and precedence rules are defined in [`docs/README.md`](../README.md).
 
 If any requirement here conflicts with a higher-precedence document, **STOP** and defer to the authority defined in the README.
-
 
 ## Purpose
 This document translates the **authoritative system design** into backend implementation responsibilities, focusing on:
@@ -13,7 +75,6 @@ This document translates the **authoritative system design** into backend implem
 - in-process processing runner + scheduler semantics
 - API implementation wiring and enforcement of the authoritative contract
 - logging and test expectations
-
 
 ## Scope
 
@@ -30,7 +91,6 @@ This document translates the **authoritative system design** into backend implem
 ## Running The Backend
 
 Run instructions live in the repository root [`README.md`](../../README.md).
-
 
 ## Backend architecture
 
@@ -52,7 +112,6 @@ Use a modular-monolith layered architecture:
 Rules:
 - Domain logic MUST be independent from infrastructure.
 - Persistence invariants MUST be enforced at the persistence layer (transactional), not in memory.
-
 
 ## Persistence model (SQLite)
 
@@ -84,7 +143,6 @@ Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.m
 Implementation guidance:
 - Encapsulate `BEGIN IMMEDIATE` + “check for RUNNING” + “transition to RUNNING” into a single repository method.
 - Never perform the check and the transition in separate transactions (no partial transitions).
-
 
 ## Filesystem storage
 
@@ -129,7 +187,6 @@ If DB references an artifact but the filesystem is missing, return:
 
 Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix B3.2 + Appendix B5.
 
-
 ## Processing execution model (in-process)
 
 ### Asynchronous behavior
@@ -171,7 +228,6 @@ Implementation guidance:
 - Timeouts transition the run to `TIMED_OUT` (terminal).
 - Reprocessing always creates a **new** run.
 
-
 ## Step model 
 
 ### Step names (closed set)
@@ -187,7 +243,6 @@ Persist step lifecycle as append-only `Artifacts`:
 
 ### Failure mapping 
 Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix C3 (Error Codes and Failure Mapping).
-
 
 ## Structured interpretation schema 
 Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix D (Structured Interpretation Schema visit-grouped canonical contract).
@@ -271,7 +326,6 @@ Update behavior:
 - Backend persists `review_status` and review timestamps as source of truth for reviewed state.
 - Default list exclusion of reviewed items is a UI behavior; backend exposes persisted reviewed state and timestamps consistently.
 
-
 ## API implementation 
 
 ### Authoritative API contracts (do not duplicate)
@@ -293,7 +347,6 @@ Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.m
 Implementation guidance:
 - When a workflow is blocked by an active run, return the authoritative conflict response using `details.reason = REVIEW_BLOCKED_BY_ACTIVE_RUN`.
 
-
 ## Text extraction + language detection 
 
 ### PDF extraction
@@ -306,7 +359,6 @@ Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.m
 
 Implementation note: if detection fails, set `language_used = "unknown"` and continue best-effort.
 
-
 ## Logging (structured) 
 
 Each log entry MUST include:
@@ -318,7 +370,6 @@ Each log entry MUST include:
 - `error_code` (nullable)
 
 Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix A8.1 (Event Type Taxonomy).
-
 
 ## Testing expectations 
 Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix B7 (Testability Expectations).
@@ -334,7 +385,6 @@ Authority: [`docs/projects/veterinary-medical-records/02-tech/technical-design.m
 - reprocess creates queued run; scheduler starts oldest; no parallel running
 - crash recovery transitions orphaned RUNNING to FAILED with `PROCESS_TERMINATED`
 - missing artifact returns 410 with `ARTIFACT_MISSING`
-
 
 ## STOP rule
 If an implementation decision is not explicitly covered by:

@@ -1,4 +1,54 @@
+---
+title: "Product Design — Document Interpretation & Layout Evolution"
+type: explanation
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Product Design — Document Interpretation & Layout Evolution
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 01-product
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Note for readers](#note-for-readers)
+- [High-level product approach](#high-level-product-approach)
+- [1. Core Product Strategy](#1-core-product-strategy)
+- [2. Human-in-the-Loop Philosophy (Product-Level)](#2-human-in-the-loop-philosophy-product-level)
+- [2.1 Confidence Principles (Product-Level)](#21-confidence-principles-product-level)
+- [3. Structural Signals & Pending Review](#3-structural-signals--pending-review)
+  - [3.1 Definition](#31-definition)
+  - [3.2 Pending Review State](#32-pending-review-state)
+  - [3.3 Scope of Impact](#33-scope-of-impact)
+- [4. Critical Concepts](#4-critical-concepts)
+  - [4.1 Semantics](#41-semantics)
+  - [4.2 Interaction with Structural Signals](#42-interaction-with-structural-signals)
+  - [4.3 Governance Boundary](#43-governance-boundary)
+  - [4.4 Critical / Non-Reversible Changes Policy](#44-critical--non-reversible-changes-policy)
+- [Conceptual Model: Local Schema, Global Schema, and Mapping](#conceptual-model-local-schema-global-schema-and-mapping)
+  - [Confidence Semantics (Stability, not Truth)](#confidence-semantics-stability-not-truth)
+  - [Context (Deterministic)](#context-deterministic)
+  - [Learnable Unit (`mapping_id`)](#learnable-unit-mapping_id)
+  - [Signals & Weighting (qualitative)](#signals--weighting-qualitative)
+  - [Policy State (soft behavior)](#policy-state-soft-behavior)
+  - [Confidence Propagation & Calibration](#confidence-propagation--calibration)
+    - [Future Improvements](#future-improvements)
+  - [Governance and Safeguards (pending_review, critical, non-reversible)](#governance-and-safeguards-pending_review-critical-non-reversible)
+- [Visit grouping (MVP)](#visit-grouping-mvp)
+- [Global Schema (Canonical Field List — Medical Record MVP)](#global-schema-canonical-field-list--medical-record-mvp)
+  - [CRITICAL_KEYS (Authoritative, closed set)](#critical_keys-authoritative-closed-set)
+- [Medical Record MVP panel semantics (US-44)](#medical-record-mvp-panel-semantics-us-44)
+  - [Authority / cross-doc](#authority--cross-doc)
+- [Appendix: Historical Global Schema Reference (Non-normative)](#appendix-historical-global-schema-reference-non-normative)
+- [5. Separation of Responsibilities (Product-Level)](#5-separation-of-responsibilities-product-level)
+- [6. Learning & Governance](#6-learning--governance)
+- [7. Final Product Rule](#7-final-product-rule)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Note for readers
 
@@ -25,7 +75,6 @@ Instead of attempting full automation, the system:
 The key principle is to convert **inevitable human review work into cumulative system learning**, without changing how veterinarians work or introducing operational risk.
 
 This high-level approach informs the technical and implementation decisions described elsewhere in the repository.
-
 
 ## 1. Core Product Strategy
 
@@ -375,7 +424,6 @@ D) Visita / episodio
 E) Clínico / revisión
 - `diagnosis`, `symptoms`, `procedure`, `medication`, `treatment_plan`, `allergies`, `vaccinations`, `lab_result`, `imaging`
 - `notes`, `language`
-
 
 ## 5. Separation of Responsibilities (Product-Level)
 

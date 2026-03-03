@@ -1,4 +1,31 @@
+---
+title: "UX Guidelines — Shared Principles"
+type: explanation
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # UX Guidelines — Shared Principles
+
+
+**Breadcrumbs:** [Docs](../../README.md) / Shared / 01-product
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Scope and Authority](#scope-and-authority)
+- [Core UX Principles](#core-ux-principles)
+- [Human-in-the-Loop (Shared Principle)](#human-in-the-loop-shared-principle)
+- [Confidence & Uncertainty (Shared Principle)](#confidence--uncertainty-shared-principle)
+- [Accessibility & Usability](#accessibility--usability)
+- [Role-Specific Workflows](#role-specific-workflows)
+- [Governance & Review (Shared Boundary)](#governance--review-shared-boundary)
+- [Delegation Rule (Mandatory)](#delegation-rule-mandatory)
+- [Final Rule](#final-rule)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 This document defines the **global UX principles and interaction guidelines**
 that apply to **all products and initiatives** developed at Barkibu.

@@ -1,4 +1,66 @@
+---
+title: "Delivery Summary — improvement/refactor"
+type: reference
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Delivery Summary — `improvement/refactor`
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [At a glance](#at-a-glance)
+- [Phase 1 — Architecture audit (12-Factor)](#phase-1--architecture-audit-12-factor)
+- [Phase 2 — Structural refactor](#phase-2--structural-refactor)
+  - [Frontend: `App.tsx` (5,998 LOC → 9-line shell + 8 modules)](#frontend-apptsx-5998-loc-%E2%86%92-9-line-shell--8-modules)
+  - [Backend: `processing_runner.py` (2,901 LOC → 5 modules)](#backend-processing_runnerpy-2901-loc-%E2%86%92-5-modules)
+  - [Backend: `document_service.py` (1,874 LOC → 8 modules)](#backend-document_servicepy-1874-loc-%E2%86%92-8-modules)
+  - [Test redistribution](#test-redistribution)
+- [Phase 3 — Tooling quick wins](#phase-3--tooling-quick-wins)
+- [Phase 4 — Test quality](#phase-4--test-quality)
+- [Phase 5 — Documentation](#phase-5--documentation)
+  - [New Architecture Decision Records (4)](#new-architecture-decision-records-4)
+  - [Other documentation](#other-documentation)
+- [Phase 6 — Evaluator smoke test](#phase-6--evaluator-smoke-test)
+- [Phase 7 — Closeout](#phase-7--closeout)
+- [Iteration 2 — CTO Verdict Improvements (Phase 8)](#iteration-2--cto-verdict-improvements-phase-8)
+- [Iteration 3 — Hardening & Maintainability (Phase 9)](#iteration-3--hardening--maintainability-phase-9)
+  - [AppWorkspace decomposition detail](#appworkspace-decomposition-detail)
+- [Iteration 4 — Docs + Lint Polish (Phase 10)](#iteration-4--docs--lint-polish-phase-10)
+- [Iteration 5 — Production Readiness (Phase 11)](#iteration-5--production-readiness-phase-11)
+- [Iteration 6 — Coverage + Security Hardening (Phase 12)](#iteration-6--coverage--security-hardening-phase-12)
+- [Iteration 7 — Modularization (Phase 13)](#iteration-7--modularization-phase-13)
+- [Iteration 8 — Bugs + CI Governance + Refactor Round 3 (Phase 14)](#iteration-8--bugs--ci-governance--refactor-round-3-phase-14)
+  - [PR A — CI governance (#156)](#pr-a--ci-governance-156)
+  - [PR B — Refactor + coverage (#157)](#pr-b--refactor--coverage-157)
+- [Iteration 9 — E2E Testing + Evaluator Experience Polish (Phase 15)](#iteration-9--e2e-testing--evaluator-experience-polish-phase-15)
+  - [E2E test evidence](#e2e-test-evidence)
+  - [CI integration](#ci-integration)
+  - [Operational improvements (Iter 9)](#operational-improvements-iter-9)
+- [Iteration 10 — Security, Resilience & Performance Hardening (Phase 16)](#iteration-10--security-resilience--performance-hardening-phase-16)
+  - [Security](#security)
+  - [Resilience](#resilience)
+  - [Performance](#performance)
+  - [CI & Process](#ci--process)
+- [Iteration 11 — E2E Expansion + Error UX + Testing Depth + DX Hardening (Phase 18)](#iteration-11--e2e-expansion--error-ux--testing-depth--dx-hardening-phase-18)
+  - [Phase A — Quick wins](#phase-a--quick-wins)
+  - [Phase B — E2E expansion (5→20 tests)](#phase-b--e2e-expansion-5%E2%86%9220-tests)
+  - [Phase C — Error UX + performance](#phase-c--error-ux--performance)
+  - [Phase D — Testing depth + architecture](#phase-d--testing-depth--architecture)
+  - [Operational improvements (Iter 11)](#operational-improvements-iter-11)
+- [Iteration 12 — E2E Coverage Expansion + Accessibility + Project Close-Out (Phase 19)](#iteration-12--e2e-coverage-expansion--accessibility--project-close-out-phase-19)
+  - [Phase A — E2E expansion (20→65 tests, 8→22 specs)](#phase-a--e2e-expansion-20%E2%86%9265-tests-8%E2%86%9222-specs)
+  - [Phase B — WCAG accessibility](#phase-b--wcag-accessibility)
+  - [Phase C — Architecture & README](#phase-c--architecture--readme)
+  - [Phase D — Documentation close-out](#phase-d--documentation-close-out)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 > Quantitative record of what was delivered across 7 phases + Iterations 2–9.  
 > Source of truth for execution details: [`implementation-history.md`](../implementation/implementation-history.md).

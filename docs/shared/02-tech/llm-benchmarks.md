@@ -1,4 +1,32 @@
+---
+title: "LLM Benchmarks System"
+type: explanation
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # LLM Benchmarks System
+
+
+**Breadcrumbs:** [Docs](../../README.md) / Shared / 02-tech
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Purpose](#purpose)
+- [Key concepts](#key-concepts)
+  - [Premium Request](#premium-request)
+  - [tok_est (repository-side proxy)](#tok_est-repository-side-proxy)
+- [Architecture](#architecture)
+  - [Data flow](#data-flow)
+- [Billing model](#billing-model)
+  - [Why "estimated" requests](#why-estimated-requests)
+- [Scenarios](#scenarios)
+- [When to use this system](#when-to-use-this-system)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Purpose
 

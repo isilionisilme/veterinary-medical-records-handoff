@@ -1,4 +1,170 @@
+---
+title: "Technical Design — Instructions for Implementation"
+type: reference
+status: active
+audience: contributor
+last-updated: 2026-03-02
+---
+
 # Note for readers:
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 02-tech
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Technical Design — Instructions for Implementation](#technical-design--instructions-for-implementation)
+  - [Purpose](#purpose)
+  - [1. System Overview (Technical)](#1-system-overview-technical)
+  - [1.1 Deployment Model (Intent)](#11-deployment-model-intent)
+  - [1.2 Logical Pipeline (Conceptual)](#12-logical-pipeline-conceptual)
+    - [Upload / Ingestion](#upload--ingestion)
+    - [Text Extraction](#text-extraction)
+    - [Interpretation](#interpretation)
+    - [State Management](#state-management)
+    - [Human Review & Feedback](#human-review--feedback)
+  - [1.3 Domain Model Overview (Conceptual)](#13-domain-model-overview-conceptual)
+  - [1.4 Persistence Strategy (Intent)](#14-persistence-strategy-intent)
+  - [1.5 Safety & Design Guardrails](#15-safety--design-guardrails)
+  - [2. Architecture](#2-architecture)
+  - [3. Processing Model](#3-processing-model)
+    - [3.1 Pipeline](#31-pipeline)
+    - [3.2 Asynchronous Execution](#32-asynchronous-execution)
+    - [3.3 Processing Runs](#33-processing-runs)
+      - [Active Run Rule](#active-run-rule)
+  - [4. Reprocessing Rules](#4-reprocessing-rules)
+  - [5. Review & Editing Rules](#5-review--editing-rules)
+  - [6. Data Persistence Rules](#6-data-persistence-rules)
+    - [6.1 General Principles](#61-general-principles)
+    - [6.2 Storage](#62-storage)
+    - [6.3 Structured Data & Versioning](#63-structured-data--versioning)
+  - [7. Confidence (Technical Contract)](#7-confidence-technical-contract)
+    - [Context (Deterministic)](#context-deterministic)
+    - [Learnable Unit Key (`mapping_id`)](#learnable-unit-key-mapping_id)
+    - [Policy Thresholds & Hysteresis](#policy-thresholds--hysteresis)
+    - [MVP payload & storage implications](#mvp-payload--storage-implications)
+    - [Confidence breakdown for veterinarian tooltip (MVP visibility contract)](#confidence-breakdown-for-veterinarian-tooltip-mvp-visibility-contract)
+    - [`confidence_policy.yaml` (minimum spec)](#confidence_policyyaml-minimum-spec)
+    - [Reviewed signal semantics (deterministic)](#reviewed-signal-semantics-deterministic)
+  - [8. Error Handling & States](#8-error-handling--states)
+    - [8.1 User-facing error messages (Iteration 11)](#81-user-facing-error-messages-iteration-11)
+  - [9. Observability](#9-observability)
+    - [9.1 Logging](#91-logging)
+    - [9.2 Future Observability](#92-future-observability)
+  - [10. API Notes](#10-api-notes)
+  - [11. Scope Ownership](#11-scope-ownership)
+  - [12. Data Lifecycle](#12-data-lifecycle)
+  - [13. Security Boundary](#13-security-boundary)
+    - [Design decisions](#design-decisions)
+    - [Production path](#production-path)
+  - [14. Known Limitations](#14-known-limitations)
+  - [15. Final Instruction](#15-final-instruction)
+- [Appendix A — Contracts, States & Invariants (Normative)](#appendix-a--contracts-states--invariants-normative)
+  - [A1. State Model & Source of Truth](#a1-state-model--source-of-truth)
+    - [A1.1 Processing Run State (authoritative)](#a11-processing-run-state-authoritative)
+    - [A1.2 Document Status (derived, not stored)](#a12-document-status-derived-not-stored)
+    - [A1.3 Review Status (human workflow only)](#a13-review-status-human-workflow-only)
+    - [A1.4 Source of Truth Summary](#a14-source-of-truth-summary)
+  - [A2. Processing Run Invariants](#a2-processing-run-invariants)
+  - [A3. Interpretation & Versioning Invariants](#a3-interpretation--versioning-invariants)
+    - [A3.1 Structured Interpretations](#a31-structured-interpretations)
+      - [Active version invariant (Operational, normative)](#active-version-invariant-operational-normative)
+    - [A3.2 Field-Level Changes](#a32-field-level-changes)
+  - [A4. Confidence Rules](#a4-confidence-rules)
+  - [A5. API Contract Principles](#a5-api-contract-principles)
+    - [A5.1 Run Resolution Rule](#a51-run-resolution-rule)
+  - [A6. Concurrency & Idempotency Rules](#a6-concurrency--idempotency-rules)
+  - [A7. Governance Invariants](#a7-governance-invariants)
+  - [A8. Audit & Observability Rules](#a8-audit--observability-rules)
+    - [A8.1 Event Type Taxonomy (Authoritative)](#a81-event-type-taxonomy-authoritative)
+  - [A10. Final Rule](#a10-final-rule)
+- [Appendix B — Operational Clarifications (Normative)](#appendix-b--operational-clarifications-normative)
+  - [B1. Asynchronous In-Process Processing Model (Authoritative)](#b1-asynchronous-in-process-processing-model-authoritative)
+    - [B1.1 Assumed Execution Model](#b11-assumed-execution-model)
+    - [B1.2 Single `RUNNING` Run Guarantee](#b12-single-running-run-guarantee)
+    - [B1.2.1 Persistence-Level Guard Pattern (SQLite, Authoritative)](#b121-persistence-level-guard-pattern-sqlite-authoritative)
+    - [B1.3 Crash & Restart Semantics](#b13-crash--restart-semantics)
+    - [B1.4 Retry & Timeout Policy](#b14-retry--timeout-policy)
+    - [B1.4.1 Fixed defaults (Normative)](#b141-fixed-defaults-normative)
+    - [B1.5 In-Process Scheduler Semantics (Authoritative)](#b15-in-process-scheduler-semantics-authoritative)
+    - [B1.5.1 Scheduler tick & fairness (Normative)](#b151-scheduler-tick--fairness-normative)
+  - [B2. Minimal Persistent Data Model (Textual ERD)](#b2-minimal-persistent-data-model-textual-erd)
+    - [B2.1 Document](#b21-document)
+    - [B2.2 ProcessingRun](#b22-processingrun)
+    - [B2.3 Artifacts](#b23-artifacts)
+      - [ArtifactType (Closed Set, normative)](#artifacttype-closed-set-normative)
+    - [B2.4 InterpretationVersion](#b24-interpretationversion)
+    - [B2.5 FieldChangeLog](#b25-fieldchangelog)
+      - [B2.5.1 Field path format (Authoritative)](#b251-field-path-format-authoritative)
+    - [B2.6 API Error Response Format & Naming Authority (Normative)](#b26-api-error-response-format--naming-authority-normative)
+    - [API Error Response Format (Normative)](#api-error-response-format-normative)
+    - [API Naming Authority (Normative)](#api-naming-authority-normative)
+    - [B2.7 SchemaVersion (Authoritative)](#b27-schemaversion-authoritative)
+    - [B2.8 StructuralChangeCandidate (Authoritative)](#b28-structuralchangecandidate-authoritative)
+    - [B2.9 GovernanceDecision (Authoritative)](#b29-governancedecision-authoritative)
+  - [B3. Minimal API Endpoint Map (Authoritative)](#b3-minimal-api-endpoint-map-authoritative)
+    - [Document-Level](#document-level)
+    - [Supported upload types (Normative)](#supported-upload-types-normative)
+    - [Run / Review](#run--review)
+    - [Reviewer / Governance (Reviewer-facing only)](#reviewer--governance-reviewer-facing-only)
+    - [B3.1 Run Resolution per Endpoint (Authoritative)](#b31-run-resolution-per-endpoint-authoritative)
+      - [Response shape (minimum, normative)](#response-shape-minimum-normative)
+      - [Field Candidate Suggestions (standard review payload)](#field-candidate-suggestions-standard-review-payload)
+    - [Processing history endpoint (minimum, normative)](#processing-history-endpoint-minimum-normative)
+    - [Language override endpoint (minimum, normative)](#language-override-endpoint-minimum-normative)
+    - [Interpretation edit endpoint (minimum, normative)](#interpretation-edit-endpoint-minimum-normative)
+    - [Reviewer governance endpoints (minimum, normative)](#reviewer-governance-endpoints-minimum-normative)
+  - [B3.2 Endpoint error semantics & error codes (Normative)](#b32-endpoint-error-semantics--error-codes-normative)
+    - [Error response format (Authoritative)](#error-response-format-authoritative)
+    - [Common HTTP statuses](#common-http-statuses)
+    - [Notes](#notes)
+    - [Upload size limit (Normative)](#upload-size-limit-normative)
+    - [GET /runs/{run_id}/artifacts/raw-text (Normative)](#get-runsrun_idartifactsraw-text-normative)
+    - [POST /runs/{run_id}/interpretations (Normative)](#post-runsrun_idinterpretations-normative)
+  - [B4. Idempotency & Safe Retry Rules (Authoritative)](#b4-idempotency--safe-retry-rules-authoritative)
+    - [B4.1 Endpoint Semantics](#b41-endpoint-semantics)
+  - [B5. Filesystem Management Rules](#b5-filesystem-management-rules)
+  - [B6. Blocking Rules (Normative)](#b6-blocking-rules-normative)
+  - [B7. Testability Expectations](#b7-testability-expectations)
+  - [Final Rule](#final-rule)
+- [Appendix C — Step Model & Run Execution Semantics (Normative)](#appendix-c--step-model--run-execution-semantics-normative)
+  - [C1. Processing Step Model (Authoritative)](#c1-processing-step-model-authoritative)
+    - [C1.1 StepName (Closed Set)](#c11-stepname-closed-set)
+    - [C1.2 StepStatus (Closed Set)](#c12-stepstatus-closed-set)
+    - [C1.3 Step Artifact Payload (JSON)](#c13-step-artifact-payload-json)
+    - [C1.4 Append-Only Rule](#c14-append-only-rule)
+  - [C2. Run State Derivation from Steps (Authoritative)](#c2-run-state-derivation-from-steps-authoritative)
+  - [C3. Error Codes and Failure Mapping (Authoritative)](#c3-error-codes-and-failure-mapping-authoritative)
+  - [C4. Relationship between Step Artifacts and Logs (Normative)](#c4-relationship-between-step-artifacts-and-logs-normative)
+- [Appendix D — Structured Interpretation Schema (Canonical) (Normative)](#appendix-d--structured-interpretation-schema-canonical-normative)
+  - [D1. Scope and Design Principles](#d1-scope-and-design-principles)
+  - [D2. Versioning](#d2-versioning)
+  - [D3. Relationship to Persistent Model (Authoritative)](#d3-relationship-to-persistent-model-authoritative)
+  - [D4. Top-Level Object: StructuredInterpretation (JSON)](#d4-top-level-object-structuredinterpretation-json)
+  - [D5. StructuredField (Authoritative)](#d5-structuredfield-authoritative)
+  - [D6. Evidence (Approximate by Design)](#d6-evidence-approximate-by-design)
+  - [D7. Semantics & Rules (Authoritative)](#d7-semantics--rules-authoritative)
+    - [D7.1 Confidence](#d71-confidence)
+    - [D7.2 Multiple Values](#d72-multiple-values)
+    - [D7.3 Governance (Future-Facing)](#d73-governance-future-facing)
+    - [D7.4 Critical Concepts (Authoritative)](#d74-critical-concepts-authoritative)
+  - [D8. Example (Multiple Fields)](#d8-example-multiple-fields)
+  - [D9. Structured Interpretation Schema (Visit-grouped Canonical) (Normative)](#d9-structured-interpretation-schema-visit-grouped-canonical-normative)
+    - [D9.1 Top-Level Object: StructuredInterpretation (Canonical Visit-grouped) (JSON)](#d91-top-level-object-structuredinterpretation-canonical-visit-grouped-json)
+    - [D9.1.a Medical Record View Template / Field Slots (Normative, US-44)](#d91a-medical-record-view-template--field-slots-normative-us-44)
+    - [D9.2 VisitGroup (Normative)](#d92-visitgroup-normative)
+    - [D9.3 Scoping Rules (Normative)](#d93-scoping-rules-normative)
+    - [D9.4 Determinism and Unassigned Rule (Normative)](#d94-determinism-and-unassigned-rule-normative)
+    - [D9.5 Contract Note (Normative)](#d95-contract-note-normative)
+    - [D9.6 Authoritative Contract Boundary for Medical Record Rendering](#d96-authoritative-contract-boundary-for-medical-record-rendering)
+- [Appendix E — Minimal Libraries for PDF Text Extraction & Language Detection (Normative)](#appendix-e--minimal-libraries-for-pdf-text-extraction--language-detection-normative)
+  - [E1. PDF Text Extraction](#e1-pdf-text-extraction)
+  - [E2. Language Detection](#e2-language-detection)
+  - [E3. Dependency Justification (Repository Requirement)](#e3-dependency-justification-repository-requirement)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 This document is intended to provide structured context to an AI Coding Assistant during implementation.
 
 The version of this document written for evaluators and reviewers is available here:
@@ -553,7 +719,6 @@ Allowed values:
   - never mutates previous runs or artifacts,
   - may remain `QUEUED` if another run is `RUNNING`.
 
-
 ---
 
 ## A3. Interpretation & Versioning Invariants
@@ -698,7 +863,6 @@ Rules:
   - `timestamp`
   - `error_code` (nullable)
 
-
 ---
 
 ## A10. Final Rule
@@ -776,7 +940,6 @@ No worker may transition a run to `RUNNING` without verifying these invariants a
 
 ---
 
-
 ### B1.3 Crash & Restart Semantics
 
 On application startup:
@@ -805,7 +968,6 @@ Reprocessing always creates a **new run**.
 - Step retry limit: 2 attempts total (1 initial + 1 retry).
 - Run timeout: 120 seconds wall-clock from `RUN_STARTED`.
 
-
 ---
 
 ### B1.5 In-Process Scheduler Semantics (Authoritative)
@@ -830,7 +992,6 @@ Rules:
 - On each tick, it attempts to start runs in FIFO order by `created_at`.
 - It MUST NOT busy-loop; it sleeps between ticks.
 - If a start attempt fails due to transient DB lock/contention, it logs `STEP_RETRIED` (or a dedicated scheduler event) and retries on the next tick.
-
 
 ## B2. Minimal Persistent Data Model (Textual ERD)
 
@@ -1286,7 +1447,6 @@ Rules:
   - `reason` (nullable)
   - `created_at`
 
-
 ---
 
 ## B3.2 Endpoint error semantics & error codes (Normative)
@@ -1345,7 +1505,6 @@ All error responses MUST follow Appendix **B2.6**:
 - Frontend MUST branch on `error_code` (and optional `details.reason`) only.
 - User stories may list example error cases, but must not redefine these semantics.
 - Upload type support is defined in Appendix B3 (“Supported upload types (Normative)”).
-
 
 ### Upload size limit (Normative)
 - Maximum upload size: 20 MB (default).
@@ -1412,7 +1571,6 @@ Mechanisms:
 
 Non-negotiable invariant:
 - The system must never end up with two runs `RUNNING` for the same document, regardless of retries.
-
 
 ---
 

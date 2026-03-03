@@ -1,4 +1,32 @@
+---
+title: "Known Limitations & Future Directions"
+type: explanation
+status: active
+audience: staff-engineer
+last-updated: 2026-03-02
+---
+
 # Known Limitations & Future Directions
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Completed improvements (summary)](#completed-improvements-summary)
+- [Known limitations — conscious trade-offs](#known-limitations--conscious-trade-offs)
+  - [14 — Optional Compose worker profile](#14--optional-compose-worker-profile)
+  - [16 — Persistent event tracing and metrics](#16--persistent-event-tracing-and-metrics)
+  - [17 — PostgreSQL adapter](#17--postgresql-adapter)
+  - [18 — Schema migration tooling](#18--schema-migration-tooling)
+  - [21 — WCAG 2.1 AA full audit](#21--wcag-21-aa-full-audit)
+  - [23 — Structured logging + Prometheus endpoint](#23--structured-logging--prometheus-endpoint)
+  - [24 (remaining) — Python version matrix + deploy previews](#24-remaining--python-version-matrix--deploy-previews)
+- [If this were production](#if-this-were-production)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 > After 12 iterations, this project has reached its target quality bar. The items
 > below represent conscious scope decisions — not gaps. Each was evaluated and

@@ -1,4 +1,29 @@
+---
+title: "Copilot Usage Metrics — veterinary-medical-records"
+type: reference
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Copilot Usage Metrics — veterinary-medical-records
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Overview](#overview)
+- [Account summary](#account-summary)
+  - [Why multiple accounts?](#why-multiple-accounts)
+- [Daily usage table](#daily-usage-table)
+- [Key observations](#key-observations)
+- [Data quality](#data-quality)
+- [Regeneration](#regeneration)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 

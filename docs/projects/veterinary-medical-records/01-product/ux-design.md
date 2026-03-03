@@ -1,4 +1,46 @@
+---
+title: "UX Design — Project Interaction Contract"
+type: reference
+status: active
+audience: contributor
+last-updated: 2026-03-02
+---
+
 # UX Design — Project Interaction Contract
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 01-product
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [1. User Roles & UX Goals](#1-user-roles--ux-goals)
+  - [1.1 Veterinarian — Document Review Under Time Pressure](#11-veterinarian--document-review-under-time-pressure)
+  - [1.2 Reviewer — System-Level Oversight](#12-reviewer--system-level-oversight)
+- [2. Confidence — UX Definition](#2-confidence--ux-definition)
+- [3. Confidence Visibility](#3-confidence-visibility)
+  - [3.1 Qualitative Signal (Primary)](#31-qualitative-signal-primary)
+  - [3.2 Quantitative Signal (Secondary)](#32-quantitative-signal-secondary)
+- [4. Veterinarian Review Flow](#4-veterinarian-review-flow)
+  - [Step 1 — Document & Interpretation Together](#step-1--document--interpretation-together)
+  - [Step 2 — Confidence-Guided Attention](#step-2--confidence-guided-attention)
+  - [Step 3 — Immediate Local Correction](#step-3--immediate-local-correction)
+  - [Step 4 — Mark document as reviewed (toggle)](#step-4--mark-document-as-reviewed-toggle)
+- [4.1 Review-in-Context Contract](#41-review-in-context-contract)
+- [Review UI Rendering Rules (Extracted Data / Informe — Medical Record MVP)](#review-ui-rendering-rules-extracted-data--informe--medical-record-mvp)
+- [4.2 Confidence Propagation & Calibration (UX Contract)](#42-confidence-propagation--calibration-ux-contract)
+- [4.3 Confidence Tooltip Breakdown (Veterinarian UI)](#43-confidence-tooltip-breakdown-veterinarian-ui)
+  - [Future Improvements](#future-improvements)
+- [5. Structural Effects — UX Consequences Only](#5-structural-effects--ux-consequences-only)
+  - [Veterinarian UX Rules](#veterinarian-ux-rules)
+  - [Reviewer UX Rules](#reviewer-ux-rules)
+- [6. Sensitive Changes — UX Rules](#6-sensitive-changes--ux-rules)
+- [7. Reviewer Interaction Model](#7-reviewer-interaction-model)
+- [8. Separation of Responsibilities (Non-Negotiable)](#8-separation-of-responsibilities-non-negotiable)
+- [9. Final UX Rule](#9-final-ux-rule)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 This document defines the **project-specific UX and interaction design contract**
 for the Veterinary Medical Records Processing system.

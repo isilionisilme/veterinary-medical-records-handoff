@@ -1,4 +1,29 @@
+---
+title: "Architecture Overview"
+type: reference
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Architecture Overview
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 02-tech
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Tech stack](#tech-stack)
+- [System diagram](#system-diagram)
+- [Key architectural decisions](#key-architectural-decisions)
+- [Data flow](#data-flow)
+- [Project structure](#project-structure)
+- [Quality metrics (post-Iteration 12)](#quality-metrics-post-iteration-12)
+- [Related documentation](#related-documentation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 > One-page summary for evaluators. For full detail, see [technical-design.md](technical-design.md).
 

@@ -1,4 +1,44 @@
+---
+title: "Lean Design System (Tokens + Primitives)"
+type: reference
+status: active
+audience: contributor
+last-updated: 2026-03-02
+---
+
 # Lean Design System (Tokens + Primitives)
+
+
+**Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 01-product
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Purpose](#purpose)
+- [Token strategy](#token-strategy)
+  - [Color tokens](#color-tokens)
+  - [Surface levels (L0–L3)](#surface-levels-l0l3)
+  - [Semantic/status tokens](#semanticstatus-tokens)
+  - [Spacing scale](#spacing-scale)
+  - [Radius scale](#radius-scale)
+  - [Text hierarchy](#text-hierarchy)
+  - [Focus ring & accent usage](#focus-ring--accent-usage)
+- [Primitives (shadcn/ui + Radix)](#primitives-shadcnui--radix)
+- [App-level wrappers (`components/app`)](#app-level-wrappers-componentsapp)
+- [Accessibility rules](#accessibility-rules)
+- [Tooltip policy (mandatory)](#tooltip-policy-mandatory)
+  - [Confidence tooltip content (standard)](#confidence-tooltip-content-standard)
+  - [Icon-only controls: do / don't](#icon-only-controls-do--dont)
+  - [Exception process (allowlist)](#exception-process-allowlist)
+- [Usage examples](#usage-examples)
+  - [Example 1 — Viewer toolbar icon action](#example-1--viewer-toolbar-icon-action)
+  - [Example 2 — Structured field row](#example-2--structured-field-row)
+  - [Example 3 — Layered panel composition](#example-3--layered-panel-composition)
+- [Enforcement](#enforcement)
+- [Do / Don't](#do--dont)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Purpose
 This document defines the minimal design-system contract for the internal Claims Review UI.

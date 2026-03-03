@@ -1,9 +1,36 @@
+---
+title: "Wiki — Documentation Index"
+type: index
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Wiki — Documentation Index
+
+
+**Breadcrumbs:** Docs
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Folder structure](#folder-structure)
+- [Sitemap](#sitemap)
+- [Documentation governance (normative)](#documentation-governance-normative)
+- [Shared Documentation](#shared-documentation)
+- [Projects](#projects)
+- [Evaluator first-pass (recommended, 10-15 min)](#evaluator-first-pass-recommended-10-15-min)
+- [Tooling (optional)](#tooling-optional)
+- [Authority & precedence](#authority--precedence)
+- [Contribution and quality gates](#contribution-and-quality-gates)
+- [Dependency justification (Technical Design Appendix E3)](#dependency-justification-technical-design-appendix-e3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 Human-oriented index for all canonical documentation in this repository.
 
 ## Folder structure
-
 ```
 docs/
 ├── shared/           ← standards and guidelines shared across all projects
@@ -11,6 +38,31 @@ docs/
 │   └── veterinary-medical-records/
 └── metrics/          ← tooling data (llm_benchmarks)
 ```
+
+## Sitemap
+
+- `docs/README.md`
+- `docs/shared/`
+  - `01-product/brand-guidelines.md`
+  - `01-product/ux-guidelines.md`
+  - `02-tech/llm-benchmarks.md`
+  - `03-ops/engineering-playbook.md`
+- `docs/projects/veterinary-medical-records/`
+  - `01-product/design-system.md`
+  - `01-product/product-design.md`
+  - `01-product/ux-design.md`
+  - `02-tech/architecture.md`
+  - `02-tech/backend-implementation.md`
+  - `02-tech/frontend-implementation.md`
+  - `02-tech/technical-design.md`
+  - `03-ops/execution-rules.md`
+  - `03-ops/manual-qa-regression-checklist.md`
+  - `03-ops/plan-e2e-test-coverage.md`
+  - `04-delivery/copilot-usage.md`
+  - `04-delivery/delivery-summary.md`
+  - `04-delivery/future-improvements.md`
+  - `04-delivery/implementation-history.md`
+  - `04-delivery/implementation-plan.md`
 
 ## Documentation governance (normative)
 

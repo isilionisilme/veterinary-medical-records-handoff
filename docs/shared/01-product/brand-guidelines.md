@@ -1,4 +1,45 @@
+---
+title: "Barkibu — Brand Guidelines (Project Canonical)"
+type: reference
+status: active
+audience: all
+last-updated: 2026-03-02
+---
+
 # Barkibu — Brand Guidelines (Project Canonical)
+
+
+**Breadcrumbs:** [Docs](../../README.md) / Shared / 01-product
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Purpose](#purpose)
+- [Scope & precedence](#scope--precedence)
+- [Brand character](#brand-character)
+- [Color system (exact values)](#color-system-exact-values)
+  - [Primary accent](#primary-accent)
+  - [Backgrounds & surfaces](#backgrounds--surfaces)
+  - [Text](#text)
+  - [Borders/dividers](#bordersdividers)
+  - [Semantic support colors (muted)](#semantic-support-colors-muted)
+- [Typography](#typography)
+- [Layout & density rules (productivity UI)](#layout--density-rules-productivity-ui)
+  - [Header](#header)
+  - [Surfaces](#surfaces)
+  - [Accent usage](#accent-usage)
+- [Components](#components)
+  - [Buttons](#buttons)
+  - [Links](#links)
+  - [Cards](#cards)
+  - [Confidence/status pills](#confidencestatus-pills)
+- [Tokenization (implementation requirement)](#tokenization-implementation-requirement)
+- [Tone of voice (UI copy)](#tone-of-voice-ui-copy)
+  - [General](#general)
+  - [Preferred product naming (internal tool)](#preferred-product-naming-internal-tool)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Purpose
 Single source of truth for **visual identity** (colors/typography/layout primitives) and **UI copy tone** used by Codex and contributors.
