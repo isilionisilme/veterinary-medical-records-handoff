@@ -2,24 +2,24 @@
 set -eu
 
 if command -v pwsh >/dev/null 2>&1; then
-  pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-L2.ps1
+  pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ci/test-L2.ps1
   exit $?
 fi
 
 if command -v powershell >/dev/null 2>&1; then
-  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-L2.ps1
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ci/test-L2.ps1
   exit $?
 fi
 
 if command -v python >/dev/null 2>&1; then
   echo "pre-push: powershell not found, falling back to legacy python quality gate"
-  python scripts/pre_push_quality_gate.py
+  python scripts/ci/pre_push_quality_gate.py
   exit $?
 fi
 
 if command -v py >/dev/null 2>&1; then
   echo "pre-push: powershell not found, falling back to legacy python quality gate"
-  py -3 scripts/pre_push_quality_gate.py
+  py -3 scripts/ci/pre_push_quality_gate.py
   exit $?
 fi
 

@@ -429,19 +429,19 @@ Each release must result in:
 Use the local preflight system with three levels:
 
 - **L1 — Quick (before commit):** lightweight checks for fast feedback.
-  - Entry points: `scripts/test-L1.ps1` / `scripts/test-L1.bat`
+  - Entry points: `scripts/ci/test-L1.ps1` / `scripts/ci/test-L1.bat`
   - Purpose: catch obvious lint/format/doc guard failures with minimal delay.
 - **L2 — Push (before every push):** CI-aligned scoped checks.
-  - Entry points: `scripts/test-L2.ps1` / `scripts/test-L2.bat`
+  - Entry points: `scripts/ci/test-L2.ps1` / `scripts/ci/test-L2.bat`
   - Frontend checks run only when frontend-impact paths changed, unless `-ForceFrontend` is provided.
   - Enforced by git hook: `.githooks/pre-push`.
 - **L3 — Full (before PR creation/update and before merge):** broadest local validation.
-  - Entry points: `scripts/test-L3.ps1` / `scripts/test-L3.bat`
+  - Entry points: `scripts/ci/test-L3.ps1` / `scripts/ci/test-L3.bat`
   - Runs path-scoped backend/frontend/docker checks by default.
   - Use `-ForceFull` to execute full backend/frontend/docker scope regardless of diff.
   - Use `-ForceFrontend` to force frontend checks even when frontend-impact paths did not change.
   - E2E runs only for frontend-impact changes, unless `-ForceFrontend` or `-ForceFull` is provided.
-  - Legacy aliases remain available: `scripts/preflight-quick.ps1`, `scripts/preflight-push.ps1`, `scripts/preflight-full.ps1`.
+  - Legacy aliases remain available: `scripts/ci/preflight-quick.ps1`, `scripts/ci/preflight-push.ps1`, `scripts/ci/preflight-full.ps1`.
 
 Rules:
 - For interactive local commits, run L1 by default.
@@ -499,7 +499,7 @@ When an AI coding assistant or automation tool is used to create or update a Pul
      - PowerShell here-string (`@' ... '@`) assigned to a variable and passed to `--body`
 
 2.1) Run local L3 preflight before PR creation/update:
-  - `scripts/test-L3.ps1` (or `scripts/test-L3.bat`)
+  - `scripts/ci/test-L3.ps1` (or `scripts/ci/test-L3.bat`)
    - If L3 fails, STOP and resolve or explicitly document justified exceptions.
 
 3) Check CI status (if configured):

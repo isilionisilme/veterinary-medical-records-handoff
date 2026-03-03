@@ -10,7 +10,7 @@
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx,css}'",
     "format:check": "prettier --check 'src/**/*.{ts,tsx,css}'",
-    "check:design-system": "node ../scripts/check_design_system.mjs",
+    "check:design-system": "node ../scripts/quality/check_design_system.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

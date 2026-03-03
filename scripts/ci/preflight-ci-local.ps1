@@ -12,7 +12,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot ".." ".." )).Path
 Set-Location $repoRoot
 
 function Invoke-Step {
@@ -288,15 +288,15 @@ if (($Mode -eq "Push" -or $Mode -eq "Full") -and -not $runFrontendFull) {
 
 if ($runDocs) {
     Invoke-Step "Docs canonical guard" {
-        & $python "scripts/check_no_canonical_router_refs.py"
+        & $python "scripts/docs/check_no_canonical_router_refs.py"
     }
 
     Invoke-Step "Doc/test sync guard" {
-        & $python "scripts/check_doc_test_sync.py" "--base-ref" $BaseRef
+        & $python "scripts/docs/check_doc_test_sync.py" "--base-ref" $BaseRef
     }
 
     Invoke-Step "Doc/router parity guard" {
-        & $python "scripts/check_doc_router_parity.py" "--base-ref" $BaseRef
+        & $python "scripts/docs/check_doc_router_parity.py" "--base-ref" $BaseRef
     }
 }
 
@@ -419,7 +419,7 @@ if ($runE2E) {
 
 if ($runFrontendGuards) {
     Invoke-Step "Brand guard (frontend changed)" {
-        & $python "scripts/check_brand_compliance.py" "--base-ref" $BaseRef
+        & $python "scripts/quality/check_brand_compliance.py" "--base-ref" $BaseRef
     }
 
     Invoke-Step "Frontend design system guard" {

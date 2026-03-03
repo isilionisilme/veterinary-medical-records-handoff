@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_TARGETS = [
     REPO_ROOT / "docs" / "README.md",
     REPO_ROOT / "docs" / "project",

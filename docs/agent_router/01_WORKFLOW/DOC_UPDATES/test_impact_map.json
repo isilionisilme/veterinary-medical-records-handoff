@@ -23,7 +23,7 @@
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py"
+        "scripts/docs/check_doc_test_sync.py"
       ]
     },
     {
@@ -38,7 +38,7 @@
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py"
+        "scripts/docs/check_doc_test_sync.py"
       ]
     },
     {
@@ -49,7 +49,7 @@
         "docs/agent_router/03_SHARED/BRAND_GUIDELINES/**/*.md"
       ],
       "required_any": [
-        "scripts/check_brand_compliance.py",
+        "scripts/quality/check_brand_compliance.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py"
       ]
@@ -86,8 +86,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -96,8 +96,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -105,7 +105,7 @@
       "description": "DOCS_IMPROVEMENT_PLAN changes require doc-updates guard alignment for this documentation refactor stream.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py",
+        "scripts/docs/check_doc_test_sync.py",
         "backend/tests/unit/test_doc_updates_contract.py"
       ]
     },
@@ -119,8 +119,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -133,8 +133,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -143,8 +143,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -152,7 +152,7 @@
       "description": "Project ADR nested changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py",
+        "scripts/docs/check_doc_test_sync.py",
         "backend/tests/unit/test_doc_updates_contract.py"
       ]
     },
@@ -161,7 +161,7 @@
       "description": "Project ADR root-level changes require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py",
+        "scripts/docs/check_doc_test_sync.py",
         "backend/tests/unit/test_doc_updates_contract.py"
       ]
     },
@@ -177,8 +177,8 @@
         "docs/agent_router/04_PROJECT/DELIVERY_SUMMARY/**/*.md",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -191,8 +191,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -205,8 +205,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -220,8 +220,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -230,8 +230,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -245,9 +245,9 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py",
+        "scripts/docs/check_doc_router_parity.py",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "scripts/check_doc_test_sync.py"
+        "scripts/docs/check_doc_test_sync.py"
       ]
     },
     {
@@ -261,7 +261,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -275,7 +275,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -289,7 +289,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -303,7 +303,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -312,8 +312,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -322,8 +322,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -332,8 +332,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -342,8 +342,8 @@
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/check_doc_test_sync.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -357,7 +357,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     },
     {
@@ -371,7 +371,7 @@
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
-        "scripts/check_doc_router_parity.py"
+        "scripts/docs/check_doc_router_parity.py"
       ]
     }
   ]

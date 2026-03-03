@@ -87,7 +87,7 @@ jobs:
           python-version: 3.11
       - name: Run canonical docs guard
         run: |
-          python scripts/check_no_canonical_router_refs.py
+          python scripts/docs/check_no_canonical_router_refs.py
 
   doc_test_sync_guard:
     if: github.event_name == 'pull_request'
@@ -103,10 +103,10 @@ jobs:
           python-version: 3.11
       - name: Classify doc changes
         run: |
-          python scripts/classify_doc_change.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/classify_doc_change.py --base-ref "${{ github.event.pull_request.base.sha }}"
       - name: Run doc/test sync guard
         run: |
-          python scripts/check_doc_test_sync.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/check_doc_test_sync.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   doc_router_parity_guard:
     if: github.event_name == 'pull_request'
@@ -122,7 +122,7 @@ jobs:
           python-version: 3.11
       - name: Run doc/router parity guard
         run: |
-          python scripts/check_doc_router_parity.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/docs/check_doc_router_parity.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   brand_guard:
     needs: changes
@@ -139,7 +139,7 @@ jobs:
           python-version: 3.11
       - name: Run brand compliance guard (frontend added lines)
         run: |
-          python scripts/check_brand_compliance.py --base-ref "${{ github.event.pull_request.base.sha }}"
+          python scripts/quality/check_brand_compliance.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   frontend_design_system_guard:
     needs: changes

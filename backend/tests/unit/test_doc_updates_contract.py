@@ -42,10 +42,10 @@ BACKEND_IMPLEMENTATION_ROUTER_ENTRY = (
 TECHNICAL_DESIGN_ROUTER_ENTRY = (
     REPO_ROOT / "docs" / "agent_router" / "04_PROJECT" / "TECHNICAL_DESIGN" / "00_entry.md"
 )
-DOC_TEST_SYNC_GUARD = REPO_ROOT / "scripts" / "check_doc_test_sync.py"
-DOC_ROUTER_PARITY_GUARD = REPO_ROOT / "scripts" / "check_doc_router_parity.py"
+DOC_TEST_SYNC_GUARD = REPO_ROOT / "scripts" / "docs" / "check_doc_test_sync.py"
+DOC_ROUTER_PARITY_GUARD = REPO_ROOT / "scripts" / "docs" / "check_doc_router_parity.py"
 PRECOMMIT_HOOK = REPO_ROOT / ".githooks" / "pre-commit"
-PRECOMMIT_INSTALLER = REPO_ROOT / "scripts" / "install-pre-commit-hook.ps1"
+PRECOMMIT_INSTALLER = REPO_ROOT / "scripts" / "ci" / "install-pre-commit-hook.ps1"
 DOCS_ROOT = REPO_ROOT / "docs"
 IMPLEMENTATION_PLAN = (
     REPO_ROOT

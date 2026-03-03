@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 
 from backend.app.infra import database
-from scripts.interpretation_debug_snapshot import build_snapshot
+from scripts.dev.interpretation_debug_snapshot import build_snapshot
 
 
 @pytest.fixture

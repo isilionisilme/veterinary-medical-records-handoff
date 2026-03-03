@@ -166,7 +166,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parents[1]
+    repo_root = Path(__file__).resolve().parents[2]
     changed_files = _run_changed_files(args.base_ref)
     config = _load_config(Path(args.map_file))
     rules = config.get("rules", [])

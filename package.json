@@ -5,7 +5,7 @@
   "scripts": {
     "docs:lint": "markdownlint-cli2 \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
     "docs:lint:fix": "markdownlint-cli2 --fix \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
-    "docs:links": "node scripts/check_docs_links.mjs",
+    "docs:links": "node scripts/docs/check_docs_links.mjs",
     "docs:toc": "doctoc --github docs/README.md docs/project docs/shared",
     "docs:format": "prettier --write \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
     "docs:format:check": "prettier --check \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\""

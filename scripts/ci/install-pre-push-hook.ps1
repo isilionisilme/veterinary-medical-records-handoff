@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..' '..')).Path
 $hooksDir = Join-Path $repoRoot '.git/hooks'
 $sourceHook = Join-Path $repoRoot '.githooks/pre-push'
 $targetHook = Join-Path $hooksDir 'pre-push'
@@ -15,4 +15,4 @@ if (-not (Test-Path $sourceHook)) {
 
 Copy-Item -Path $sourceHook -Destination $targetHook -Force
 Write-Host "Installed pre-push hook at: $targetHook"
-Write-Host "This hook runs scripts/test-L2.ps1 before every push."
+Write-Host "This hook runs scripts/ci/test-L2.ps1 before every push."

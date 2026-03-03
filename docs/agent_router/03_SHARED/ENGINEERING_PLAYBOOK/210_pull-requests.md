@@ -24,17 +24,17 @@ When an AI coding assistant or automation tool is used to create or update a Pul
 
 Apply these levels automatically at the corresponding moments:
 
-- **L1 — Quick (before commit):** `scripts/test-L1.ps1` (or `.bat`)
-- **L2 — Push (before every push):** `scripts/test-L2.ps1` (or `.bat`), enforced by `.githooks/pre-push`
-- **L3 — Full (before PR creation/update and before merge):** `scripts/test-L3.ps1` (or `.bat`)
+- **L1 — Quick (before commit):** `scripts/ci/test-L1.ps1` (or `.bat`)
+- **L2 — Push (before every push):** `scripts/ci/test-L2.ps1` (or `.bat`), enforced by `.githooks/pre-push`
+- **L3 — Full (before PR creation/update and before merge):** `scripts/ci/test-L3.ps1` (or `.bat`)
 
-Legacy aliases remain available: `scripts/preflight-quick.ps1`, `scripts/preflight-push.ps1`, `scripts/preflight-full.ps1`.
+Legacy aliases remain available: `scripts/ci/preflight-quick.ps1`, `scripts/ci/preflight-push.ps1`, `scripts/ci/preflight-full.ps1`.
 
 Operational defaults:
 - L2 and L3 are path-scoped for frontend: run frontend checks only when frontend-impact paths changed.
 - `-ForceFrontend` forces frontend checks when no frontend-impact paths changed.
 - `-ForceFull` forces full backend/frontend/docker scope for L3.
-- Before merge to `main`, if the change is relevant, `scripts/test-L3.ps1 -ForceFull` is mandatory.
+- Before merge to `main`, if the change is relevant, `scripts/ci/test-L3.ps1 -ForceFull` is mandatory.
 - Relevant change for this rule means any diff touching: `backend/**`, `frontend/**`, `shared/**`, docker files/compose, root/frontend package manifests, or environment/config entrypoints (`backend/app/main.py`, `backend/app/config.py`, `backend/app/settings.py`, `.env.example`).
 
 If the required level fails, STOP and resolve issues before continuing.
@@ -71,7 +71,7 @@ Code review execution is manual trigger only.
      - PowerShell here-string (`@' ... '@`) assigned to a variable and passed to `--body`
 
 2.1) Run local L3 preflight before creating/updating the PR:
-   - Use `scripts/test-L3.ps1` (or `.bat`).
+   - Use `scripts/ci/test-L3.ps1` (or `.bat`).
     - If L3 fails, STOP and fix or explicitly justify any accepted exception.
 
 3) Check CI status (if configured):
@@ -132,7 +132,7 @@ Only STOP and ask for confirmation if the repository state is unsafe or ambiguou
 ### When user asks "merge this PR"
 
 1) Preconditions (must pass before merge):
-   - Run local L3 preflight (`scripts/test-L3.ps1` or `.bat`) and stop on failures.
+   - Run local L3 preflight (`scripts/ci/test-L3.ps1` or `.bat`) and stop on failures.
    - Ensure working tree is clean (`git status`).
    - Sync refs and prune (`git fetch --prune`).
    - Verify PR is mergeable without bypassing protections:
