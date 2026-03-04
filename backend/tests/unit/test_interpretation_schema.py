@@ -229,6 +229,44 @@ def test_microchip_heuristic_rejects_generic_no_reference_without_chip_context()
     assert candidates.get("microchip_id", []) == []
 
 
+def test_microchip_heuristic_rejects_date_time_digit_concatenation() -> None:
+    """Digits spread across date/time separators must not become a chip candidate."""
+    candidates = _mine_interpretation_candidates(
+        "- 08/12/19 - 16:12 -\nVolveremos a revisar el jueves y ponemos el chip"
+    )
+
+    values = [c["value"] for c in candidates.get("microchip_id", [])]
+    assert "0812191612" not in values
+
+
+def test_microchip_heuristic_extracts_digits_when_label_is_next_line() -> None:
+    candidates = _mine_interpretation_candidates("941000024967769\nNº Chip\nPaciente: Luna")
+
+    microchip_candidates = candidates.get("microchip_id", [])
+    assert microchip_candidates
+    assert microchip_candidates[0]["value"] == "941000024967769"
+
+
+def test_microchip_heuristic_extracts_digits_when_chip_label_is_nearby_tabular() -> None:
+    candidates = _mine_interpretation_candidates(
+        "MARLEY\n"
+        "Canino\n"
+        "Labrador Retriever\n"
+        "04/10/19\n"
+        "941000024967769\n"
+        "Nombre\n"
+        "Especie\n"
+        "Raza\n"
+        "F/Nto\n"
+        "Capa\n"
+        "Nº Chip\n"
+    )
+
+    microchip_candidates = candidates.get("microchip_id", [])
+    assert microchip_candidates
+    assert microchip_candidates[0]["value"] == "941000024967769"
+
+
 def test_vet_name_label_heuristic_extracts_name_candidate() -> None:
     candidates = _mine_interpretation_candidates(
         "Centro Veterinario Norte\nVeterinario: Dr. Juan Pérez\nPaciente: Luna"

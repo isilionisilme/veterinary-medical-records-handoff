@@ -1,0 +1,96 @@
+{
+  "description": "Synthetic raw-text fixtures with expected microchip_id extraction",
+  "version": "2026-03-04",
+  "cases": [
+    {
+      "id": "chip_label_microchip_basic",
+      "expected_microchip_id": "941000024967769",
+      "text": "Paciente: Luna\nMicrochip: 941000024967769\nEspecie: Canina"
+    },
+    {
+      "id": "chip_label_no_chip",
+      "expected_microchip_id": "982000411223344",
+      "text": "Nº chip: 982000411223344\nNombre: Rex\nSexo: Macho"
+    },
+    {
+      "id": "chip_label_identificacion_electronica",
+      "expected_microchip_id": "900123456789012",
+      "text": "Identificación electrónica: 900123456789012\nPaciente: Kira"
+    },
+    {
+      "id": "chip_label_transponder",
+      "expected_microchip_id": "100000123456789",
+      "text": "Transponder 100000123456789\nCentro: Vet Norte"
+    },
+    {
+      "id": "chip_ocr_n_prefix_same_line",
+      "expected_microchip_id": "941000024967769",
+      "text": "Paciente LUNA\nN-941000024967769\nCanina"
+    },
+    {
+      "id": "chip_with_spaces_and_dashes",
+      "expected_microchip_id": "941000024967769",
+      "text": "Chip: 941 0000-2496 7769\nPaciente: Max"
+    },
+    {
+      "id": "chip_9_digits_min_length",
+      "expected_microchip_id": "123456789",
+      "text": "Microchip: 123456789\nPaciente: Nilo"
+    },
+    {
+      "id": "chip_15_digits_max_length",
+      "expected_microchip_id": "123456789012345",
+      "text": "Nro chip 123456789012345\nEspecie: Felina"
+    },
+    {
+      "id": "chip_two_values_prefers_labeled",
+      "expected_microchip_id": "941000024967769",
+      "text": "Teléfono: 912345678\nMicrochip: 941000024967769\nFactura: 20260304001"
+    },
+    {
+      "id": "chip_null_owner_phone_only",
+      "expected_microchip_id": null,
+      "text": "Propietario: Ana Pérez\nTeléfono: 612345678\nEmail: ana@example.com"
+    },
+    {
+      "id": "chip_null_nif_present",
+      "expected_microchip_id": null,
+      "text": "Titular: Luis García\nNIF: 12345678Z\nPaciente: Toby"
+    },
+    {
+      "id": "chip_null_cp_and_phone",
+      "expected_microchip_id": null,
+      "text": "Dirección: C/ Mayor 10, 28001 Madrid\nTel: 934001122\nPaciente: Mía"
+    },
+    {
+      "id": "chip_null_short_8_digits",
+      "expected_microchip_id": null,
+      "text": "Microchip: 12345678\nPaciente: Duna"
+    },
+    {
+      "id": "chip_null_long_16_digits",
+      "expected_microchip_id": null,
+      "text": "Microchip: 1234567890123456\nPaciente: Duna"
+    },
+    {
+      "id": "chip_multiline_label_next_line",
+      "expected_microchip_id": "941000024967769",
+      "text": "Paciente: Thor\nNº Chip\n941000024967769\nEspecie: Canina"
+    },
+    {
+      "id": "chip_microchip_colon_with_suffix",
+      "expected_microchip_id": "941000024967769",
+      "text": "Microchip: 941000024967769 (ISO 11784)\nCentro Vet Sur"
+    },
+    {
+      "id": "chip_noise_but_keyword_present",
+      "expected_microchip_id": "941000024967769",
+      "text": "MICR0CHIP : 941000024967769\nPaciente: Bimba"
+    },
+    {
+      "id": "chip_null_no_numeric_identifier",
+      "expected_microchip_id": null,
+      "text": "Paciente: Rocky\nEspecie: Canina\nRaza: Mestiza"
+    }
+  ]
+}

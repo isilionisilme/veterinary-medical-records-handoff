@@ -233,6 +233,49 @@ def test_build_extraction_triage_flags_suspicious_accepted_fields() -> None:
     assert "clinic_address_po_box_without_street" in clinic_address_flags
 
 
+def test_build_extraction_triage_flags_microchip_phone_and_document_context() -> None:
+    phone_snapshot = {
+        "runId": "run-microchip-context",
+        "documentId": "doc-microchip-context",
+        "createdAt": "2026-02-13T20:06:00Z",
+        "fields": {
+            "microchip_id": {
+                "status": "accepted",
+                "confidence": "mid",
+                "valueNormalized": "Teléfono 612345678",
+            },
+        },
+        "counts": {"accepted": 1, "missing": 0, "rejected": 0, "low": 0, "mid": 1, "high": 0},
+    }
+
+    triage = extraction_observability.build_extraction_triage(phone_snapshot)
+    suspicious_by_field = {item["field"]: item for item in triage["suspiciousAccepted"]}
+
+    phone_flags = suspicious_by_field["microchip_id"]["flags"]
+    assert "microchip_phone_context" in phone_flags
+    assert "microchip_phone_like_digits" in phone_flags
+
+    document_snapshot = {
+        "runId": "run-microchip-document-context",
+        "documentId": "doc-microchip-document-context",
+        "createdAt": "2026-02-13T20:06:00Z",
+        "fields": {
+            "microchip_id": {
+                "status": "accepted",
+                "confidence": "mid",
+                "valueNormalized": "NIF 12345678Z",
+            },
+        },
+        "counts": {"accepted": 1, "missing": 0, "rejected": 0, "low": 0, "mid": 1, "high": 0},
+    }
+
+    triage = extraction_observability.build_extraction_triage(document_snapshot)
+    suspicious_by_field = {item["field"]: item for item in triage["suspiciousAccepted"]}
+
+    doc_flags = suspicious_by_field["microchip_id"]["flags"]
+    assert "microchip_document_id_context" in doc_flags
+
+
 def test_build_extraction_triage_keeps_top_candidates_shape() -> None:
     snapshot = {
         "runId": "run-top-candidates",

@@ -165,8 +165,82 @@ def _normalize_review_interpretation_data(data: dict[str, object]) -> dict[str, 
     normalized_global_schema = dict(global_schema)
     normalized_global_schema["microchip_id"] = normalized_microchip
     normalized_data["global_schema"] = normalized_global_schema
+    changed = True
 
-    return _project_review_payload_to_canonical(normalized_data)
+    fields_changed = _upsert_microchip_field_from_global_schema(
+        normalized_data=normalized_data,
+        normalized_microchip=normalized_microchip,
+    )
+    changed = changed or fields_changed
+
+    if changed:
+        return _project_review_payload_to_canonical(normalized_data)
+
+    return _project_review_payload_to_canonical(dict(data))
+
+
+def _upsert_microchip_field_from_global_schema(
+    *,
+    normalized_data: dict[str, object],
+    normalized_microchip: str | None,
+) -> bool:
+    if not normalized_microchip:
+        return False
+
+    raw_fields = normalized_data.get("fields")
+    fields: list[object]
+    if isinstance(raw_fields, list):
+        fields = list(raw_fields)
+    else:
+        fields = []
+
+    microchip_field_index: int | None = None
+    for index, item in enumerate(fields):
+        if isinstance(item, dict) and item.get("key") == "microchip_id":
+            microchip_field_index = index
+            break
+
+    if microchip_field_index is None:
+        fields.append(
+            {
+                "field_id": "backfill-microchip-id",
+                "key": "microchip_id",
+                "value": normalized_microchip,
+                "value_type": "string",
+                "scope": "document",
+                "section": "patient",
+                "classification": "medical_record",
+                "domain": "clinical",
+                "is_critical": True,
+                "origin": "machine",
+                "evidence": {"page": 1, "snippet": normalized_microchip},
+            }
+        )
+        normalized_data["fields"] = fields
+        return True
+
+    existing_field = fields[microchip_field_index]
+    if not isinstance(existing_field, dict):
+        return False
+
+    existing_value = existing_field.get("value")
+    existing_compact = str(existing_value).strip() if isinstance(existing_value, str) else ""
+    if existing_compact == normalized_microchip:
+        return False
+
+    patched_field = dict(existing_field)
+    patched_field["value"] = normalized_microchip
+    patched_field["value_type"] = "string"
+    patched_field.setdefault("scope", "document")
+    patched_field.setdefault("section", "patient")
+    patched_field.setdefault("classification", "medical_record")
+    patched_field.setdefault("domain", "clinical")
+    patched_field.setdefault("is_critical", True)
+    patched_field.setdefault("origin", "machine")
+    patched_field.setdefault("evidence", {"page": 1, "snippet": normalized_microchip})
+    fields[microchip_field_index] = patched_field
+    normalized_data["fields"] = fields
+    return True
 
 
 def _project_review_payload_to_canonical(data: dict[str, object]) -> dict[str, object]:

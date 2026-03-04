@@ -54,10 +54,23 @@ def test_lookup_name_case_insensitive() -> None:
     )
 
 
-def test_lookup_address_no_match() -> None:
+def test_lookup_address_no_match(monkeypatch) -> None:
+    class _FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> list[dict[str, str]]:
+            return []
+
+    def _fake_get(*_args, **_kwargs):
+        return _FakeResponse()
+
+    monkeypatch.setattr(clinic_catalog.httpx, "get", _fake_get)
+
     result = clinic_catalog.lookup_address_by_name("CLINICA DESCONOCIDA")
     assert result["found"] is False
     assert result["address"] is None
+    assert result["source"] == "none"
 
 
 def test_lookup_name_no_match() -> None:

@@ -68,11 +68,12 @@ _DATE_TARGET_PRIORITY: dict[str, int] = {
     "document_date": 2,
 }
 _MICROCHIP_KEYWORD_WINDOW_PATTERN = re.compile(
-    r"(?is)(?:microchip|chip|n[ºo°\uFFFD]\s*chip)\s*(?:n[ºo°\uFFFD]\.?|id)?\s*[:\-]?\s*([^\n]{0,90})"
+    r"(?is)(?:microchip|micr0chip|chip|transponder|identificaci[oó]n\s+electr[oó]nica|"
+    r"n[ºo°\uFFFD]\s*chip)\s*(?:n[ºo°\uFFFD]\.?|nro\.?|id)?\s*[:\-]?\s*([^\n]{0,90})"
 )
 _MICROCHIP_DIGITS_PATTERN = re.compile(r"(?<!\d)(\d{9,15})(?!\d)")
 _MICROCHIP_OCR_PREFIX_WINDOW_PATTERN = re.compile(
-    r"(?is)\bn(?:[º°\uFFFD]|ro)\.?\s*[:\-]?\s*([^\n]{0,60})"
+    r"(?is)\bn(?:[º°\uFFFD]|ro)?\.?\s*[:\-]\s*([^\n]{0,60})"
 )
 _VET_LABEL_LINE_PATTERN = re.compile(
     r"(?i)^\s*(?:veterinari(?:o|a|o/a)|vet|dr\.?|dra\.?|dr/a|doctor|doctora)\b\s*[:\-]?\s*(.*)$"
@@ -143,7 +144,7 @@ _LABELED_PATTERNS: tuple[tuple[str, str, float], ...] = (
     ),
     (
         "microchip_id",
-        r"(?:microchip|chip)\s*(?:n[ºo°\uFFFD]\.?|nro\.?|id)?\s*[:\-]?\s*([A-Za-z0-9][A-Za-z0-9./_\-]{1,30}(?:\s+[A-Za-z0-9][A-Za-z0-9./_\-]{0,20}){0,3})",
+        r"(?:microchip|micr0chip|chip|transponder|identificaci[oó]n\s+electr[oó]nica)\s*(?:n[ºo°\uFFFD]\.?|nro\.?|id)?\s*[:\-]?\s*([A-Za-z0-9][A-Za-z0-9./_\-]{1,30}(?:\s+[A-Za-z0-9][A-Za-z0-9./_\-]{0,20}){0,3})",
         COVERAGE_CONFIDENCE_LABEL,
     ),
     (

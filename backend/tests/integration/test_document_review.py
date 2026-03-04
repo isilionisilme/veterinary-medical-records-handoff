@@ -457,6 +457,13 @@ def test_document_review_normalizes_microchip_suffix_to_digits_only(test_client)
     assert (
         payload["active_interpretation"]["data"]["global_schema"]["microchip_id"] == "00023035139"
     )
+    microchip_fields = [
+        field
+        for field in payload["active_interpretation"]["data"].get("fields", [])
+        if isinstance(field, dict) and field.get("key") == "microchip_id"
+    ]
+    assert microchip_fields
+    assert microchip_fields[0].get("value") == "00023035139"
 
 
 def test_document_review_moves_visit_scoped_keys_into_visits_group(test_client):

@@ -63,6 +63,7 @@ def _suspicious_accepted_flags(field_key: str, value: str | None) -> list[str]:
     if len(normalized_value) > 80:
         flags.append("value_too_long")
     if normalized_key == "microchip_id":
+        compact_digits = re.sub(r"\D", "", normalized_value)
         if any(char.isalpha() for char in normalized_value):
             flags.append("microchip_contains_letters")
         if len(normalized_value.split()) > 1:
@@ -71,6 +72,12 @@ def _suspicious_accepted_flags(field_key: str, value: str | None) -> list[str]:
             flags.append("microchip_length_out_of_range")
         if not normalized_value.isdigit():
             flags.append("microchip_non_digit_characters")
+        if re.search(r"(?i)\b(?:tel(?:[eé]fono)?|movil|m[oó]vil)\b", normalized_value):
+            flags.append("microchip_phone_context")
+        if re.search(r"(?i)\b(?:nif|dni|nie|pasaporte|documento)\b", normalized_value):
+            flags.append("microchip_document_id_context")
+        if len(compact_digits) == 9 and compact_digits.startswith(("6", "7", "8", "9")):
+            flags.append("microchip_phone_like_digits")
     if normalized_key == "weight":
         letter_tokens = re.findall(r"[A-Za-z]+", normalized_value)
         if [token for token in letter_tokens if token.lower() not in {"kg", "kgs"}]:

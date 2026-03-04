@@ -129,9 +129,9 @@ def test_doc_b_golden_goal_fields_regression(monkeypatch) -> None:
     assert isinstance(candidates, dict)
 
     microchip = schema.get("microchip_id")
-    assert microchip in ("", None)
+    assert microchip == "941000024967769"
     microchip_candidates = candidates.get("microchip_id", [])
-    assert microchip_candidates == []
+    assert microchip_candidates
 
     # pet_name — docB has "NOMBRE DEMO" (actually owner name) picked up by
     # unlabeled heuristic near "chip" context. Known false positive.
@@ -271,3 +271,41 @@ def test_clinic_address_labeled_disambiguates_owner_address(monkeypatch) -> None
     schema = data["global_schema"]
     assert isinstance(schema, dict)
     assert schema.get("clinic_address") == "Av. Moratalaz 10, 28030 Madrid"
+
+
+def test_microchip_transponder_label_regression(monkeypatch) -> None:
+    raw_text = "\n".join(
+        [
+            "Paciente: Kira",
+            "Transponder 100000123456789",
+            "Especie: Felina",
+        ]
+    )
+    data = _build_with_candidates(
+        monkeypatch,
+        doc_id="golden-doc-microchip-transponder",
+        raw_text=raw_text,
+    )
+
+    schema = data["global_schema"]
+    assert isinstance(schema, dict)
+    assert schema.get("microchip_id") == "100000123456789"
+
+
+def test_microchip_separated_digits_regression(monkeypatch) -> None:
+    raw_text = "\n".join(
+        [
+            "Paciente: Max",
+            "Chip: 941 0000-2496 7769",
+            "Especie: Canina",
+        ]
+    )
+    data = _build_with_candidates(
+        monkeypatch,
+        doc_id="golden-doc-microchip-separated-digits",
+        raw_text=raw_text,
+    )
+
+    schema = data["global_schema"]
+    assert isinstance(schema, dict)
+    assert schema.get("microchip_id") == "941000024967769"

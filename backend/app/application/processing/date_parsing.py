@@ -34,6 +34,17 @@ from .constants import (
 )
 
 
+def _extract_microchip_digits(window: str) -> str | None:
+    direct_match = _MICROCHIP_DIGITS_PATTERN.search(window)
+    if direct_match is not None:
+        return direct_match.group(1)
+
+    compact_digits = re.sub(r"\D", "", window)
+    if 9 <= len(compact_digits) <= 15:
+        return compact_digits
+    return None
+
+
 def _split_owner_before_address_tokens(text: str) -> str:
     tokens = text.split()
     if not tokens:
@@ -261,13 +272,13 @@ def extract_microchip_keyword_candidates(
     payloads: list[dict[str, object]] = []
     for match in _MICROCHIP_KEYWORD_WINDOW_PATTERN.finditer(raw_text):
         window = match.group(1) if isinstance(match.group(1), str) else ""
-        digit_match = _MICROCHIP_DIGITS_PATTERN.search(window)
-        if digit_match is None:
+        digits = _extract_microchip_digits(window)
+        if digits is None:
             continue
         payloads.append(
             {
                 "key": "microchip_id",
-                "value": digit_match.group(1),
+                "value": digits,
                 "confidence": confidence,
                 "snippet": match.group(0),
             }
@@ -302,17 +313,64 @@ def extract_ocr_microchip_candidates(raw_text: str, confidence: float) -> list[d
     payloads: list[dict[str, object]] = []
     for match in _MICROCHIP_OCR_PREFIX_WINDOW_PATTERN.finditer(raw_text):
         window = match.group(1) if isinstance(match.group(1), str) else ""
-        digit_match = _MICROCHIP_DIGITS_PATTERN.search(window)
-        if digit_match is None:
+        digits = _extract_microchip_digits(window)
+        if digits is None:
             continue
         payloads.append(
             {
                 "key": "microchip_id",
-                "value": digit_match.group(1),
+                "value": digits,
                 "confidence": confidence,
                 "snippet": match.group(0),
             }
         )
+    return payloads
+
+
+def extract_microchip_adjacent_line_candidates(
+    raw_text: str,
+    confidence: float,
+) -> list[dict[str, object]]:
+    payloads: list[dict[str, object]] = []
+    raw_lines = raw_text.splitlines()
+    chip_label_re = re.compile(
+        r"(?i)\b(?:microchip|micr0chip|chip|transponder|identificaci[oó]n\s+electr[oó]nica|"
+        r"n[º°o]?\s*chip)\b"
+    )
+
+    max_label_distance = 8
+
+    for index, raw_line in enumerate(raw_lines):
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        digits = _extract_microchip_digits(line)
+        if digits is None:
+            continue
+
+        window_start = max(0, index - max_label_distance)
+        window_end = min(len(raw_lines), index + max_label_distance + 1)
+        has_label_in_window = any(
+            chip_label_re.search(raw_lines[candidate_index].strip())
+            for candidate_index in range(window_start, window_end)
+            if candidate_index != index
+        )
+        if not has_label_in_window:
+            continue
+
+        snippet_start = window_start
+        snippet_end = window_end
+        snippet = "\n".join(raw_lines[snippet_start:snippet_end])
+        payloads.append(
+            {
+                "key": "microchip_id",
+                "value": digits,
+                "confidence": confidence,
+                "snippet": snippet,
+            }
+        )
+
     return payloads
 
 
