@@ -12,7 +12,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot ".." ".." )).Path
+. (Join-Path $PSScriptRoot "lib\repo-root.ps1")
+$repoRoot = Get-RepoRoot -ScriptRoot $PSScriptRoot
 Set-Location $repoRoot
 
 function Invoke-Step {
