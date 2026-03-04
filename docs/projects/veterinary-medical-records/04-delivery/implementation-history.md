@@ -4,7 +4,7 @@
 
 ## Active iteration
 
-**None** — Iteration 17 closed. Next iteration plan pending.
+**None** — Iteration 18 closed. Next iteration plan pending.
 
 ## Timeline
 
@@ -27,10 +27,12 @@
 | 15 | 2026-03-02 | #182 | Golden loop hardening for `pet_name` extraction | Synthetic benchmark 53.3% → 100.0% EM, null misses 26.7% → 0.0%, false positives 13.3% → 0.0%, focused suite 50 passed | [completed-2026-03-02-golden-loop-pet-name.md](completed/completed-2026-03-02-golden-loop-pet-name.md) |
 | 16 | 2026-03-03 | #186 | Golden loop hardening for `clinic_name` extraction | Hard-gate GO: 340/340 tests green, clinic benchmark 11/11, 0 regressions; review follow-ups merged | [completed-2026-03-02-golden-loop-clinic-name.md](plans/completed/completed-2026-03-02-golden-loop-clinic-name.md) |
 | 17 | 2026-03-03 | #192 | L1/L2/L3 preflight rules alignment in execution protocol | `execution-rules.md` now references L1/L2/L3 + `ForceFull`; contract coverage added for doc references; CI green at merge | [COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md](plans/completed/COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md) |
+| 18 | 2026-03-04 | #198 | Clinic address enrichment with production online resolver chain | User-consented lookup UX, online resolver chain (`nominatim` + `web_search` proxy fallback), no local stored clinic addresses by default, CI green at merge | [COMPLETED_2026-03-04_CLINIC-ENRICHMENT-BIDIRECTIONAL.md](plans/completed/COMPLETED_2026-03-04_CLINIC-ENRICHMENT-BIDIRECTIONAL.md) |
 
 ## Cumulative progress
 
 - Iteration 15 cumulative extraction outcome (`pet_name` golden loop): baseline 8/15 exact matches to final 15/15 exact matches with zero null misses and zero false positives on synthetic fixtures.
 - Iteration 16 cumulative extraction outcome (`clinic_name` golden loop): final synthetic benchmark 11/11 exact matches with no benchmark regressions after review follow-ups.
 - Iteration 17 cumulative process-governance outcome: `execution-rules.md` and local preflight policy are aligned on L1/L2/L3 flow, reducing drift between agent protocol and CI/local guardrails.
+- Iteration 18 cumulative clinic-enrichment outcome: on-demand resolver is production-ready with explicit source semantics (`clinic_catalog|nominatim|web_search|none`), proxy fallback observability events, and merged completed plan archive.
 - See [delivery-summary.md](delivery-summary.md) for the broader cumulative metrics table across all iterations.
