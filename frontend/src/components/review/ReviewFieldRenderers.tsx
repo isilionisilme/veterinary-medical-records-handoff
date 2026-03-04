@@ -5,6 +5,7 @@ import type {
 } from "react";
 import { Pencil } from "lucide-react";
 
+import { ClinicAddressEnrichmentPrompt } from "./ClinicAddressEnrichmentPrompt";
 import { CriticalBadge } from "../app/CriticalBadge";
 import { FieldBlock, FieldRow, RepeatableList, ValueSurface } from "../app/Field";
 import { IconButton } from "../app/IconButton";
@@ -50,6 +51,15 @@ export type ReviewFieldRenderersContext = {
   onSetHoveredCriticalTriggerId: (
     value: string | ((current: string | null) => string | null),
   ) => void;
+  clinicEnrichment?: {
+    state: "idle" | "loading" | "found" | "not-found" | "error";
+    foundAddress: string | null;
+    clinicNameValue: string | null;
+    addressFieldItem: ReviewSelectableField | null;
+    onSearch: () => void;
+    onAccept: () => void;
+    onDismiss: () => void;
+  };
 };
 
 export function createReviewFieldRenderers(ctx: ReviewFieldRenderersContext): {
@@ -535,6 +545,19 @@ export function createReviewFieldRenderers(ctx: ReviewFieldRenderersContext): {
             {isExpanded ? "Ver menos" : "Ver más"}
           </button>
         )}
+        {field.key === "clinic_address" &&
+          item.isMissing &&
+          ctx.clinicEnrichment &&
+          ctx.clinicEnrichment.clinicNameValue && (
+            <ClinicAddressEnrichmentPrompt
+              state={ctx.clinicEnrichment.state}
+              foundAddress={ctx.clinicEnrichment.foundAddress}
+              isDocumentReviewed={ctx.isDocumentReviewed}
+              onSearch={ctx.clinicEnrichment.onSearch}
+              onAccept={ctx.clinicEnrichment.onAccept}
+              onDismiss={ctx.clinicEnrichment.onDismiss}
+            />
+          )}
       </FieldBlock>
     );
   };

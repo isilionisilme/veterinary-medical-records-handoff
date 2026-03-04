@@ -23,6 +23,7 @@ type UseReviewRenderersParams = {
   onSetExpandedFieldValues: ReviewFieldRenderersContext["onSetExpandedFieldValues"];
   onSetHoveredFieldTriggerId: ReviewFieldRenderersContext["onSetHoveredFieldTriggerId"];
   onSetHoveredCriticalTriggerId: ReviewFieldRenderersContext["onSetHoveredCriticalTriggerId"];
+  clinicEnrichment?: ReviewFieldRenderersContext["clinicEnrichment"];
   isCanonicalContract: boolean;
   hasVisitGroups: boolean;
   validatedReviewFields: ReviewField[];
@@ -54,6 +55,7 @@ export function useReviewRenderers({
   onSetExpandedFieldValues,
   onSetHoveredFieldTriggerId,
   onSetHoveredCriticalTriggerId,
+  clinicEnrichment,
   isCanonicalContract,
   hasVisitGroups,
   validatedReviewFields,
@@ -79,6 +81,7 @@ export function useReviewRenderers({
         onSetExpandedFieldValues,
         onSetHoveredFieldTriggerId,
         onSetHoveredCriticalTriggerId,
+        clinicEnrichment,
       }),
     [
       activeConfidencePolicy,
@@ -96,6 +99,7 @@ export function useReviewRenderers({
       onSetExpandedFieldValues,
       onSetHoveredFieldTriggerId,
       onSetHoveredCriticalTriggerId,
+      clinicEnrichment,
     ],
   );
 

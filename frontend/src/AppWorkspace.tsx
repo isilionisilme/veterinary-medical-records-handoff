@@ -10,6 +10,7 @@ import { WorkspaceDialogs } from "./components/review/WorkspaceDialogs";
 import { type ActionFeedback, type UploadFeedback } from "./components/toast/toast-types";
 import { useConnectivityToasts } from "./hooks/useConnectivityToasts";
 import { useFieldEditing } from "./hooks/useFieldEditing";
+import { useClinicAddressLookup } from "./hooks/useClinicAddressLookup";
 import { useDocumentsSidebar } from "./hooks/useDocumentsSidebar";
 import { useReviewSplitPanel } from "./hooks/useReviewSplitPanel";
 import { useStructuredDataFilters } from "./hooks/useStructuredDataFilters";
@@ -473,6 +474,43 @@ export function App() {
     onSubmitInterpretationChanges: submitInterpretationChanges,
     onActionFeedback: setActionFeedback,
   });
+  const { lookupState, lookupResult, startLookup, acceptLookupResult, dismissLookup } =
+    useClinicAddressLookup({
+      onSubmitInterpretationChanges: submitInterpretationChanges,
+      onActionFeedback: setActionFeedback,
+    });
+  const clinicEnrichmentContext = useMemo(() => {
+    const clinicNameField = selectableReviewItems.find((f) => f.key === "clinic_name");
+    const clinicAddressField = selectableReviewItems.find((f) => f.key === "clinic_address");
+    const clinicNameValue =
+      clinicNameField && !clinicNameField.isMissing
+        ? String(clinicNameField.rawField?.value ?? "")
+        : null;
+    const addressIsMissing = clinicAddressField?.isMissing ?? true;
+
+    if (!clinicNameValue || !addressIsMissing) return undefined;
+
+    return {
+      state: lookupState,
+      foundAddress: lookupResult?.address ?? null,
+      clinicNameValue,
+      addressFieldItem: clinicAddressField ?? null,
+      onSearch: () => {
+        if (clinicAddressField) {
+          startLookup(clinicNameValue, clinicAddressField);
+        }
+      },
+      onAccept: acceptLookupResult,
+      onDismiss: dismissLookup,
+    };
+  }, [
+    selectableReviewItems,
+    lookupState,
+    lookupResult,
+    startLookup,
+    acceptLookupResult,
+    dismissLookup,
+  ]);
   const { renderSectionLayout } = useReviewRenderers({
     activeConfidencePolicy,
     isDocumentReviewed,
@@ -489,6 +527,7 @@ export function App() {
     onSetExpandedFieldValues: setExpandedFieldValues,
     onSetHoveredFieldTriggerId: setHoveredFieldTriggerId,
     onSetHoveredCriticalTriggerId: setHoveredCriticalTriggerId,
+    clinicEnrichment: clinicEnrichmentContext,
     isCanonicalContract,
     hasVisitGroups,
     validatedReviewFields,

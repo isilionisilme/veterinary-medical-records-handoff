@@ -308,3 +308,18 @@ class ExtractionRunsAggregateSummaryResponse(BaseModel):
     fields: list[ExtractionRunFieldSummaryResponse]
     most_missing_fields: list[ExtractionRunFieldSummaryResponse]
     most_rejected_fields: list[ExtractionRunFieldSummaryResponse]
+
+
+# --- Clinic address lookup ---
+
+
+class ClinicAddressLookupRequest(BaseModel):
+    clinic_name: str = Field(
+        ..., min_length=1, description="Name of the clinic to look up the address for."
+    )
+
+
+class ClinicAddressLookupResponse(BaseModel):
+    found: bool = Field(description="Whether a matching address was found.")
+    address: str | None = Field(None, description="The resolved clinic address, if found.")
+    source: str = Field(description="Source of the lookup result (e.g. 'clinic_catalog').")

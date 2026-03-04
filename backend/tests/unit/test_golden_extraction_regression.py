@@ -102,6 +102,13 @@ def test_doc_a_golden_goal_fields_regression(monkeypatch) -> None:
         f"clinic_name regression: expected 'CENTRO COSTA AZAHAR', got {clinic_name!r}"
     )
 
+    # clinic_address is NOT auto-enriched — user must trigger lookup explicitly
+    clinic_address = schema.get("clinic_address")
+    assert clinic_address in ("", None), (
+        "clinic_address should be empty for docA (enrichment is now user-initiated), "
+        f"got {clinic_address!r}"
+    )
+
     _assert_owner_or_vet_invariant(
         schema=schema,
         candidates=candidates,

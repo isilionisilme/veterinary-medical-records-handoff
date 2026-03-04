@@ -447,3 +447,46 @@ export async function copyTextToClipboard(text: string): Promise<void> {
 
   throw new UiError("No se pudo copiar el texto al portapapeles.");
 }
+
+// --- Clinic address lookup ---
+
+export type ClinicAddressLookupResponse = {
+  found: boolean;
+  address: string | null;
+  source: string;
+};
+
+export async function lookupClinicAddress(
+  clinicName: string,
+): Promise<ClinicAddressLookupResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/clinics/lookup-address`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clinic_name: clinicName }),
+    });
+  } catch (error) {
+    if (isNetworkFetchError(error)) {
+      throw new UiError(
+        "No se pudo conectar con el servidor para buscar la dirección.",
+        `Network error calling ${API_BASE_URL}/clinics/lookup-address`,
+      );
+    }
+    throw error;
+  }
+  if (!response.ok) {
+    let errorMessage = "No se pudo buscar la dirección de la clínica.";
+    try {
+      const payload = await response.json();
+      errorMessage = resolveFriendlyPayloadMessage(payload?.message, errorMessage);
+    } catch {
+      // Ignore JSON parse errors for non-JSON responses.
+    }
+    throw new UiError(
+      errorMessage,
+      `HTTP ${response.status} calling ${API_BASE_URL}/clinics/lookup-address`,
+    );
+  }
+  return response.json();
+}
