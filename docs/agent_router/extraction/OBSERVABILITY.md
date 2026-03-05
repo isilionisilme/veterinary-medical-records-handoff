@@ -1,56 +1,49 @@
-# Extraction Observability
+<!-- AUTO-GENERATED from canonical source: extraction-quality.md — DO NOT EDIT -->
+<!-- To update, edit the canonical source and run: python scripts/docs/generate-router-files.py -->
 
-## What we capture
-- Per-run extraction snapshot with per-field status:
-  - `missing` / `rejected` / `accepted`
-- Per-field candidate evidence:
-  - `topCandidates` (max 3)
-  - confidence
-  - reason (for rejected)
-  - suspicious accepted flags (triage)
+## 3. Observability
 
-## Storage
+### What We Capture
+
+Per-run extraction snapshot with per-field status:
+- `missing` / `rejected` / `accepted`
+
+Per-field candidate evidence:
+- `topCandidates` (max 3)
+- confidence
+- reason (for rejected)
+- suspicious accepted flags (triage)
+
+### Storage
+
 - Path: `.local/extraction_runs/<documentId>.json`
 - Behavior: ring buffer of latest 20 runs per document.
 
-## Backend endpoints
-- `POST /debug/extraction-runs`
-  - Persist one run snapshot.
-- `GET /debug/extraction-runs/{documentId}`
-  - Return persisted runs for one document.
-- `GET /debug/extraction-runs/{documentId}/summary?limit=...`
-  - Aggregate recent runs (default operational window: 20).
+### Backend Endpoints
 
-## Summary outputs
-- Most missing fields.
-- Most rejected fields.
-- For missing/rejected: top1 sample + average confidence.
-- Suspicious accepted counts.
-- Missing split:
-  - with candidates
-  - without candidates
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /debug/extraction-runs` | Persist one run snapshot |
+| `GET /debug/extraction-runs/{documentId}` | Return persisted runs for one document |
+| `GET /debug/extraction-runs/{documentId}/summary?limit=...` | Aggregate recent runs (default window: 20) |
 
-## Logs emitted by backend
-- Triage summary header.
-- `MISSING` section.
-- `REJECTED` section.
-- `SUSPICIOUS_ACCEPTED` section.
-- Diff vs previous persisted snapshot.
-- Aggregate summary logs (`MOST_MISSING`, `MOST_REJECTED`).
+Optional `run_id` parameter for run-pinned summary filtering.
 
-## Practical interpretation rule
-- `limit=20` includes historical behavior and is useful for trend.
-- `limit=1` isolates the latest run and is the right check to confirm a new fix.
+### Summary Outputs
 
-## Relevant code paths
-- Snapshot persistence + triage + summary:
-  - [backend/app/application/extraction_observability.py](../../backend/app/application/extraction_observability.py)
-- Debug endpoints:
-  - [backend/app/api/routes.py](../../backend/app/api/routes.py)
-  - [backend/app/api/schemas.py](../../backend/app/api/schemas.py)
+- Most missing fields
+- Most rejected fields
+- For missing/rejected: top1 sample + average confidence
+- Suspicious accepted counts
+- Missing split: with candidates / without candidates
 
-## Verification quick-start
-1. Process/review a document with extraction debug enabled.
-2. Persist snapshot (`POST /debug/extraction-runs`).
-3. Query summary with `limit=20` and `limit=1`.
-4. Confirm field transitions and candidate evidence in both endpoint output and logs.
+### Practical Interpretation Rule
+
+- `limit=20` includes historical behavior — useful for **trends**.
+- `limit=1` isolates the latest run — correct check to confirm a **new fix**.
+
+### Snapshot Ownership
+
+Snapshots are **backend-canonical**. The backend auto-persists snapshots at completed-run boundary. Frontend does NOT write snapshots.
+
+---

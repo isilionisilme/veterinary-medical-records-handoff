@@ -180,7 +180,7 @@ def test_evaluate_sync_passes_when_owner_and_related_files_change() -> None:
     findings = module.evaluate_sync(
         changed_files=[
             "docs/shared/03-ops/engineering-playbook.md",
-            "docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/150_documentation-guidelines.md",
+            "docs/agent_router/03_SHARED/DOCUMENTATION_GUIDELINES/10_documentation-guidelines.md",
             "backend/tests/unit/test_doc_updates_contract.py",
         ],
         rules=[

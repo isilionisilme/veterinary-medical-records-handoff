@@ -203,13 +203,49 @@
       ]
     },
     {
-      "source_doc": "docs/shared/03-ops/engineering-playbook.md",
-      "description": "Shared ENGINEERING_PLAYBOOK must map to shared owner entry module.",
+      "source_doc": "docs/shared/02-tech/coding-standards.md",
+      "description": "Shared CODING_STANDARDS must map to the CODING_STANDARDS shared owner entry module. Router files are auto-generated via MANIFEST.yaml.",
       "router_modules": [
         {
-          "path": "docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/00_entry.md",
+          "path": "docs/agent_router/03_SHARED/CODING_STANDARDS/00_entry.md",
           "required_terms": [
-            "ENGINEERING_PLAYBOOK — Modules"
+            "CODING_STANDARDS — Modules"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/shared/02-tech/documentation-guidelines.md",
+      "description": "Shared DOCUMENTATION_GUIDELINES must map to the DOCUMENTATION_GUIDELINES shared owner entry module. Router files are auto-generated via MANIFEST.yaml.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/03_SHARED/DOCUMENTATION_GUIDELINES/00_entry.md",
+          "required_terms": [
+            "DOCUMENTATION_GUIDELINES — Modules"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/shared/03-ops/way-of-working.md",
+      "description": "Shared WAY_OF_WORKING must map to the WAY_OF_WORKING shared owner entry module. Router files are auto-generated via MANIFEST.yaml.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/03_SHARED/WAY_OF_WORKING/00_entry.md",
+          "required_terms": [
+            "WAY_OF_WORKING — Modules"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
+      "description": "Project PLAN_EXECUTION_PROTOCOL must map to execution rule reference module.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/03_SHARED/WAY_OF_WORKING/90_execution-rule.md",
+          "required_terms": [
+            "Execution Rule"
           ]
         }
       ]
@@ -334,7 +370,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/02-tech/extraction-quality.md",
-      "description": "Project EXTRACTION_QUALITY must map to project owner entry module.",
+      "description": "Project EXTRACTION_QUALITY must map to project owner entry module, including canonical wording cleanups.",
       "router_modules": [
         {
           "path": "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/00_entry.md",

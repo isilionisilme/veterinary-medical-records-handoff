@@ -1,6 +1,6 @@
 # Plan: Canonical Documentation Restructuring
 
-> **Operational rules:** See [execution-rules.md](../../03-ops/execution-rules.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit-task schema, and handoff rules.
 
 **Rama:** `docs/canonical-doc-restructure`
 **PR:** [#197](https://github.com/isilionisilme/veterinary-medical-records/pull/197)
@@ -34,6 +34,7 @@ Este plan establece 7 documentos canónicos (5 shared, 2 project) como single so
 | Directionality enforcement | CI check + regeneration script | Convention alone is insufficient; automated protection required |
 | brand/ux guidelines | Keep as-is, add governance header only | Already well-structured canonical docs |
 | Router mini-files | Derived via script + manifest | Single source of truth; no manual edits to router |
+| Derived router files strategy | Delete ~58 derived files, regenerate from scratch | Cleaner than incremental update; avoids stale content. Keep routing infra (00_AUTHORITY, 00_FALLBACK, 00_RULES_INDEX, README), DOC_UPDATES, 02_PRODUCT pointers, 04_PROJECT (out of scope), extraction ADR/ITERATIONS, extraction-tracking |
 
 ## PR Roadmap
 
@@ -57,11 +58,37 @@ Este plan establece 7 documentos canónicos (5 shared, 2 project) como single so
 | C9 | `docs: fix all cross-references from engineering-playbook.md to new canonicals` | Multiple files (grep + replace) | F2-D |
 | C10 | `docs(router): add MANIFEST.yaml — canonical-to-router derivation map` | `docs/agent_router/MANIFEST.yaml` | F3-A |
 | C11 | `chore(scripts): add generate-router-files.py — canonical→router derivation` | `scripts/docs/generate-router-files.py` | F3-B |
-| C12 | `docs(router): regenerate all router files from canonical sources` | `docs/agent_router/01_WORKFLOW/`, `docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/` | F3-C |
+| C12 | `docs(router): delete derived router files and regenerate from canonicals` | `docs/agent_router/01_WORKFLOW/{BRANCHING,CODE_REVIEW,PULL_REQUESTS,START_WORK,TESTING}/`, `docs/agent_router/03_SHARED/{ENGINEERING_PLAYBOOK,BRAND_GUIDELINES,UX_GUIDELINES}/`, `docs/agent_router/extraction/{STRATEGY,FIELD_GUARDRAILS,OBSERVABILITY}.md` | F3-C |
 | C13 | `docs(router): update AGENTS.md and 00_AUTHORITY.md — remove embedded rules` | `AGENTS.md`, `docs/agent_router/00_AUTHORITY.md` | F3-D |
 | C14 | `docs(router): update parity and impact maps for new canonical paths` | `docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json`, `test_impact_map.json` | F3-E |
 | C15 | `ci: add canonical→router directionality check` | `.github/workflows/` or `scripts/ci/` | F4-A |
 | C16 | `ci: add router drift check — regenerate and compare` | `.github/workflows/` or `scripts/ci/` | F4-B |
+
+## Operational override steps (commit-task schema)
+
+### CT-1 — Commit F3 implementation bundle
+
+- `type`: `commit-task`
+- `trigger`: after F3-A, F3-B, F3-C, F3-D, F3-E are `[x]`
+- `preconditions`: targeted docs/router tests green; `python scripts/docs/generate-router-files.py --check` passes
+- `commands`:
+   - `git add docs/agent_router/MANIFEST.yaml scripts/docs/generate-router-files.py requirements-dev.txt AGENTS.md docs/shared/03-ops/way-of-working.md docs/agent_router/00_AUTHORITY.md docs/agent_router/00_RULES_INDEX.md docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json docs/agent_router/01_WORKFLOW/CODE_REVIEW/ docs/agent_router/01_WORKFLOW/BRANCHING/ docs/agent_router/01_WORKFLOW/PULL_REQUESTS/ docs/agent_router/01_WORKFLOW/START_WORK/ docs/agent_router/01_WORKFLOW/TESTING/ docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/ docs/agent_router/03_SHARED/BRAND_GUIDELINES/ docs/agent_router/03_SHARED/UX_GUIDELINES/ docs/agent_router/03_SHARED/00_entry.md docs/agent_router/extraction/STRATEGY.md docs/agent_router/extraction/FIELD_GUARDRAILS.md docs/agent_router/extraction/OBSERVABILITY.md`
+   - `git commit -m "docs(router): F3 canonical->router derivation, regeneration, and contract alignment"`
+   - `git push origin chore/router-directionality-protection`
+- `approval`: `auto`
+- `fallback`: if commit fails due to scope mismatch, split into CT-1a/CT-1b in this plan before retrying
+
+### CT-2 — Commit F4 CI protection
+
+- `type`: `commit-task`
+- `trigger`: after F4-A and F4-B are `[x]`
+- `preconditions`: CI checks added and passing in branch validation run
+- `commands`:
+   - `git add .github/workflows/ scripts/ci/`
+   - `git commit -m "ci(plan-f4): add canonical-router directionality and drift checks"`
+   - `git push origin chore/router-directionality-protection`
+- `approval`: `auto`
+- `fallback`: if checks fail, keep F4 steps in `🚫 BLOCKED` until focused fix is committed
 
 ---
 
@@ -85,21 +112,23 @@ Este plan establece 7 documentos canónicos (5 shared, 2 project) como single so
 - [x] F2-B 🚧 — **Delete `engineering-playbook.md`** — Sustituido por coding-standards + documentation-guidelines + way-of-working. Commit C7. (Claude Opus 4.6)
 - [x] F2-C 🔄 — **Update wiki section indexes** — Actualizar ficheros índice de `docs/shared/02-tech/` y `docs/shared/03-ops/` para que listen los nuevos documentos. Commit C8. (Codex)
 - [x] F2-D 🔄 — **Fix all cross-references** — Grep todos los links a engineering-playbook.md en el repo, reemplazar por el canónico correspondiente (coding-standards, documentation-guidelines, o way-of-working según la sección referenciada). Commit C9. (Codex)
-- [ ] F2-E 🚧 — **Hard-gate: user review** — El usuario revisa los 5 canónicos, valida contenido, tono, completitud. Go/no-go para merge PR-1. (Claude Opus 4.6)
+- [x] F2-E 🚧 — **Hard-gate: user review** — El usuario revisa los 5 canónicos, valida contenido, tono, completitud. Go/no-go para merge PR-1. (Claude Opus 4.6) ✅ GO (2026-03-05)
 
 ### Phase 3 — Router derivation + governance **[PR-2]**
 
-- [ ] F3-A 🚧 — **Define router derivation manifest** — Crear `docs/agent_router/MANIFEST.yaml` que mapee cada canónico → secciones → mini-archivos a generar. Commit C10. (Claude Opus 4.6)
-- [ ] F3-B 🔄 — **Create `scripts/docs/generate-router-files.py`** — Script que lee canónicos + manifest, genera mini-archivos con header AUTO-GENERATED. Commit C11. (Codex)
-- [ ] F3-C 🔄 — **Run initial generation** — Ejecutar script, diff contra router files actuales, validar equivalencia. Commit C12. (Codex)
-- [ ] F3-D 🚧 — **Update `AGENTS.md` and `00_AUTHORITY.md`** — Reemplazar reglas embebidas por references a canónicos. Mantener AGENTS.md como entry point ligero. Commit C13. (Claude Opus 4.6)
-- [ ] F3-E 🔄 — **Update parity and impact maps** — Ajustar `router_parity_map.json` y `test_impact_map.json` a nuevos paths canónicos. Commit C14. (Codex)
+- [x] F3-A 🚧 — **Define router derivation manifest** — Crear `docs/agent_router/MANIFEST.yaml` que mapee cada canónico → secciones → mini-archivos a generar. Commit C10. (Claude Opus 4.6) ✅ (2026-03-05)
+- [x] F3-B 🚧 — **Create `scripts/docs/generate-router-files.py`** — Script que lee canónicos + manifest, genera mini-archivos con header AUTO-GENERATED. Commit C11. (Claude Opus 4.6) ✅ (2026-03-05)
+- [x] F3-C 🚧 — **Delete derived router files + regenerate** — Eliminados ~58 archivos derivados, regenerados 55 desde canónicos. Drift check OK. Commit C12. (Claude Opus 4.6) ✅ (2026-03-05)
+- [x] F3-D 🚧 — **Update `AGENTS.md` and `00_AUTHORITY.md`** — Reemplazar reglas embebidas por references a canónicos. Mantener AGENTS.md como entry point ligero. Commit C13. (Claude Opus 4.6) ✅ (2026-03-05)
+- [x] F3-E 🔄 — **Update parity and impact maps** — Ajustar `router_parity_map.json` y `test_impact_map.json` a nuevos paths canónicos. Commit C14. (Claude Opus 4.6) ✅ (2026-03-05)
+- [x] F3-F 🔄 — **Commit-task CT-1** — Ejecutar CT-1 (commit/push de implementación F3 según schema). (Codex) — ✅ `e417b965`
 
 ### Phase 4 — CI protection **[PR-2]**
 
 - [ ] F4-A 🔄 — **Add CI directionality check** — Step en CI que falla si archivos bajo `docs/agent_router/03_SHARED/` o `01_WORKFLOW/` son modificados sin cambio en canónico correspondiente. Commit C15. (Codex)
 - [ ] F4-B 🔄 — **Add CI drift check** — Step que ejecuta `generate-router-files.py` y compara output con committed. Falla si difieren. Commit C16. (Codex)
 - [ ] F4-C 🚧 — **Hard-gate: user validation of full pipeline** — Verificar ciclo canonical → generate → router → agent-use. Go/no-go para merge PR-2. (Claude Opus 4.6)
+- [ ] F4-D 🔄 — **Commit-task CT-2** — Ejecutar CT-2 (commit/push de protección CI F4). (Codex)
 
 ---
 

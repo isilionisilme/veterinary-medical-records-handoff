@@ -24,5 +24,10 @@ Load **only one** module unless it explicitly triggers another.
 - Router docs are derived assistant modules under `docs/agent_router/*`.
 - Prefer router modules for discovery/token-optimized reads; do not load canonical docs by default.
 - Consult canonical docs only when explicitly requested, when router guidance is missing/ambiguous, or when resolving a source-of-truth conflict.
-- Directionality is canonical -> derived.
+- Directionality is canonical → derived.
 - Canonical docs MUST NOT reference `docs/agent_router/*`.
+
+## Auto-generated files
+- Files with `<!-- AUTO-GENERATED -->` header are managed by `docs/agent_router/MANIFEST.yaml`.
+- Regenerate: `python scripts/docs/generate-router-files.py`.
+- CI checks for drift: `python scripts/docs/generate-router-files.py --check`.

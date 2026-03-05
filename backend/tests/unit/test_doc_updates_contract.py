@@ -23,12 +23,7 @@ DOC_UPDATES_ROUTER_PARITY_MAP = (
 )
 WAY_OF_WORKING = REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md"
 CODE_REVIEW_OWNER = (
-    REPO_ROOT
-    / "docs"
-    / "agent_router"
-    / "03_SHARED"
-    / "ENGINEERING_PLAYBOOK"
-    / "220_code-reviews.md"
+    REPO_ROOT / "docs" / "agent_router" / "03_SHARED" / "WAY_OF_WORKING" / "60_code-reviews.md"
 )
 CODE_REVIEW_ENTRY = (
     REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "CODE_REVIEW" / "00_entry.md"
@@ -205,7 +200,6 @@ def test_doc_test_sync_map_has_minimum_rules() -> None:
         '"doc_glob": "docs/projects/veterinary-medical-records/99-archive/12-factor-audit.md"'
         in text
     )
-    assert '"doc_glob": "docs/shared/03-ops/engineering-playbook.md"' in text
     assert (
         '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/backend-implementation.md"'
         in text
@@ -216,7 +210,7 @@ def test_doc_test_sync_map_has_minimum_rules() -> None:
     )
     assert '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/adr/**/*.md"' in text
     assert '"owner_any"' in text
-    assert '"docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/*.md"' in text
+    assert '"docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md"' in text
     assert '"docs/agent_router/04_PROJECT/BACKEND_IMPLEMENTATION/*.md"' in text
     assert '"doc_glob": "docs/shared/01-product/brand-guidelines.md"' in text
     assert "test_doc_updates_contract.py" in text
@@ -241,7 +235,7 @@ def test_router_parity_map_has_product_design_rule() -> None:
         '"source_doc": "docs/projects/veterinary-medical-records/02-tech/technical-design.md"'
         in text
     )
-    assert '"source_doc": "docs/shared/03-ops/engineering-playbook.md"' in text
+    assert '"source_doc": "docs/shared/03-ops/way-of-working.md"' in text
     assert (
         '"path": "docs/agent_router/04_PROJECT/PRODUCT_DESIGN/'
         '76_conceptual-model-local-schema-global-schema-and-mapping.md"' in text
@@ -280,12 +274,7 @@ def test_code_review_guidance_terms_are_propagated() -> None:
 def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
     source_text = _read_text(WAY_OF_WORKING)
     pr_router = (
-        REPO_ROOT
-        / "docs"
-        / "agent_router"
-        / "03_SHARED"
-        / "ENGINEERING_PLAYBOOK"
-        / "210_pull-requests.md"
+        REPO_ROOT / "docs" / "agent_router" / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md"
     )
     pr_router_text = _read_text(pr_router)
     readme_text = _read_text(REPO_ROOT / "README.md")

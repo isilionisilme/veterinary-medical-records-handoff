@@ -55,16 +55,54 @@
       ]
     },
     {
-      "doc_glob": "docs/shared/03-ops/engineering-playbook.md",
-      "description": "Shared ENGINEERING_PLAYBOOK changes require propagation to its owner module.",
+      "doc_glob": "docs/shared/02-tech/coding-standards.md",
+      "description": "Shared CODING_STANDARDS changes require router regeneration and propagation to CODING_STANDARDS.",
       "owner_any": [
-        "docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/*.md",
-        "docs/agent_router/03_SHARED/ENGINEERING_PLAYBOOK/**/*.md"
+        "docs/agent_router/03_SHARED/CODING_STANDARDS/*.md"
       ],
       "required_any": [
+        "scripts/docs/generate-router-files.py",
         "backend/tests/unit/test_doc_router_contract.py",
         "backend/tests/unit/test_doc_updates_contract.py",
         "backend/tests/unit/test_doc_updates_e2e_contract.py"
+      ]
+    },
+    {
+      "doc_glob": "docs/shared/02-tech/documentation-guidelines.md",
+      "description": "Shared DOCUMENTATION_GUIDELINES changes require router regeneration and propagation to DOCUMENTATION_GUIDELINES.",
+      "owner_any": [
+        "docs/agent_router/03_SHARED/DOCUMENTATION_GUIDELINES/*.md"
+      ],
+      "required_any": [
+        "scripts/docs/generate-router-files.py",
+        "backend/tests/unit/test_doc_router_contract.py",
+        "backend/tests/unit/test_doc_updates_contract.py",
+        "backend/tests/unit/test_doc_updates_e2e_contract.py"
+      ]
+    },
+    {
+      "doc_glob": "docs/shared/03-ops/way-of-working.md",
+      "description": "Shared WAY_OF_WORKING changes require router regeneration and propagation to WAY_OF_WORKING + 01_WORKFLOW.",
+      "owner_any": [
+        "docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md",
+        "docs/agent_router/01_WORKFLOW/**/*.md"
+      ],
+      "required_any": [
+        "scripts/docs/generate-router-files.py",
+        "backend/tests/unit/test_doc_router_contract.py",
+        "backend/tests/unit/test_doc_updates_contract.py",
+        "backend/tests/unit/test_doc_updates_e2e_contract.py"
+      ]
+    },
+    {
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
+      "description": "Project PLAN_EXECUTION_PROTOCOL changes require router regeneration.",
+      "owner_any": [
+        "docs/agent_router/03_SHARED/WAY_OF_WORKING/90_execution-rule.md"
+      ],
+      "required_any": [
+        "scripts/docs/generate-router-files.py",
+        "backend/tests/unit/test_doc_updates_contract.py"
       ]
     },
     {
@@ -363,7 +401,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/02-tech/extraction-quality.md",
-      "description": "Project EXTRACTION_QUALITY changes require propagation to its owner module and doc-updates guards.",
+      "description": "Project EXTRACTION_QUALITY changes require propagation to its owner module and doc-updates guards, including canonical wording cleanups.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/*.md",
         "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/**/*.md"

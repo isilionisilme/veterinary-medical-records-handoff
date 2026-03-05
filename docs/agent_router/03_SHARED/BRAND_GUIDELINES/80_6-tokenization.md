@@ -1,5 +1,7 @@
-# Tokenization (implementation requirement)
+<!-- AUTO-GENERATED from canonical source: brand-guidelines.md — DO NOT EDIT -->
+<!-- To update, edit the canonical source and run: python scripts/docs/generate-router-files.py -->
 
+## Tokenization (implementation requirement)
 Avoid scattering hex codes across components.
 
 Preferred (Tailwind): extend theme with:
