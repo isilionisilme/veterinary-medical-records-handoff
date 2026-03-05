@@ -1,6 +1,6 @@
 # AGENTS — Entry Point (Token-Optimized)
 
-AI assistant entrypoint. Keep reads minimal and route by intent.
+Assistant entrypoint Keep reads minimal and route by intent.
 
 ## Required order
 1) Read `docs/agent_router/00_AUTHORITY.md` first.
@@ -37,13 +37,13 @@ AI assistant entrypoint. Keep reads minimal and route by intent.
 - Never edit auto-generated router files directly; edit the canonical source instead.
 
 ## Plan execution
-- **Trigger:** continuation intent ("Continúa", "continue", "go", "proceed", "resume") OR any git operation request (commit, push, branch, merge) while an active `PLAN_*.md` is attached or its execution is in progress in the current conversation.
+- **Trigger:** continuation intent or any git operation request while an active `PLAN_*.md` is attached or in progress.
 - Load: `docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md`.
-  Then load only the mini-file(s) relevant to the current step (e.g., `40_step-eligibility.md` for step selection, `60_step-completion.md` at step close). Do NOT load the full canonical `plan-execution-protocol.md` unless the router module is missing or ambiguous.
+  Then load only the mini-file(s) needed for the current step. Load canonical `plan-execution-protocol.md` only if router guidance is missing or ambiguous.
 - Read Estado de ejecución and take the first `[ ]` step that belongs to the active agent for this chat.
 - If the next unchecked step does not belong to the active agent, STOP and hand off to the required agent.
 - Use token-efficiency policy during plan execution: `iterative-retrieval` before execution and `strategic-compact` at step close.
 - For plan execution behavior, follow the protocol as the sole source of truth (do not duplicate plan-operational rules here).
 
 ## Fallback
-If no intent matches, read `docs/agent_router/00_FALLBACK.md` and ask for clarification.
+If no intent matches, read `docs/agent_router/00_FALLBACK.md` for clarification.
