@@ -275,17 +275,28 @@ Compatibility note: this section is also referenced as **Severity classification
 
 ### Review Output Format
 
-Every review must use the mandatory format with sections (in order):
-1. Must-fix
-2. Should-fix
-3. Nice-to-have
-4. Questions / assumptions
-5. Pre-existing issues
-6. UX/Brand Compliance
+Produce the review using this mandatory output format:
+- Must-fix (blocking maintainability or correctness issues)
+- Should-fix (strong recommendations)
+- Nice-to-have (optional improvements)
+- Questions / assumptions
 
-Each finding includes: **File**, **Why**, **Minimal change**.
+For PRs that include `frontend/**` or user-visible behavior/copy changes, include:
+- UX/Brand Compliance (mandatory section)
+- Any UX/Brand non-compliance must be reported under Must-fix.
+
+Each finding must include:
+- File reference(s)
+- Short rationale
+- Minimal suggested change
 
 ### Review Publication
+
+### Pull Request review visibility
+
+After producing a PR code review, the AI assistant must publish the review output as a comment in the Pull Request (or update an existing `AI Code Review` comment), using the mandatory review output format.
+
+For `frontend/**` or user-visible changes, that PR review comment must include a dedicated `UX/Brand Compliance` section.
 
 ### Mandatory publication protocol (blocking)
 
