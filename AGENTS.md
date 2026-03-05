@@ -46,4 +46,4 @@ Assistant entrypoint Keep reads minimal and route by intent.
 - For plan execution behavior, follow the protocol as the sole source of truth (do not duplicate plan-operational rules here).
 
 ## Fallback
-If no intent matches, read `docs/agent_router/00_FALLBACK.md` for clarification.
+If no intent matches, read `docs/agent_router/00_FALLBACK.md` for clarity.
