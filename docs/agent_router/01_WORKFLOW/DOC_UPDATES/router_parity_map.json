@@ -370,7 +370,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/02-tech/extraction-quality.md",
-      "description": "Project EXTRACTION_QUALITY must map to project owner entry module.",
+      "description": "Project EXTRACTION_QUALITY must map to project owner entry module, including canonical wording cleanups.",
       "router_modules": [
         {
           "path": "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/00_entry.md",

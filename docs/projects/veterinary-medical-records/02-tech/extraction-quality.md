@@ -15,7 +15,7 @@
 
 This document defines the operational rules for extraction quality: the strategy for improving field extraction, per-field guardrails and acceptance criteria, observability infrastructure, and risk management policies.
 
-It consolidates stable operational rules from the extraction tracking system. Transient run logs and per-iteration reports are NOT included here — they live in `docs/agent_router/extraction-tracking/runs/`.
+It consolidates stable operational rules from the extraction tracking system. Transient run logs and per-iteration reports are NOT included here; they remain in the extraction-tracking run artifacts.
 
 ---
 

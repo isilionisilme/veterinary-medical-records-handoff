@@ -401,7 +401,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/02-tech/extraction-quality.md",
-      "description": "Project EXTRACTION_QUALITY changes require propagation to its owner module and doc-updates guards.",
+      "description": "Project EXTRACTION_QUALITY changes require propagation to its owner module and doc-updates guards, including canonical wording cleanups.",
       "owner_any": [
         "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/*.md",
         "docs/agent_router/04_PROJECT/TECHNICAL_DESIGN/**/*.md"

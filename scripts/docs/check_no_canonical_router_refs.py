@@ -13,7 +13,8 @@ CANONICAL_TARGETS = [
     REPO_ROOT / "docs" / "projects",
     REPO_ROOT / "docs" / "shared",
 ]
-EXCLUDED_CANONICAL_SUBPATHS = ("/04-delivery/plans/completed/",)
+# Plans are operational artifacts and may legitimately reference router paths.
+EXCLUDED_CANONICAL_SUBPATHS = ("/04-delivery/plans/",)
 FORBIDDEN_PATTERN = re.compile(r"docs/agent_router|agent_router", re.IGNORECASE)
 ALLOWED_CANONICAL_NOTE_PATTERN = re.compile(
     r"^\s*>?\s*-?\s*Router files under `docs/agent_router/` "

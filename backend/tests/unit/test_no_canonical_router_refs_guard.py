@@ -71,7 +71,7 @@ owner: team
     assert violations == []
 
 
-def test_excludes_completed_plan_path_from_scan() -> None:
+def test_excludes_plan_paths_from_scan() -> None:
     module = _load_guard_module()
 
     completed = (
@@ -95,10 +95,10 @@ def test_excludes_completed_plan_path_from_scan() -> None:
     )
 
     assert module.is_excluded_canonical_path(completed)
-    assert not module.is_excluded_canonical_path(active)
+    assert module.is_excluded_canonical_path(active)
 
 
-def test_iter_markdown_files_skips_completed_plans(
+def test_iter_markdown_files_skips_delivery_plans(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     module = _load_guard_module()
@@ -118,5 +118,5 @@ def test_iter_markdown_files_skips_completed_plans(
 
     scanned = module.iter_markdown_files()
 
-    assert active_file in scanned
+    assert active_file not in scanned
     assert completed_file not in scanned
