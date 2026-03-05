@@ -115,6 +115,6 @@ After a Pull Request is merged into `main`, the AI assistant must run this clean
 2. Check for stashes related to the merged branch; clean up where safe.
 3. Switch to `main` and pull latest changes.
 4. Delete the local branch (safe deletion first; force-delete only if verified no unique commits).
-5. Do NOT delete remote branches unless explicitly requested.
+5. Delete the remote branch (`git push origin --delete <branch-name>`).
 
 ---

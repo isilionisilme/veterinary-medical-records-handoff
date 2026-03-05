@@ -320,6 +320,22 @@ def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
     assert "Maximum automatic remediation loop: 2 attempts" in pr_router_text
 
 
+def test_post_merge_cleanup_requires_remote_branch_deletion() -> None:
+    source_text = _read_text(WAY_OF_WORKING)
+    shared_pr_router = _read_text(
+        REPO_ROOT / "docs" / "agent_router" / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md"
+    )
+    workflow_pr_router = _read_text(
+        REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "PULL_REQUESTS" / "00_entry.md"
+    )
+
+    required_term = "Delete the remote branch (`git push origin --delete <branch-name>`)."
+
+    assert required_term in source_text
+    assert required_term in shared_pr_router
+    assert required_term in workflow_pr_router
+
+
 def test_commit_confirmation_policy_is_documented_across_general_and_plan_modes() -> None:
     source_text = _read_text(WAY_OF_WORKING)
     plan_protocol = _read_text(

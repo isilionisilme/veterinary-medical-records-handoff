@@ -86,7 +86,7 @@
     },
     {
       "doc_glob": "docs/shared/03-ops/way-of-working.md",
-      "description": "Shared WAY_OF_WORKING changes require router regeneration and propagation to WAY_OF_WORKING + 01_WORKFLOW.",
+      "description": "Shared WAY_OF_WORKING changes (including post-merge cleanup rules such as remote-branch deletion) require router regeneration and propagation to WAY_OF_WORKING + 01_WORKFLOW.",
       "owner_any": [
         "docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md",
         "docs/agent_router/01_WORKFLOW/**/*.md"
