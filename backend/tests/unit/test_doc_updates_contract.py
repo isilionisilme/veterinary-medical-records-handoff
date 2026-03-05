@@ -320,6 +320,25 @@ def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
     assert "Maximum automatic remediation loop: 2 attempts" in pr_router_text
 
 
+def test_commit_confirmation_policy_is_documented_across_general_and_plan_modes() -> None:
+    source_text = _read_text(WAY_OF_WORKING)
+    plan_protocol = _read_text(
+        REPO_ROOT
+        / "docs"
+        / "projects"
+        / "veterinary-medical-records"
+        / "03-ops"
+        / "plan-execution-protocol.md"
+    )
+
+    assert "Agent commit confirmation (hard rule)" in source_text
+    assert "Outside of an active plan with an explicit commit-task (`CT-*`)" in source_text
+    assert "wait for explicit confirmation before running `git commit`" in source_text
+
+    assert "explicit commit task (`CT-*`)" in plan_protocol
+    assert "only case where auto-commit without user confirmation is permitted" in plan_protocol
+
+
 def test_owner_entries_track_iteration_4_doc_propagation() -> None:
     backend_text = _read_text(BACKEND_IMPLEMENTATION_ROUTER_ENTRY)
     technical_text = _read_text(TECHNICAL_DESIGN_ROUTER_ENTRY)

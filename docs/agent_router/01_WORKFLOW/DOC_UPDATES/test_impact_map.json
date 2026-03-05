@@ -96,7 +96,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL changes require router regeneration.",
+      "description": "Project PLAN_EXECUTION_PROTOCOL changes require router regeneration and doc-updates guard alignment.",
       "required_any": [
         "scripts/docs/generate-router-files.py",
         "backend/tests/unit/test_doc_updates_contract.py",

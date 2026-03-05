@@ -4,7 +4,7 @@
 
 ## Active iteration
 
-**None** — Iteration 18 closed. Next iteration plan pending.
+**None** — Iteration 19 closed. Next iteration plan pending.
 
 ## Timeline
 
@@ -28,6 +28,7 @@
 | 16 | 2026-03-03 | #186 | Golden loop hardening for `clinic_name` extraction | Hard-gate GO: 340/340 tests green, clinic benchmark 11/11, 0 regressions; review follow-ups merged | [completed-2026-03-02-golden-loop-clinic-name.md](plans/completed/completed-2026-03-02-golden-loop-clinic-name.md) |
 | 17 | 2026-03-03 | #192 | L1/L2/L3 preflight rules alignment in execution protocol | `execution-rules.md` now references L1/L2/L3 + `ForceFull`; contract coverage added for doc references; CI green at merge | [COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md](plans/completed/COMPLETED_2026-03-03_L1-L2-L3-RULES-ALIGNMENT.md) |
 | 18 | 2026-03-04 | #198 | Clinic address enrichment with production online resolver chain | User-consented lookup UX, online resolver chain (`nominatim` + `web_search` proxy fallback), no local stored clinic addresses by default, CI green at merge | [COMPLETED_2026-03-04_CLINIC-ENRICHMENT-BIDIRECTIONAL.md](plans/completed/COMPLETED_2026-03-04_CLINIC-ENRICHMENT-BIDIRECTIONAL.md) |
+| 19 | 2026-03-05 | #207 | Plan-mode routing hardening for ad-hoc git commands | Expanded `AGENTS.md` trigger for active plan git requests, added explicit plan-mode governance/activation clauses in `plan-execution-protocol.md`, aligned DOC_UPDATES guard mapping, CI green at merge | [COMPLETED_2026-03-05_PLAN-MODE-ROUTING-FIX.md](plans/completed/COMPLETED_2026-03-05_PLAN-MODE-ROUTING-FIX.md) |
 
 ## Cumulative progress
 
@@ -35,4 +36,5 @@
 - Iteration 16 cumulative extraction outcome (`clinic_name` golden loop): final synthetic benchmark 11/11 exact matches with no benchmark regressions after review follow-ups.
 - Iteration 17 cumulative process-governance outcome: `execution-rules.md` and local preflight policy are aligned on L1/L2/L3 flow, reducing drift between agent protocol and CI/local guardrails.
 - Iteration 18 cumulative clinic-enrichment outcome: on-demand resolver is production-ready with explicit source semantics (`clinic_catalog|nominatim|web_search|none`), proxy fallback observability events, and merged completed plan archive.
+- Iteration 19 cumulative plan-governance outcome: plan-mode now captures ad-hoc git intents through protocol routing (`AGENTS.md` trigger + protocol §2/§13), reducing risk of bypassing SCOPE BOUNDARY during active plan execution.
 - See [delivery-summary.md](delivery-summary.md) for the broader cumulative metrics table across all iterations.

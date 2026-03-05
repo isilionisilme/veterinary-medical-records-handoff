@@ -62,7 +62,9 @@ In both cases, the agent MUST explain the reason briefly and wait for explicit u
 
 ## 2. Atomic Iterations
 
-Never mix scope between steps. Each step in Execution Status is an atomic unit: execute its objective and mark progress. Commits/pushes are executed only when the active step is an explicit commit task defined in the plan. If a step fails, report — do not continue to the next one.
+Never mix scope between steps. Each step in Execution Status is an atomic unit: execute its objective and mark progress. Commits/pushes are executed only when the active step is an explicit commit task (`CT-*`) defined in the plan — this is the only case where auto-commit without user confirmation is permitted. Outside of a `CT-*` step, the agent must present staged files and proposed message and wait for explicit confirmation (see `way-of-working.md` §3). If a step fails, report — do not continue to the next one.
+
+**Plan-mode governance (hard rule):** While a plan is active, all git operations (commit, push, branch) are governed by this protocol. Ad-hoc user requests that imply git operations are interpreted through the lens of the active plan step and routed to SCOPE BOUNDARY (§13). There is no "just commit and push" shortcut.
 
 ---
 
@@ -83,7 +85,7 @@ For visibility and traceability, mark the active step with the appropriate label
 2. Before executing a `[ ]` step, mark it `⏳ IN PROGRESS (<agent>, <date>)`.
 3. `IN PROGRESS` and `BLOCKED` are text labels, not checkbox states.
 4. On completion, remove any label and mark `[x]`.
-5. On completion, **append the code commit short SHA** for traceability: `- [x] F?-? — Description — ✅ \`abc1234f\``
+5. On completion, **append the code commit short SHA** for traceability: `- [x] F?-? — Description — ✅ \`abc1234f\``. If the step produced no code change (e.g., a verification or check step), use `✅ \`no-commit (<reason>)\`` instead of a SHA.
 6. For `BLOCKED`, include brief reason and next action.
 7. After code commit but before CI green + plan update, mark `🔒 STEP LOCKED`.
 
@@ -403,6 +405,8 @@ The planning agent records the decision, commits, prepares the prompt, and direc
 ---
 
 ## 13. SCOPE BOUNDARY Procedure (Two-Commit Strategy for Commit Tasks)
+
+> **Activation rule:** Any commit or push during active plan execution MUST go through this procedure. If the user requests "commit", "push", or any git operation while a plan step is active, treat it as a SCOPE BOUNDARY trigger — not as an isolated command.
 
 Execute these steps **IN THIS EXACT ORDER**:
 
