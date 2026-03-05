@@ -294,6 +294,23 @@ def test_way_of_working_plan_level_pr_roadmap_is_propagated() -> None:
         assert term in owner_doc
 
 
+def test_pull_request_procedure_ai_automation_clauses_are_propagated() -> None:
+    source_doc = _read_text(REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md")
+    owner_doc = _read_text(ROUTER_ROOT / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md")
+    workflow_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "PULL_REQUESTS" / "00_entry.md")
+
+    required_terms = (
+        "When an AI coding assistant or automation tool creates or updates a Pull Request",
+        "After a Pull Request is merged into `main`, "
+        "the AI assistant must run this cleanup automatically",
+    )
+
+    for term in required_terms:
+        assert term in source_doc
+        assert term in owner_doc
+        assert term in workflow_doc
+
+
 def test_user_visible_entry_includes_design_system_module() -> None:
     user_visible_entry = _read_text(ROUTER_ROOT / "02_PRODUCT" / "USER_VISIBLE" / "00_entry.md")
     design_system_entry = _read_text(ROUTER_ROOT / "02_PRODUCT" / "DESIGN_SYSTEM" / "00_entry.md")
