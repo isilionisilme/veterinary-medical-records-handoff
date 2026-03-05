@@ -130,7 +130,7 @@ Este plan establece 7 documentos canónicos (5 shared, 2 project) como single so
 
 - [x] F4-A 🔄 — **Add CI directionality check** — Step en CI que falla si archivos bajo `docs/agent_router/03_SHARED/` o `01_WORKFLOW/` son modificados sin cambio en canónico correspondiente. Commit C15. (Codex) — ✅ `c04b4a26`
 - [x] F4-B 🔄 — **Add CI drift check** — Step que ejecuta `generate-router-files.py` y compara output con committed. Falla si difieren. Commit C16. (Codex) — ✅ `c04b4a26`
-- [ ] F4-C 🚧 — **Hard-gate: user validation of full pipeline** — Verificar ciclo canonical → generate → router → agent-use. Go/no-go para merge PR-2. (Claude Opus 4.6) — ⏳ NO-GO parcial: CI pipeline 4/4 tests PASS, pero progressive discovery rota en 2 docs (plan-execution-protocol: type:reference, documentation-guidelines: sections:all). Creado F4-C.fix.
+- [x] F4-C 🚧 — **Hard-gate: user validation of full pipeline** — Verificar ciclo canonical → generate → router → agent-use. Go/no-go para merge PR-2. (Claude Opus 4.6) — ✅ GO (2026-03-05): pipeline validado tras F4-C.fix.
 - [x] F4-C.fix 🚧 — **Fix progressive discovery for 2 broken docs** — Rediseñar MANIFEST.yaml: plan-execution-protocol → 11 mini-files en nueva dir EXECUTION_PROTOCOL; documentation-guidelines → 5 mini-files. Eliminar orphaned files. Añadir bypass de directionality guard cuando MANIFEST.yaml cambia. (Claude Opus 4.6)
 - [x] F4-D 🔄 — **Commit-task CT-2** — Ejecutar CT-2 (commit/push de protección CI F4). (Codex) — ✅ `c04b4a26`
 
