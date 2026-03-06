@@ -14,13 +14,14 @@
 
 ## Continuation Context
 
-Este plan es la **Parte 2 de 3** de la implementacion de multi-visit scoping:
+Este plan es la **Parte 2 de 4** del macro-plan de multi-visit scoping:
 
 | Parte | Plan | Scope | Estado |
 |---|---|---|---|
 | **1** | [COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md](completed/COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md) | Deteccion de boundaries de visitas desde raw text | Completado (PR #216) |
-| **2 (esta)** | [PLAN_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md](PLAN_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md) | Extraccion de campos clinicos por segmento de visita | Activo |
-| **3 (condicional)** | [PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md](PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md) | Observabilidad, debug tooling y documentacion de cierre | Pendiente |
+| **2 (esta)** | [PLAN_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md](PLAN_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md) | Extraccion de campos clinicos por segmento + observations/actions | Activo |
+| **3** | [PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md](PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md) | Observabilidad, metricas de cobertura y documentacion de cierre | Pendiente (condicional) |
+| **4** | [PLAN_2026-03-07_MULTI-VISIT_P4_NER-LLM-ENRICHMENT.md](PLAN_2026-03-07_MULTI-VISIT_P4_NER-LLM-ENRICHMENT.md) | NER/LLM sobre observations/actions → campos granulares | Pendiente (condicional) |
 
 ---
 
@@ -55,13 +56,14 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 
 1. Visitas detectadas desde raw text pasan de `fields: []` a tener campos clinicos extraidos de su segmento de texto.
 2. Orden de campos por iteracion: `reason_for_visit` → `diagnosis`/`symptoms` → `medication` → `procedure`.
-3. No introducir regresiones en golden loops ni en campos ya asignados por fuentes de mayor prioridad.
-4. Payload canonical determinista e idempotente.
+3. Nuevos campos pre-categorizados `observations` (hallazgos/signos/sintomas/diagnostico) y `actions` (tratamiento/medicacion/procedimientos/seguimiento) que capturan el texto clinico del segmento con alta cobertura.
+4. No introducir regresiones en golden loops ni en campos ya asignados por fuentes de mayor prioridad.
+5. Payload canonical determinista e idempotente.
 
 ## Scope Boundary
 
-- **In scope:** extraccion de campos clinicos por segmento de visita, integracion aditiva en `_normalize_canonical_review_scoping()`, tests focalizados por campo.
-- **Out of scope:** cambios UX/frontend, cambios de prompt/LLM, nuevas keys de schema, debug endpoints, soporte de otros idiomas, refactors no relacionados.
+- **In scope:** extraccion de campos clinicos por segmento de visita, integracion aditiva en `_normalize_canonical_review_scoping()`, tests focalizados por campo; nuevos campos pre-categorizados `observations`/`actions` (schema + backend heuristica + frontend + tests).
+- **Out of scope:** NER/LLM (Plan 4), debug endpoints y metricas de cobertura (Plan 3), soporte de otros idiomas, refactors no relacionados.
 
 ---
 
@@ -74,6 +76,8 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 | CT-3 | P2-A, P2-B | diagnosis + symptoms extraction | `feat(plan-p2): extract diagnosis and symptoms from visit segment text` | Inmediato |
 | CT-4 | P3-A, P3-B | medication + procedure extraction | `feat(plan-p3): extract medication and procedure from visit segment text` | Inmediato |
 | CT-5 | P4-A, P4-B | Validacion final + benchmark | `test(plan-p4): validate per-visit field extraction end-to-end` | Inmediato |
+| CT-6 | P5-A, P5-B, P5-C | observations/actions schema + backend + frontend + tests | `feat(plan-p5): add observations and actions pre-categorized fields` | Inmediato |
+| CT-7 | P6-B | Merge PR | `chore(plan-p6): merge per-visit field extraction` | Inmediato |
 
 ---
 
@@ -112,8 +116,23 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 - [x] P4-A 🔄 - Ejecutar benchmark completo + delta. Verificar no regresiones en golden loops existentes.
 - [x] P4-B 🔄 - Ejecutar suite de integracion completa. Verificar payload determinista e idempotente.
 - [ ] CT-5 🔄 - Commit task P4.
-- [ ] P4-C 🚧 ⏳ IN PROGRESS - Hard-gate: revision de campos extraidos en docB. Criterio GO: al menos `reason_for_visit` y un campo clinico por visita.
-- [ ] P4-D 🔄 - Merge PR a `main`. Verificar CI verde.
+- [x] P4-C 🚧 — **CLOSED (pivot).** Hard-gate de deteccion granular: la extraccion por keyword tiene recall muy bajo en texto clinico no estructurado. Decision: mantener campos granulares como best-effort y pivotar a campos pre-categorizados `observations`/`actions` en Phase 5. Validacion de cobertura redefinida en P6-A.
+- [x] P4-D 🔄 — **DEFERRED.** Merge movido a P6-B tras completar observations/actions.
+
+### Phase 5 - Campos pre-categorizados (observations / actions)
+
+> **Contexto del pivot:** La extraccion granular (symptoms, diagnosis, medication, procedure) por keyword tiene precision/recall insuficiente en texto clinico veterinario no estructurado. Se añaden dos campos amplios que pre-categorizan el texto del segmento: `observations` (hallazgos, signos, sintomas, impresiones clinicas) y `actions` (tratamiento, medicacion, procedimientos, seguimiento). Esto garantiza alta cobertura y prepara el input para un futuro NER/LLM (Plan 4) que distribuya la informacion en campos granulares.
+
+- [ ] P5-A 🔄 - **Schema + Backend:** Añadir `observations` y `actions` a `global_schema_contract.json` (section "Visita / episodio", `repeatable: false`, `value_type: "string"`). Implementar heuristica en `review_service.py` que divida `segment_text` en observaciones vs. acciones (separador: verbos de accion/prescripcion como "se recomienda", "se prescribe", "se administra", "se aplica", "tratamiento", "cita para", etc.). Inyectar en `visit["fields"]` como campos aditivos.
+- [ ] P5-B 🔄 - **Frontend:** Añadir `observations` y `actions` a `CANONICAL_VISIT_SCOPED_FIELD_KEYS` y `FIELD_LABELS` en `appWorkspace.ts`. Renderizar como campos de texto largo en las episode cards, antes de los campos granulares existentes.
+- [ ] P5-C 🔄 - **Tests:** Unit tests para la heuristica de particion (casos: texto mixto, texto solo-observaciones, texto solo-acciones, texto vacio). Integracion: verificar que docB produce observations/actions con ≥80% cobertura del segmento.
+- [ ] CT-6 🔄 - Commit task P5.
+
+### Phase 6 - Validacion y merge
+
+- [ ] P6-A 🚧 - Hard-gate: revision de observations/actions en docB. Criterio GO: ≥80% del texto clinico del segmento clasificado en uno de los dos campos. Campos granulares best-effort se valoran como bonus.
+- [ ] P6-B 🔄 - Merge PR a `main`. Verificar CI verde.
+- [ ] CT-7 🔄 - Commit task P6.
 
 ---
 
@@ -129,23 +148,27 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 8. `P3-B`: tests focalizados de `medication`/`procedure`.
 9. `P4-A`: benchmark completo + delta.
 10. `P4-B`: suite de integracion + verificacion de determinismo.
-11. `P4-C`: hard-gate de revision de campos.
-12. `P4-D`: merge PR.
+11. `P5-A`: schema + backend heuristica observations/actions.
+12. `P5-B`: frontend — render observations/actions en episode cards.
+13. `P5-C`: tests unitarios + integracion de observations/actions.
+14. `P6-A`: hard-gate validacion de observations/actions en docB.
+15. `P6-B`: merge PR.
 
 ## Active Prompt
 
-En ejecucion. Siguiente paso: `P4-C`.
+En ejecucion. Siguiente paso: `CT-5` (commit P4 scope) → `P5-A`.
 
 ---
 
 ## Acceptance criteria
 
 1. Visitas detectadas desde raw text tienen `reason_for_visit` poblado cuando el segmento contiene contexto de motivo de consulta.
-2. Al menos `diagnosis` o `symptoms` extraido por visita cuando el segmento contiene informacion clinica.
-3. No se introducen campos duplicados en visitas que ya tenian campos asignados por el LLM.
-4. Payload canonical determinista e idempotente.
-5. Suites de regresion y benchmark en verde.
-6. LOC de logica productiva <400.
+2. Al menos `diagnosis` o `symptoms` extraido por visita cuando el segmento contiene informacion clinica (best-effort).
+3. Campos pre-categorizados `observations` y `actions` capturan ≥80% del texto clinico de cada segmento.
+4. No se introducen campos duplicados en visitas que ya tenian campos asignados por el LLM.
+5. Payload canonical determinista e idempotente.
+6. Suites de regresion y benchmark en verde.
+7. LOC de logica productiva <400.
 
 ---
 
@@ -156,6 +179,8 @@ En ejecucion. Siguiente paso: `P4-C`.
 | `backend/app/application/documents/_shared.py` | Constantes de visit-scoped keys, patrones de contexto |
 | `backend/app/application/documents/review_service.py` | Integracion de campos en visitas durante scoping canonical |
 | `backend/app/application/processing/candidate_mining.py` | Logica de extraccion de candidatos reutilizable por segmento |
+| `frontend/src/constants/appWorkspace.ts` | Constantes de campos visit-scoped, labels UI |
+| `shared/global_schema_contract.json` | Schema canonical con observations/actions |
 | `backend/tests/integration/test_document_review.py` | Casos de integracion multi-visita |
 | `backend/tests/fixtures/raw_text/docB.txt` | Fixture principal de validacion |
 | `backend/tests/benchmarks/` | Benchmark/regresion de extraccion |
