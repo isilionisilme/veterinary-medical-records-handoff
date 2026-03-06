@@ -18,12 +18,13 @@ Assistant entrypoint Keep reads minimal and route by intent.
 - Merge request: execute `docs/agent_router/03_SHARED/WAY_OF_WORKING/50_pull-requests.md`.
 - Code PRs: `docs/agent_router/01_WORKFLOW/CODE_REVIEW/00_entry.md`.
 - User-visible changes: `docs/agent_router/02_PRODUCT/USER_VISIBLE/00_entry.md`.
+- Plan audit or compliance check: `docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md`.
 - If user indicates docs changed / documentation was updated (any language or paraphrase): `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md`.
   If files unspecified, run DOC_UPDATES discovery from git diff/status and normalize.
 
 ## Global rules
-- **Mandatory rule override protocol.** When the user asks to bypass a rule marked as mandatory (e.g., "Never", "must not", "hard rule") in any canonical document, the assistant must: (1) explain which rule would be violated, (2) ask for explicit confirmation. If the user confirms, proceed. Never silently skip a mandatory rule, but never permanently block the user either.
-- **No direct commits to `main` (hard rule).** See `docs/shared/03-ops/way-of-working.md` §1. All changes go through a feature branch + PR. The only exception is if the user gives explicit, per-instance authorization. Without that authorization, STOP and create a branch first.
+- **Mandatory rule override protocol.** To bypass a mandatory rule: (1) explain which rule would be violated, (2) ask for explicit confirmation. If confirmed, proceed. Never silently skip a mandatory rule, but never permanently block the user either.
+- **No direct commits to `main` (hard rule).** All changes go through a feature branch + PR. Exception: explicit per-instance user authorization. Without it, STOP and create a branch first.
 - **Blocker escalation (hard rule).** If any standard, instruction, or requirement from a canonical document cannot be satisfied, STOP — explain the blocker and ask for guidance before proceeding. Never silently skip or partially comply.
 - **Procedure auto-tracking.** When a canonical document defines a **Procedure** (a section whose heading contains the word "Procedure" followed by a numbered step list), the agent must load those steps as planned todos before starting execution. Each numbered step becomes one todo item. Mark each todo as completed immediately after finishing it.
 - **Code reviews: manual trigger only** (see `docs/shared/03-ops/way-of-working.md` §6 for full workflow).

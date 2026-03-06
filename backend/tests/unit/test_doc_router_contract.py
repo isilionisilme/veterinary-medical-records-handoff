@@ -35,6 +35,16 @@ def test_entrypoint_contract_paths_exist() -> None:
     assert "docs/agent_router/00_FALLBACK.md" in agents_text
 
 
+def test_authority_plan_audit_intent_exists() -> None:
+    authority_text = _read_text(AUTHORITY_DOC)
+    assert "Plan audit" in authority_text, (
+        "00_AUTHORITY.md must include a 'Plan audit' intent entry."
+    )
+    assert "EXECUTION_PROTOCOL" in authority_text, (
+        "Plan audit intent must route to EXECUTION_PROTOCOL module."
+    )
+
+
 def test_entrypoint_docs_stay_small() -> None:
     assert len(_read_text(ROOT_AGENTS)) <= MAX_ROOT_AGENTS_CHARS
     assert len(_read_text(AUTHORITY_DOC)) <= MAX_AUTHORITY_CHARS
