@@ -115,7 +115,7 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 
 - [x] P4-A 🔄 - Ejecutar benchmark completo + delta. Verificar no regresiones en golden loops existentes.
 - [x] P4-B 🔄 - Ejecutar suite de integracion completa. Verificar payload determinista e idempotente.
-- [ ] CT-5 🔄 - Commit task P4.
+- [x] CT-5 🔄 - Commit task P4. — ✅ `67ea55d8`
 - [x] P4-C 🚧 — **CLOSED (pivot).** Hard-gate de deteccion granular: la extraccion por keyword tiene recall muy bajo en texto clinico no estructurado. Decision: mantener campos granulares como best-effort y pivotar a campos pre-categorizados `observations`/`actions` en Phase 5. Validacion de cobertura redefinida en P6-A.
 - [x] P4-D 🔄 — **DEFERRED.** Merge movido a P6-B tras completar observations/actions.
 
