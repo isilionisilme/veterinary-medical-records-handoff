@@ -35,7 +35,7 @@ if ([string]::IsNullOrWhiteSpace($expectedWorktree)) {
 }
 
 $escapedWorktree = [Regex]::Escape($expectedWorktree)
-$newFormatPattern = "^${escapedWorktree}/(${allowedCategories})/[a-z0-9][a-z0-9-]*[a-z0-9]$"
+$newFormatPattern = "^${escapedWorktree}/(${allowedCategories})/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
 $legacyPattern = "^(${allowedCategories})/.+"
 
 if ($currentBranch -match $newFormatPattern) {
