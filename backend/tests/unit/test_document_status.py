@@ -40,6 +40,7 @@ def test_derive_status_for_completed_run() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "COMPLETED"
+    assert status_view.status_message == "Processing completed."
     assert status_view.failure_type is None
 
 
@@ -51,6 +52,7 @@ def test_derive_status_for_failed_run_maps_failure_type() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "FAILED"
+    assert status_view.status_message == "Processing failed during extraction."
     assert status_view.failure_type == "EXTRACTION_FAILED"
 
 
@@ -62,7 +64,23 @@ def test_derive_status_for_failed_run_maps_low_quality_failure_type() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "FAILED"
+    assert (
+        status_view.status_message
+        == "Processing failed because extracted text quality was too low."
+    )
     assert status_view.failure_type == "EXTRACTION_LOW_QUALITY"
+
+
+def test_derive_status_for_failed_run_maps_interpretation_failure_message() -> None:
+    latest_run = ProcessingRunSummary(
+        run_id="run-1",
+        state=ProcessingRunState.FAILED,
+        failure_type="INTERPRETATION_FAILED",
+    )
+    status_view = derive_document_status(latest_run)
+    assert status_view.status.value == "FAILED"
+    assert status_view.status_message == "Processing failed during interpretation."
+    assert status_view.failure_type == "INTERPRETATION_FAILED"
 
 
 def test_derive_status_for_failed_run_defaults_unknown_failure() -> None:
@@ -73,6 +91,7 @@ def test_derive_status_for_failed_run_defaults_unknown_failure() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "FAILED"
+    assert status_view.status_message == "Processing failed due to an unknown error."
     assert status_view.failure_type == "UNKNOWN_ERROR"
 
 
@@ -84,6 +103,7 @@ def test_derive_status_for_timed_out_run_includes_failure_type() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "TIMED_OUT"
+    assert status_view.status_message == "Processing timed out."
     assert status_view.failure_type == "INTERPRETATION_FAILED"
 
 
@@ -95,4 +115,17 @@ def test_derive_status_for_timed_out_run_defaults_unknown_failure() -> None:
     )
     status_view = derive_document_status(latest_run)
     assert status_view.status.value == "TIMED_OUT"
+    assert status_view.status_message == "Processing timed out."
+    assert status_view.failure_type == "UNKNOWN_ERROR"
+
+
+def test_derive_status_for_unknown_state_falls_back_to_unknown_failed() -> None:
+    latest_run = ProcessingRunSummary(
+        run_id="run-1",
+        state="UNKNOWN_STATE",  # type: ignore[arg-type]
+        failure_type="EXTRACTION_FAILED",
+    )
+    status_view = derive_document_status(latest_run)
+    assert status_view.status.value == "FAILED"
+    assert status_view.status_message == "Processing failed due to an unknown error."
     assert status_view.failure_type == "UNKNOWN_ERROR"
