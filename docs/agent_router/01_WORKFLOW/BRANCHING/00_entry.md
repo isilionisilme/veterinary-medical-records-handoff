@@ -12,6 +12,26 @@
 
 ### Branch Naming Conventions
 
+Canonical format:
+- `<worktree>/<category>/<slug>`
+
+Creation-time rule:
+- During `Starting New Work`, the agent must derive and create branch names in canonical format, using the category mapping defined in Section 1.
+
+Worktree segment:
+- `worktree` must match the current worktree folder name exactly.
+
+Allowed categories:
+- `feature`
+- `fix`
+- `docs`
+- `chore`
+- `refactor`
+- `ci`
+- `improvement`
+
+Category-specific branch patterns:
+
 **User stories:**
 - `feature/<ID>-<short-representative-slug>`
 - The slug must be concise and describe the purpose of the user story.
@@ -25,6 +45,24 @@
 - `ci/<short-slug>`
 - `docs/<short-slug>`
 - `fix/<short-slug>`
+
+Slug rules:
+- Use lowercase letters, numbers, and hyphens.
+- Keep it concise and representative of the work item.
+
+Exemptions:
+- `main` is exempt from this naming convention.
+- Detached HEAD is exempt from this naming convention.
+
+Transition policy:
+- Legacy format `<category>/<slug>` is temporarily allowed during migration.
+- Legacy branches must emit a warning in branch-name validation but must not be blocked.
+
+Examples:
+- `veterinary-medical-records/feature/us-42-pet-owner-export`
+- `veterinary-medical-records-golden-loop/improvement/prescription-print-layout`
+- `golden-2/chore/preflight-branch-name-hook`
+- `docs/docs/branching-convention-refresh`
 
 Branches must be **short-lived** and focused on a single user story or a single technical concern.
 

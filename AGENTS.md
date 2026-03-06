@@ -13,7 +13,7 @@ Assistant entrypoint Keep reads minimal and route by intent.
 - Fallback format if module is unavailable: `Severity | File:Line | Finding | Suggested fix`.
 
 ## Mandatory triggers
-- Starting new work: `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md`.
+- Starting new work / creating branches: `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md`.
 - Pull requests: `docs/agent_router/01_WORKFLOW/PULL_REQUESTS/00_entry.md`.
 - Merge request: execute `docs/agent_router/03_SHARED/WAY_OF_WORKING/50_pull-requests.md`.
 - Code PRs: `docs/agent_router/01_WORKFLOW/CODE_REVIEW/00_entry.md`.
@@ -23,11 +23,12 @@ Assistant entrypoint Keep reads minimal and route by intent.
   If files unspecified, run DOC_UPDATES discovery from git diff/status and normalize.
 
 ## Global rules
-- **Mandatory rule override protocol.** To bypass a mandatory rule: (1) explain which rule would be violated, (2) ask for explicit confirmation. If confirmed, proceed. Never silently skip a mandatory rule, but never permanently block the user either.
+- **Mandatory rule override protocol.** To bypass a mandatory rule: (1) explain it, (2) ask for explicit confirmation. If confirmed, proceed.
 - **No direct commits to `main` (hard rule).** All changes go through a feature branch + PR. Exception: explicit per-instance user authorization. Without it, STOP and create a branch first.
-- **Blocker escalation (hard rule).** If any standard, instruction, or requirement from a canonical document cannot be satisfied, STOP — explain the blocker and ask for guidance before proceeding. Never silently skip or partially comply.
-- **Procedure auto-tracking.** When a canonical document defines a **Procedure** (a section whose heading contains the word "Procedure" followed by a numbered step list), the agent must load those steps as planned todos before starting execution. Each numbered step becomes one todo item. Mark each todo as completed immediately after finishing it.
-- **Code reviews: manual trigger only** (see `docs/shared/03-ops/way-of-working.md` §6 for full workflow).
+- **Branch naming convention (hard rule).** All new branches must follow `<worktree>/<category>/<slug>`. Before running `git branch`, `git switch -c`, or `git checkout -b`, load `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md`.
+- **Blocker escalation (hard rule).** If any required standard cannot be satisfied, STOP, explain the blocker, and ask for guidance.
+- **Procedure auto-tracking.** When a canonical doc defines a **Procedure** heading with numbered steps, load them as todos and complete each after execution.
+- **Code reviews: manual trigger only.**
 - After modifying docs, run the DOC_UPDATES normalization pass once before finishing.
 - Include final `How to test` for user-validatable changes.
 - Run `git`, `gh`, and `npm` with elevation on first attempt; if unavailable, STOP and ask.
@@ -40,11 +41,11 @@ Assistant entrypoint Keep reads minimal and route by intent.
 ## Plan execution
 - **Trigger:** continuation intent or any git operation request while an active `PLAN_*.md` is attached or in progress.
 - Load: `docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md`.
-  Then load only the mini-file(s) needed for the current step. Load canonical `plan-execution-protocol.md` only if router guidance is missing or ambiguous.
+  Then load only mini-files needed for the current step. Load canonical `plan-execution-protocol.md` only if router guidance is missing or ambiguous.
 - Read Estado de ejecución and take the first `[ ]` step that belongs to the active agent for this chat.
 - If the next unchecked step does not belong to the active agent, STOP and hand off to the required agent.
 - Use token-efficiency policy during plan execution: `iterative-retrieval` before execution and `strategic-compact` at step close.
-- For plan execution behavior, follow the protocol as the sole source of truth (do not duplicate plan-operational rules here).
+- For plan execution behavior, follow the protocol as sole source of truth.
 
 ## Fallback
 If no intent matches, read `docs/agent_router/00_FALLBACK.md` for clarity.

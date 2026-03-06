@@ -304,6 +304,55 @@ def test_way_of_working_plan_level_pr_roadmap_is_propagated() -> None:
         assert term in owner_doc
 
 
+def test_way_of_working_branch_naming_worktree_prefix_is_propagated() -> None:
+    source_doc = _read_text(REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md")
+    owner_doc = _read_text(
+        ROUTER_ROOT / "03_SHARED" / "WAY_OF_WORKING" / "30_branching-strategy.md"
+    )
+    workflow_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "BRANCHING" / "00_entry.md")
+
+    required_terms = (
+        "Canonical format:",
+        "<worktree>/<category>/<slug>",
+        "Category-specific branch patterns:",
+        "Legacy format `<category>/<slug>` is temporarily allowed during migration.",
+        "Detached HEAD is exempt from this naming convention.",
+    )
+
+    for term in required_terms:
+        assert term in source_doc
+        assert term in owner_doc
+        assert term in workflow_doc
+
+
+def test_way_of_working_canonical_branch_creation_rules_are_propagated() -> None:
+    source_doc = _read_text(REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md")
+    start_work_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "START_WORK" / "00_entry.md")
+    branching_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "BRANCHING" / "00_entry.md")
+
+    start_work_terms = (
+        "build `<branch-name>` using the canonical format `<worktree>/<category>/<slug>`",
+        "Derive `worktree` from the current repository top-level folder name",
+        "user story -> `feature`",
+        "user-facing improvement -> `improvement`",
+        "technical work -> `fix`, `docs`, `chore`, `refactor`, or `ci`",
+    )
+    branching_terms = (
+        "Creation-time rule:",
+        "During `Starting New Work`, the agent must derive and create branch names "
+        "in canonical format",
+        "category mapping defined in Section 1.",
+    )
+
+    for term in start_work_terms:
+        assert term in source_doc
+        assert term in start_work_doc
+
+    for term in branching_terms:
+        assert term in source_doc
+        assert term in branching_doc
+
+
 def test_pull_request_procedure_ai_automation_clauses_are_propagated() -> None:
     source_doc = _read_text(REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md")
     owner_doc = _read_text(ROUTER_ROOT / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md")

@@ -235,6 +235,7 @@ $runFrontendFull = $false
 $runFrontendGuards = $false
 $runDocker = $false
 $runE2E = $false
+$runBranchNameValidation = $false
 
 switch ($Mode) {
     "Quick" {
@@ -246,6 +247,7 @@ switch ($Mode) {
         $runE2E = $false
     }
     "Push" {
+        $runBranchNameValidation = $true
         $runDocs = $docsChanged
         $runBackendFull = $backendChanged
         $runFrontendFull = $frontendImpacted -or $forceFrontendChecks
@@ -272,6 +274,7 @@ Write-Host " - Frontend full:    $runFrontendFull"
 Write-Host " - Frontend guards:  $runFrontendGuards"
 Write-Host " - Docker guard:     $runDocker"
 Write-Host " - E2E:              $runE2E"
+Write-Host " - Branch naming:    $runBranchNameValidation"
 Write-Host " - Frontend impacted:$frontendImpacted"
 Write-Host " - Force frontend:   $forceFrontendChecks"
 
@@ -285,6 +288,12 @@ else {
 
 if (($Mode -eq "Push" -or $Mode -eq "Full") -and -not $runFrontendFull) {
     Write-Host " - Frontend checks skipped: no frontend-impact paths (use -ForceFrontend to override)"
+}
+
+if ($runBranchNameValidation) {
+    Invoke-Step "Branch naming guard" {
+        & (Join-Path $repoRoot "scripts/ci/validate-branch-name.ps1")
+    }
 }
 
 if ($runDocs) {
