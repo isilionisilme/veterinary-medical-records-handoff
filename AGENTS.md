@@ -13,7 +13,7 @@ Assistant entrypoint Keep reads minimal and route by intent.
 - Fallback format if module is unavailable: `Severity | File:Line | Finding | Suggested fix`.
 
 ## Mandatory triggers
-- Starting new work: `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md`.
+- Starting new work / creating branches: `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md`.
 - Pull requests: `docs/agent_router/01_WORKFLOW/PULL_REQUESTS/00_entry.md`.
 - Merge request: execute `docs/agent_router/03_SHARED/WAY_OF_WORKING/50_pull-requests.md`.
 - Code PRs: `docs/agent_router/01_WORKFLOW/CODE_REVIEW/00_entry.md`.
@@ -25,6 +25,7 @@ Assistant entrypoint Keep reads minimal and route by intent.
 ## Global rules
 - **Mandatory rule override protocol.** To bypass a mandatory rule: (1) explain which rule would be violated, (2) ask for explicit confirmation. If confirmed, proceed. Never silently skip a mandatory rule, but never permanently block the user either.
 - **No direct commits to `main` (hard rule).** All changes go through a feature branch + PR. Exception: explicit per-instance user authorization. Without it, STOP and create a branch first.
+- **Branch naming convention (hard rule).** All new branches must follow `<worktree>/<category>/<slug>`. Before running `git branch`, `git switch -c`, or `git checkout -b`, load `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md` and apply the full naming procedure. Never create a branch without this format.
 - **Blocker escalation (hard rule).** If any standard, instruction, or requirement from a canonical document cannot be satisfied, STOP — explain the blocker and ask for guidance before proceeding. Never silently skip or partially comply.
 - **Procedure auto-tracking.** When a canonical document defines a **Procedure** (a section whose heading contains the word "Procedure" followed by a numbered step list), the agent must load those steps as planned todos before starting execution. Each numbered step becomes one todo item. Mark each todo as completed immediately after finishing it.
 - **Code reviews: manual trigger only** (see `docs/shared/03-ops/way-of-working.md` §6 for full workflow).

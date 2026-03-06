@@ -18,12 +18,7 @@ Before making any new changes (code, docs, config, etc.), create a new branch of
    - Switch to base and update it (`git switch main` then `git pull origin main`).
 3. Create the branch before editing any files:
    - If already on a correctly named branch for the same work item, proceed.
-   - Otherwise, build `<branch-name>` using the canonical format `<worktree>/<category>/<slug>` and create it from the updated base (`git switch -c <branch-name>`).
-   - Derive `worktree` from the current repository top-level folder name (`git rev-parse --show-toplevel`, then use the folder leaf).
-   - Select `category` by request type:
-     - user story -> `feature`
-     - user-facing improvement -> `improvement`
-     - technical work -> `fix`, `docs`, `chore`, `refactor`, or `ci` (as appropriate)
+   - Otherwise, build `<branch-name>` according to **Section 2 — Branch Naming Conventions** and create it from the updated base (`git switch -c <branch-name>`).
    - If it is ambiguous whether the current branch is the correct work branch, STOP and ask.
 
 ---

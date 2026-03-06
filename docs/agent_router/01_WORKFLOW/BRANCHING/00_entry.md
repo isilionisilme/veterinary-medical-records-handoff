@@ -16,7 +16,7 @@ Canonical format:
 - `<worktree>/<category>/<slug>`
 
 Creation-time rule:
-- During `Starting New Work`, the agent must derive and create branch names in canonical format and apply the category mapping defined in Section 1.
+- During `Starting New Work`, the agent must derive and create branch names according to this section.
 
 Worktree segment:
 - `worktree` must match the current worktree folder name exactly.
