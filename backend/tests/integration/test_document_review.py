@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -219,6 +220,29 @@ def _extract_top_level_fields_by_key(data: dict[str, object], key: str) -> list[
     if not isinstance(fields, list):
         return []
     return [field for field in fields if isinstance(field, dict) and field.get("key") == key]
+
+
+def _extract_visit_field_value(visit: dict[str, object], *, key: str) -> str:
+    fields = visit.get("fields")
+    if not isinstance(fields, list):
+        return ""
+    for field in fields:
+        if not isinstance(field, dict):
+            continue
+        if field.get("key") != key:
+            continue
+        value = field.get("value")
+        if isinstance(value, str):
+            return value
+    return ""
+
+
+def _coverage_ratio(source_text: str, candidate_text: str) -> float:
+    normalized_source = re.sub(r"\W+", "", source_text.casefold())
+    normalized_candidate = re.sub(r"\W+", "", candidate_text.casefold())
+    if not normalized_source:
+        return 0.0
+    return len(normalized_candidate) / len(normalized_source)
 
 
 def _get_calibration_counts(
@@ -1363,6 +1387,93 @@ def test_document_review_multi_visit_rich_raw_text_extracts_reason_for_visit_fro
         assigned_by_date["2026-02-18"].get("reason_for_visit")
         == "mejora parcial, persiste inflamacion leve"
     )
+
+
+def test_document_review_multi_visit_docb_populates_observations_actions_with_high_coverage(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        _load_raw_text_fixture("docB_multi_visit_rich.txt"),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+    assigned_by_date = {
+        visit.get("visit_date"): visit
+        for visit in assigned
+        if isinstance(visit, dict) and isinstance(visit.get("visit_date"), str)
+    }
+
+    expected_segment_by_date = {
+        "2026-02-11": (
+            "Consulta 11/02/2026: dolor de oido y prurito auricular. "
+            "Se diagnostica otitis externa y se realiza limpieza de oido. "
+            "Se indica medicacion: gotas oticas 4 gotas cada 12 horas por 7 dias."
+        ),
+        "2026-02-18": (
+            "Control 18/02/2026: mejora parcial, persiste inflamacion leve. "
+            "Diagnostico de seguimiento: otitis externa en resolucion. "
+            "Procedimiento: limpieza auricular de control. "
+            "Tratamiento: mantener gotas oticas y revaluar en 5 dias."
+        ),
+    }
+
+    for visit_date, expected_segment in expected_segment_by_date.items():
+        visit = assigned_by_date.get(visit_date)
+        assert isinstance(visit, dict)
+
+        observations = _extract_visit_field_value(visit, key="observations")
+        actions = _extract_visit_field_value(visit, key="actions")
+        assert observations or actions
+
+        coverage = _coverage_ratio(expected_segment, f"{observations} {actions}".strip())
+        assert coverage >= 0.8
 
 
 def test_document_review_multi_visit_reason_for_visit_does_not_override_existing_value(test_client):

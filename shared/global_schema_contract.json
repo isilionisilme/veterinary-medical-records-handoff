@@ -183,6 +183,24 @@
       "optional": false
     },
     {
+      "key": "observations",
+      "label": "Observaciones",
+      "section": "Visita / episodio",
+      "value_type": "string",
+      "repeatable": false,
+      "critical": false,
+      "optional": false
+    },
+    {
+      "key": "actions",
+      "label": "Acciones",
+      "section": "Visita / episodio",
+      "value_type": "string",
+      "repeatable": false,
+      "critical": false,
+      "optional": false
+    },
+    {
       "key": "diagnosis",
       "label": "Diagnostico",
       "section": "Clinico",

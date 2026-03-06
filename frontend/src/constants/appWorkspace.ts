@@ -63,6 +63,8 @@ export const STRUCTURED_FIELD_STACK_CLASS = "space-y-[var(--field-row-gap-y)]";
 export const LONG_TEXT_FALLBACK_THRESHOLD = 180;
 export const LONG_TEXT_FIELD_KEYS = new Set([
   "treatment_plan",
+  "observations",
+  "actions",
   "diagnosis",
   "symptoms",
   "procedure",
@@ -73,6 +75,8 @@ export const OWNER_SECTION_FIELD_KEYS = new Set(["owner_name", "owner_address"])
 export const VISIT_SECTION_FIELD_KEYS = new Set(["visit_date", "reason_for_visit"]);
 
 export const CANONICAL_VISIT_SCOPED_FIELD_KEYS = [
+  "observations",
+  "actions",
   "symptoms",
   "diagnosis",
   "procedure",
@@ -145,6 +149,8 @@ export const FIELD_LABELS: Record<string, string> = {
   admission_date: "Fecha de admisión",
   discharge_date: "Fecha de alta",
   reason_for_visit: "Motivo de visita",
+  observations: "Observaciones",
+  actions: "Acciones",
   diagnosis: "Diagnóstico",
   symptoms: "Síntomas",
   procedure: "Procedimiento",

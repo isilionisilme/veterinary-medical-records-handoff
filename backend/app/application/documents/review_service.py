@@ -40,6 +40,15 @@ _VISIT_REASON_LABEL_PREFIX_RE = re.compile(
 _DATE_TOKEN_RE = re.compile(
     r"^(?:\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}|\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4})\b"
 )
+_ACTION_VERB_RE = re.compile(
+    r"\b("
+    r"se\s+recomienda|se\s+prescribe|se\s+administra|se\s+aplica|"
+    r"se\s+indica|se\s+pauta|se\s+realiza|"
+    r"recomendar|prescribir|administrar|aplicar|iniciar|continuar|"
+    r"tratamiento|medicaci[oó]n|terapia|procedimiento|control|seguimiento|cita\s+para"
+    r")\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -488,6 +497,133 @@ def _extract_reason_for_visit_from_segment(*, segment_text: str) -> str | None:
     return None
 
 
+def _normalize_segment_clause(*, raw_clause: str) -> str:
+    clause = raw_clause.strip()
+    if not clause:
+        return ""
+
+    clause = clause.lstrip("-*• \t")
+    clause = _VISIT_REASON_LABEL_PREFIX_RE.sub("", clause, count=1).strip()
+
+    while True:
+        compact = clause.lstrip(" :,-\t")
+        date_match = _DATE_TOKEN_RE.match(compact)
+        if date_match is None:
+            clause = compact
+            break
+        clause = compact[date_match.end() :].strip()
+
+    normalized = " ".join(clause.strip(" :,-\t").split())
+    return normalized
+
+
+def _split_segment_into_observations_actions(*, segment_text: str) -> tuple[str | None, str | None]:
+    observations: list[str] = []
+    actions: list[str] = []
+    seen_observations: set[str] = set()
+    seen_actions: set[str] = set()
+
+    for raw_line in segment_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        raw_clauses = [line]
+        if "." in line or ";" in line:
+            split_clauses = [part for part in re.split(r"[.;]", line) if part.strip()]
+            if split_clauses:
+                raw_clauses = split_clauses
+
+        for raw_clause in raw_clauses:
+            normalized_clause = _normalize_segment_clause(raw_clause=raw_clause)
+            if not normalized_clause:
+                continue
+
+            key = normalized_clause.casefold()
+            if _ACTION_VERB_RE.search(normalized_clause):
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if key in seen_observations:
+                continue
+            seen_observations.add(key)
+            observations.append(normalized_clause)
+
+    observation_value = " ".join(observations).strip() or None
+    action_value = " ".join(actions).strip() or None
+    return observation_value, action_value
+
+
+def _append_visit_segment_summary_field(
+    *,
+    visit_fields: list[object],
+    visit_id: str,
+    key: str,
+    value: str,
+) -> None:
+    visit_fields.append(
+        {
+            "field_id": f"derived-{key}-{visit_id}",
+            "key": key,
+            "value": value,
+            "value_type": "string",
+            "scope": "visit",
+            "section": "visits",
+            "classification": "medical_record",
+            "origin": "derived",
+            "evidence": {"snippet": value},
+        }
+    )
+
+
+def _populate_visit_observations_actions_from_segments(
+    *,
+    assigned_visits: list[dict[str, object]],
+    visit_segments_by_id: dict[str, str],
+) -> None:
+    for visit in assigned_visits:
+        visit_id = visit.get("visit_id")
+        if not isinstance(visit_id, str) or not visit_id:
+            continue
+
+        segment_text = visit_segments_by_id.get(visit_id)
+        if not isinstance(segment_text, str) or not segment_text.strip():
+            continue
+
+        visit_fields = visit.get("fields")
+        if not isinstance(visit_fields, list):
+            visit_fields = []
+            visit["fields"] = visit_fields
+
+        existing_keys = {
+            field.get("key")
+            for field in visit_fields
+            if isinstance(field, dict) and isinstance(field.get("key"), str)
+        }
+
+        observation_value, action_value = _split_segment_into_observations_actions(
+            segment_text=segment_text
+        )
+        if "observations" not in existing_keys and isinstance(observation_value, str):
+            _append_visit_segment_summary_field(
+                visit_fields=visit_fields,
+                visit_id=visit_id,
+                key="observations",
+                value=observation_value,
+            )
+
+        if "actions" not in existing_keys and isinstance(action_value, str):
+            _append_visit_segment_summary_field(
+                visit_fields=visit_fields,
+                visit_id=visit_id,
+                key="actions",
+                value=action_value,
+            )
+
+
 def _build_visit_segment_text_by_visit_id(
     *,
     raw_text: str | None,
@@ -833,6 +969,10 @@ def _normalize_canonical_review_scoping(
         assigned_visits=assigned_visits,
         visit_segments_by_id=visit_segments_by_id,
         candidate_keys=("diagnosis", "symptoms", "medication", "procedure"),
+    )
+    _populate_visit_observations_actions_from_segments(
+        assigned_visits=assigned_visits,
+        visit_segments_by_id=visit_segments_by_id,
     )
 
     metadata_values_for_unassigned: dict[str, object] = {}
