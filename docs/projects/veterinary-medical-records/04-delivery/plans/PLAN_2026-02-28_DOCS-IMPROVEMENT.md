@@ -1,10 +1,17 @@
 # Plan: Documentation Improvement — Wiki audit, restructure & standardization
 
-> **Operational rules:** See [EXECUTION_RULES.md](EXECUTION_RULES.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
-**Rama:** `docs/documentation-refactor`
+**Branch:** `docs/documentation-refactor`
 **PR:** [#154](https://github.com/isilionisilme/veterinary-medical-records/pull/154)
-**Prerequisito:** Iteration 12 merged to `main`.
+**Prerequisite:** Iteration 12 merged to `main`.
+**Worktree:** `D:/Git/veterinary-medical-records` (default — single worktree)
+**CI Mode:** Pipeline depth-1 gate (mode 2, default)
+**Agents:** Planning agent + Execution agent
+
+## Objective
+
+Audit, restructure, and standardize the project's canonical documentation to eliminate stale/duplicate content, apply consistent templates and navigation, and automate quality gates via CI.
 
 ## Context
 
@@ -21,101 +28,202 @@ The project's canonical documentation (`docs/projects/veterinary-medical-records
 - **Exception:** Broken Link Checker and Terminology Enforcer may run across wiki + router when explicitly required.
 - **Out of scope:** application code (`backend/`, `frontend/`).
 
+## Commit plan
+
+> This plan predates the formal commit-task schema. Phases 0–4 were executed with ad-hoc commits.
+> From Phase 5 onward, commit tasks follow the required operational override step schema.
+
+| Commit task | Trigger | Scope | Message | Push |
+|---|---|---|---|---|
+| CT-D5-1 | After D5-A | Lint/format fixes in `docs/` scope | `docs(plan-d5a): markdown lint autofix + prettier` | Immediate |
+| CT-D5-2 | After D5-D | Frontmatter + validator script | `docs(plan-d5d): apply frontmatter schema + validator` | Immediate |
+| CT-D5-3 | After D5-G | Broken link fixes | `docs(plan-d5g): fix broken links and anchors` | Immediate |
+| CT-D6-1 | After D6-B | Rewritten pages | `docs(plan-d6b): rewrite key pages for readability` | Immediate |
+| CT-D6-2 | After D6-F | Terminology updates | `docs(plan-d6f): apply terminology consistency` | Immediate |
+| CT-D7-1 | After D7-A | Onboarding guides | `docs(plan-d7a): add onboarding guides` | Immediate |
+| CT-D7-2 | After D7-C | Changelog | `docs(plan-d7c): add structured changelog` | Immediate |
+| CT-D8-1 | After D8-B | CI pipeline + scripts | `ci(plan-d8b): docs QA CI pipeline` | Immediate |
+
+## Operational override steps
+
+> Phases 0–4 were completed before this schema was required. Retroactive documentation only.
+> From Phase 5 onward, override steps follow the required schema.
+
+### CT-D5-1 — Commit lint/format fixes
+
+- **type:** `commit-task`
+- **trigger:** After D5-A completion
+- **preconditions:** D5-A changes staged, L1 green
+- **commands:** `git add docs/; git commit -m "docs(plan-d5a): markdown lint autofix + prettier"`; `git push origin <branch>`
+- **approval:** `auto`
+- **fallback:** Revert staged changes and report formatter errors
+
+### CT-D5-2 — Commit frontmatter + validator
+
+- **type:** `commit-task`
+- **trigger:** After D5-D completion
+- **preconditions:** D5-C schema approved (D5-E), D5-D applied, L1 green
+- **commands:** `git add docs/ scripts/; git commit -m "docs(plan-d5d): apply frontmatter schema + validator"`; `git push origin <branch>`
+- **approval:** `auto`
+- **fallback:** Revert staged changes and report validation errors
+
+### CT-D5-3 — Commit broken link fixes
+
+- **type:** `commit-task`
+- **trigger:** After D5-G completion
+- **preconditions:** D5-F report generated, D5-G fixes applied, L1 green
+- **commands:** `git add docs/; git commit -m "docs(plan-d5g): fix broken links and anchors"`; `git push origin <branch>`
+- **approval:** `auto`
+- **fallback:** Document unfixable links and continue
+
+### CT-D8-1 — Commit CI pipeline
+
+- **type:** `commit-task`
+- **trigger:** After D8-B completion
+- **preconditions:** D8-A design approved, D8-B implemented, L1 green
+- **commands:** `git add .github/ scripts/; git commit -m "ci(plan-d8b): docs QA CI pipeline"`; `git push origin <branch>`
+- **approval:** `auto`
+- **fallback:** Report CI configuration issues
+
+## Acceptance criteria
+
+1. All canonical docs pass `markdownlint-cli2` with zero errors.
+2. All canonical docs pass `markdown-link-check` with zero broken links.
+3. All canonical docs have valid frontmatter per the approved schema.
+4. Navigation (TOCs, sitemap, breadcrumbs) is complete and verified.
+5. Key technical pages have been rewritten for readability with Mermaid diagrams.
+6. Canonical glossary is defined and terminology is consistent across scope.
+7. Onboarding guides exist for all four audiences.
+8. CI pipeline runs docs QA on every PR touching `docs/`.
+9. All templates are applied per Diátaxis classification.
+
+## How to test
+
+1. `npx markdownlint-cli2 "docs/**/*.md"` — zero errors.
+2. `npx markdown-link-check docs/**/*.md --config .markdown-link-check.json` — zero broken links.
+3. `node scripts/docs/validate-frontmatter.js` (or equivalent) — all files valid.
+4. Manual review: navigate wiki from `docs/README.md` through all TOC links — no dead ends.
+5. CI: push a docs-only change and verify the docs QA pipeline runs and passes.
+
 ---
 
-## Estado de ejecución — update on completion of each step
+## Execution Status — update on completion of each step
 
-> **Rationale del orden:** Primero saber qué tenemos (inventario + auditoría de calidad) →
-> decidir qué queda y cómo se organiza (estructura) → normalizar formato → pulir estilo → automatizar.
+> **Rationale:** First know what we have (inventory + quality audit) →
+> decide what stays and how it's organized (structure) → normalize format → polish style → automate.
 
-**Leyenda:**
-- 🔄 **auto-chain** — Codex ejecuta; usuario revisa después.
-- 🚧 **hard-gate** — Claude; requiere decisión del usuario.
+**Legend:**
+- 🔄 **auto-chain** — Execution agent executes; user reviews afterwards.
+- 🚧 **hard-gate** — Planning agent; requires user decision.
+
+> **Note:** 🔄/🚧 classify step *type* (auto-chain vs hard-gate). The protocol's ⏳/🚫/🔒 markers in §3 classify *execution state* at runtime.
 
 ### Phase 0 — Bootstrap
 
-- [x] D0-A 🔄 — Install doc tooling, root config, docs scripts (Codex) — ✅ `a7c2c3d7`
-- [x] D0-B 🚧 — Review + approve bootstrap changes (Claude) — ✅
-- [x] D0-C 🚧 — Create docs PR, initialize PR tracking (Claude) — ✅ PR #154
+- [x] D0-A 🔄 — Install doc tooling, root config, docs scripts (Execution agent) — ✅ `a7c2c3d7`
+- [x] D0-B 🚧 — Review + approve bootstrap changes (Planning agent) — ✅ `no-commit (review/approval)`
+- [x] D0-C 🚧 — Create docs PR, initialize PR tracking (Planning agent) — ✅ `no-commit (PR #154 creation)`
 
 ### Phase 1 — Inventory and audit (know what we have)
 
-- [x] D1-A 🚧 — Build current-state inventory of canonical docs: path, type, audience, staleness, status · skill: `microsoft-wiki-architect` (Claude) — ✅
-- [x] D1-B 🚧 — Detect duplicate/stale content → consolidation report with keep/merge/delete recommendations · skill: `duplicate-stale-detector` (Claude) — ✅
-- [x] D1-C 🚧 — User approves consolidation decisions (Claude) — ✅ all 7 actions approved
-- [x] D1-D 🔄 — Apply consolidation/deprecation updates (Codex) — ✅ `9653c790`
-- [x] D1-E 🚧 — Full docs QA audit against current codebase reality · skill: `architecture-doc-auditor` (Claude) — ✅
-- [x] D1-F 🚧 — User prioritizes QA findings: fix now vs defer (Claude) — ✅ all 13 approved
-- [x] D1-G 🔄 — Implement approved QA corrections (Codex) — ✅ `681e38e7`
+- [x] D1-A 🚧 — Build current-state inventory of canonical docs: path, type, audience, staleness, status · skill: `microsoft-wiki-architect` (Planning agent) — ✅ `no-commit (analysis)`
+- [x] D1-B 🚧 — Detect duplicate/stale content → consolidation report with keep/merge/delete recommendations · skill: `duplicate-stale-detector` (Planning agent) — ✅ `no-commit (analysis)`
+- [x] D1-C 🚧 — User approves consolidation decisions (Planning agent) — ✅ `no-commit (user approval)`
+- [x] D1-D 🔄 — Apply consolidation/deprecation updates (Execution agent) — ✅ `9653c790`
+- [x] D1-E 🚧 — Full docs QA audit against current codebase reality · skill: `architecture-doc-auditor` (Planning agent) — ✅ `no-commit (analysis)`
+- [x] D1-F 🚧 — User prioritizes QA findings: fix now vs defer (Planning agent) — ✅ `no-commit (user approval)`
+- [x] D1-G 🔄 — Implement approved QA corrections (Execution agent) — ✅ `681e38e7`
 
 ### Phase 2 — Structure and taxonomy (organize what survives)
 
-- [x] D2-A 🚧 — Propose target taxonomy and folder hierarchy based on clean inventory; user approves · skill: `microsoft-wiki-architect` (Claude) — ✅ approved (v2)
-- [x] D2-B 🔄 — Migrate files to approved structure and update internal links (Codex) — ✅ implemented in PR #154
-- [x] D2-C 🚧 — User validation of migrated structure and content integrity · skill: `microsoft-wiki-qa` (Claude) — ✅ completed in PR-A (`docs/wiki-naming-cleanup`)
+- [x] D2-A 🚧 — Propose target taxonomy and folder hierarchy based on clean inventory; user approves · skill: `microsoft-wiki-architect` (Planning agent) — ✅ `no-commit (analysis + user approval v2)`
+- [x] D2-B 🔄 — Migrate files to approved structure and update internal links (Execution agent) — ✅ `no-commit (implemented in PR #154 merge)`
+- [x] D2-C 🚧 — User validation of migrated structure and content integrity · skill: `microsoft-wiki-qa` (Planning agent) — ✅ `no-commit (validated in PR-A docs/wiki-naming-cleanup)`
 
 ### Phase 3 — Templates and normalization
 
-- [x] D3-A 🚧 — Define templates per doc type (Diátaxis: tutorial, how-to, reference, explanation) · skill: `template-normalizer` (Claude) — ✅ approved 2026-03-02
-- [x] D3-B 🚧 — User approval of templates (Claude) — ✅ approved 2026-03-02
-- [x] D3-C 🔄 — Normalize existing docs to approved templates · skill: `template-normalizer` (Codex) — ✅ frontmatter + minimal structural normalization applied (2026-03-02)
-- [x] D3-D 🚧 — User validation of normalized docs (Claude) — ✅ validated & committed `c8daa6c8`, PR #184, CI green (2026-03-02)
+- [x] D3-A 🚧 — Define templates per doc type (Diátaxis: tutorial, how-to, reference, explanation) · skill: `template-normalizer` (Planning agent) — ✅ `no-commit (analysis + user approval 2026-03-02)`
+- [x] D3-B 🚧 — User approval of templates (Planning agent) — ✅ `no-commit (user approval 2026-03-02)`
+- [x] D3-C 🔄 — Normalize existing docs to approved templates · skill: `template-normalizer` (Execution agent) — ✅ `no-commit (applied 2026-03-02, committed in D3-D)`
+- [x] D3-D 🚧 — User validation of normalized docs (Planning agent) — ✅ `c8daa6c8` (PR #184, CI green)
 
 ### Phase 4 — Navigation
 
-- [x] D4-A 🔄 — Build sitemap, TOCs, breadcrumbs for canonical docs · tool: `doctoc` (Codex) — ✅ `01375f23`
-- [ ] D4-B 🚧 — User validation of navigation quality (Claude)
+- [x] D4-A 🔄 — Build sitemap, TOCs, breadcrumbs for canonical docs · tool: `doctoc` (Execution agent) — ✅ `01375f23`
+- [ ] D4-B 🚧 — User validation of navigation quality (Planning agent)
 
 ### Phase 5 — Format and Markdown standardization
 
-- [ ] D5-A 🔄 — Run markdown lint autofix + prettier write on docs scope · tools: `markdownlint-cli2`, `prettier` (Codex)
-- [ ] D5-B 🚧 — User review formatting diff (Claude)
-- [ ] D5-C 🚧 — Define frontmatter schema(s) and validation approach · skill: `frontmatter-validator` (Claude)
-- [ ] D5-D 🔄 — Apply frontmatter + implement validator script · skill: `frontmatter-validator` (Codex)
-- [ ] D5-E 🚧 — User review metadata correctness (Claude)
-- [ ] D5-F 🔄 — Run broken link/anchor checks → produce report · tool: `markdown-link-check` (Codex)
-- [ ] D5-G 🔄 — Fix broken links/anchors · tool: `markdown-link-check` (Codex)
+- [ ] D5-A 🔄 — Run markdown lint autofix + prettier write on docs scope · tools: `markdownlint-cli2`, `prettier` (Execution agent)
+- [ ] D5-B 🚧 — User review formatting diff (Planning agent)
+- [ ] D5-C 🚧 — Define frontmatter schema(s) and validation approach · skill: `frontmatter-validator` (Planning agent)
+- [ ] D5-D 🔄 — Apply frontmatter + implement validator script · skill: `frontmatter-validator` (Execution agent)
+- [ ] D5-E 🚧 — User review metadata correctness (Planning agent)
+- [ ] D5-F 🔄 — Run broken link/anchor checks → produce report · tool: `markdown-link-check` (Execution agent)
+- [ ] D5-G 🔄 — Fix broken links/anchors · tool: `markdown-link-check` (Execution agent)
 
 ### Phase 6 — Readability and style
 
-- [ ] D6-A 🚧 — Readability analysis and prioritized report (Claude)
-- [ ] D6-B 🚧 — Rewrite key pages for clarity/scannability with Mermaid diagrams and source citations · skill: `microsoft-wiki-page-writer` (Claude)
-- [ ] D6-C 🚧 — User validation of rewritten technical content (Claude)
-- [ ] D6-D 🚧 — Define canonical glossary and approved terminology · skill: `terminology-enforcer` (Claude)
-- [ ] D6-E 🚧 — User approval of glossary (Claude)
-- [ ] D6-F 🔄 — Apply terminology consistency updates across scope · skill: `terminology-enforcer` (Codex)
+- [ ] D6-A 🚧 — Readability analysis and prioritized report (Planning agent)
+- [ ] D6-B 🚧 — Rewrite key pages for clarity/scannability with Mermaid diagrams and source citations · skill: `microsoft-wiki-page-writer` (Planning agent)
+- [ ] D6-C 🚧 — User validation of rewritten technical content (Planning agent)
+- [ ] D6-D 🚧 — Define canonical glossary and approved terminology · skill: `terminology-enforcer` (Planning agent)
+- [ ] D6-E 🚧 — User approval of glossary (Planning agent)
+- [ ] D6-F 🔄 — Apply terminology consistency updates across scope · skill: `terminology-enforcer` (Execution agent)
 
 ### Phase 7 — Onboarding and changelog
 
-- [ ] D7-A 🚧 — Generate audience-tailored onboarding guides (Contributor, Staff Engineer, Executive, PM) · skill: `microsoft-wiki-onboarding` (Claude)
-- [ ] D7-B 🚧 — User review + approve onboarding guides (Claude)
-- [ ] D7-C 🚧 — Generate structured changelog from git history · skill: `microsoft-wiki-changelog` (Claude)
-- [ ] D7-D 🚧 — User review changelog (Claude)
+- [ ] D7-A 🚧 — Generate audience-tailored onboarding guides (Contributor, Staff Engineer, Executive, PM) · skill: `microsoft-wiki-onboarding` (Planning agent)
+- [ ] D7-B 🚧 — User review + approve onboarding guides (Planning agent)
+- [ ] D7-C 🚧 — Generate structured changelog from git history · skill: `microsoft-wiki-changelog` (Planning agent)
+- [ ] D7-D 🚧 — User review changelog (Planning agent)
 
 ### Phase 8 — Maintenance and automation
 
-- [ ] D8-A 🚧 — Design docs QA CI pipeline · skill: `docs-pr-gatekeeper` (Claude)
-- [ ] D8-B 🔄 — Implement CI workflow + script wiring · skill: `docs-pr-gatekeeper` (Codex)
-- [ ] D8-C 🚧 — User verifies expected pass/fail behavior in CI (Claude)
+- [ ] D8-A 🚧 — Design docs QA CI pipeline · skill: `docs-pr-gatekeeper` (Planning agent)
+- [ ] D8-B 🔄 — Implement CI workflow + script wiring · skill: `docs-pr-gatekeeper` (Execution agent)
+- [ ] D8-C 🚧 — User verifies expected pass/fail behavior in CI (Planning agent)
 
 ### Closure
 
-- [ ] D9-A 🚧 — Final smoke review and acceptance decision for merge readiness · skill: `microsoft-wiki-qa` (Claude)
+- [ ] D9-A 🚧 — Final smoke review and acceptance decision for merge readiness · skill: `microsoft-wiki-qa` (Planning agent)
 
 ---
 
-## Cola de prompts
+## Prompt Queue
 
-> Pre-written prompts for semi-unattended execution. Codex reads these directly.
-> Prompts that depend on prior results are marked "just-in-time" — Claude writes them after the dependency resolves.
+> Pre-written prompts for semi-unattended execution. Execution agent reads these directly.
+> Prompts that depend on prior results are marked "just-in-time" — Planning agent writes them after the dependency resolves.
 
-_No prompts written yet. Claude will populate as phases begin._
+### D5-A — Markdown lint + Prettier
+
+Run `npx markdownlint-cli2 "docs/**/*.md" --fix` then `npx prettier --write "docs/**/*.md"`. Stage only files in the plan's scope boundary. Report the diff summary.
+
+### D5-D — Frontmatter + validator script
+
+Just-in-time — Planning agent writes after D5-C defines schema.
+
+### D5-F — Broken link/anchor check
+
+Run `npx markdown-link-check docs/**/*.md --config .markdown-link-check.json`. Collect all failures into a report table in the Audit Results section (D5-F).
+
+### D5-G — Fix broken links
+
+Just-in-time — Planning agent writes after D5-F report.
+
+### D6-F — Terminology consistency
+
+Just-in-time — Planning agent writes after D6-D/D6-E glossary approval.
+
+### D8-B — CI workflow wiring
+
+Just-in-time — Planning agent writes after D8-A pipeline design.
 
 ---
 
-## Prompt activo
+## Active Prompt
 
-### Paso objetivo
+### Step objective
 
 _Empty._
 
