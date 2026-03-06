@@ -126,7 +126,7 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 - [x] P5-A 🔄 - **Schema + Backend:** Añadir `observations` y `actions` a `global_schema_contract.json` (section "Visita / episodio", `repeatable: false`, `value_type: "string"`). Implementar heuristica en `review_service.py` que divida `segment_text` en observaciones vs. acciones (separador: verbos de accion/prescripcion como "se recomienda", "se prescribe", "se administra", "se aplica", "tratamiento", "cita para", etc.). Inyectar en `visit["fields"]` como campos aditivos. — ✅ `no-commit (batched into CT-6)`
 - [x] P5-B 🔄 - **Frontend:** Añadir `observations` y `actions` a `CANONICAL_VISIT_SCOPED_FIELD_KEYS` y `FIELD_LABELS` en `appWorkspace.ts`. Renderizar como campos de texto largo en las episode cards, antes de los campos granulares existentes. — ✅ `no-commit (batched into CT-6)`
 - [x] P5-C 🔄 - **Tests:** Unit tests para la heuristica de particion (casos: texto mixto, texto solo-observaciones, texto solo-acciones, texto vacio). Integracion: verificar que docB produce observations/actions con ≥80% cobertura del segmento. — ✅ `no-commit (batched into CT-6)`
-- [x] CT-6 🔄 - Commit task P5. — ✅ `6979b03b`
+- [x] CT-6 🔄 - Commit task P5. — ✅ `6979b03b`, ✅ `4296bb14`
 
 ### Phase 6 - Validacion y merge
 
