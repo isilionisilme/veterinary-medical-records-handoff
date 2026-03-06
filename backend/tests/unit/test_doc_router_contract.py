@@ -314,6 +314,7 @@ def test_way_of_working_branch_naming_worktree_prefix_is_propagated() -> None:
     required_terms = (
         "Canonical format:",
         "<worktree>/<category>/<slug>",
+        "Category-specific branch patterns:",
         "Legacy format `<category>/<slug>` is temporarily allowed during migration.",
         "Detached HEAD is exempt from this naming convention.",
     )

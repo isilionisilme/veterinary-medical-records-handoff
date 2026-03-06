@@ -59,7 +59,6 @@ Canonical format:
 
 Worktree segment:
 - `worktree` must match the current worktree folder name exactly.
-- Expected values in this repository setup include: `veterinary-medical-records`, `veterinary-medical-records-golden-loop`, `golden-2`, `docs`.
 
 Allowed categories:
 - `feature`
@@ -69,6 +68,22 @@ Allowed categories:
 - `refactor`
 - `ci`
 - `improvement`
+
+Category-specific branch patterns:
+
+**User stories:**
+- `feature/<ID>-<short-representative-slug>`
+- The slug must be concise and describe the purpose of the user story.
+
+**User-facing improvements (to previous implementations):**
+- `improvement/<short-slug>`
+
+**Technical non-user-facing work:**
+- `refactor/<short-slug>`
+- `chore/<short-slug>`
+- `ci/<short-slug>`
+- `docs/<short-slug>`
+- `fix/<short-slug>`
 
 Slug rules:
 - Use lowercase letters, numbers, and hyphens.
