@@ -2901,7 +2901,7 @@ def test_document_review_visit_scoping_observability_handles_missing_raw_text(te
 def test_document_review_visit_scoping_observability_returns_404_for_missing_document(test_client):
     response = test_client.get(f"/documents/{uuid4()}/review/debug/visit-scoping")
     assert response.status_code == 404
-    assert response.json() == {"error": {"code": "NOT_FOUND", "message": "Document not found."}}
+    assert response.json() == {"error_code": "NOT_FOUND", "message": "Document not found."}
 
 
 def test_document_review_visit_scoping_observability_returns_409_without_completed_run(test_client):
@@ -2909,8 +2909,8 @@ def test_document_review_visit_scoping_observability_returns_409_without_complet
     response = test_client.get(f"/documents/{document_id}/review/debug/visit-scoping")
     assert response.status_code == 409
     body = response.json()
-    assert body["error"]["code"] == "CONFLICT"
-    assert body["error"]["details"] == {"reason": "NO_COMPLETED_RUN"}
+    assert body["error_code"] == "CONFLICT"
+    assert body["details"] == {"reason": "NO_COMPLETED_RUN"}
 
 
 def test_document_review_merges_prepopulated_and_inferred_visits_deterministically(test_client):
