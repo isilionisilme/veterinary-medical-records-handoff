@@ -184,6 +184,10 @@ For standard override types, runtime behavior is:
 ### Pull Request progress tracking (mandatory)
 Every completed step must be reflected in the active Pull Request. After push, the agent updates the PR body with `gh pr edit <pr_number> --body "..."`.
 
+### PR traceability in plan metadata (mandatory)
+
+When a PR is created for the plan branch, the execution agent MUST update the `**PR:**` field in the plan file with the actual PR link (e.g., `[#220](https://github.com/…/pull/220)`) in the same commit or the immediately following plan-update commit. A plan with a merged or open PR whose `**PR:**` field still shows the placeholder text is a compliance failure.
+
 ### Execution Worktree Selection (Mandatory Plan-Start Choice)
 
 Before executing the first step of a plan, the agent must ask the user where to execute the plan.

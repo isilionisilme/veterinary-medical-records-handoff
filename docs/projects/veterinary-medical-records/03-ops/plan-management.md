@@ -28,7 +28,8 @@ Every new plan MUST include:
 2. Operational rules pointer: `> **Operational rules:** See [plan-execution-protocol.md](...)`
 3. Metadata:
 	- `**Branch:**`
-	- `**PR:**`
+	- `**PR:**` — Use `Pending (branch PR not created yet)` as placeholder until the PR exists.
+	- `**User Story:**` — Markdown link to the related US in `implementation-plan.md` (e.g., `[US-78](../implementation-plan.md#us-78)`). If the plan covers multiple stories, list all of them.
 	- `**Prerequisite:**`
 	- `**Worktree:**`
 	- `**CI Mode:**`
