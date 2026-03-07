@@ -78,7 +78,7 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 | CT-4 | P3-A, P3-B | medication + procedure extraction | `feat(plan-p3): extract medication and procedure from visit segment text` | Inmediato |
 | CT-5 | P4-A, P4-B | Validacion final + benchmark | `test(plan-p4): validate per-visit field extraction end-to-end` | Inmediato |
 | CT-6 | P5-A, P5-B, P5-C | observations/actions schema + backend + frontend + tests | `feat(plan-p5): add observations and actions pre-categorized fields` | Inmediato |
-| CT-7 | P6-B | Merge PR | `chore(plan-p6): merge per-visit field extraction` | Inmediato |
+| CT-7 | P6-B | Cierre de fase y espera de autorizacion de merge | `chore(plan-p6): close phase-6 gate and await merge authorization` | Inmediato |
 
 ---
 
@@ -129,11 +129,11 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 - [x] P5-C 🔄 - **Tests:** Unit tests para la heuristica de particion (casos: texto mixto, texto solo-observaciones, texto solo-acciones, texto vacio). Integracion: verificar que docB produce observations/actions con ≥80% cobertura del segmento. — ✅ `no-commit (batched into CT-6)`
 - [x] CT-6 🔄 - Commit task P5. — ✅ `6979b03b`, ✅ `4296bb14`
 
-### Phase 6 - Validacion y merge
+### Phase 6 - Validacion y espera de merge
 
-- [ ] P6-A 🚧 - Hard-gate: revision de observations/actions en docB. Criterio GO: ≥80% del texto clinico del segmento clasificado en uno de los dos campos. Campos granulares best-effort se valoran como bonus. 🚫 BLOCKED (awaiting user decision)
-- [ ] P6-B 🔄 - Merge PR a `main`. Verificar CI verde.
-- [ ] CT-7 🔄 - Commit task P6.
+- [x] P6-A 🚧 - Hard-gate: revision de observations/actions en docB. Criterio GO: ≥80% del texto clinico del segmento clasificado en uno de los dos campos. Campos granulares best-effort se valoran como bonus. ✅ APPROVED by user (2026-03-07).
+- [ ] P6-B 🚧 - Esperar instruccion explicita del usuario para mergear PR a `main`.
+- [ ] CT-7 🔄 - Commit task P6 (cierre documental/operativo sin merge automatico).
 
 ---
 
@@ -153,11 +153,11 @@ Re-utilizar `_mine_interpretation_candidates()` sobre el texto de cada segmento 
 12. `P5-B`: frontend — render observations/actions en episode cards.
 13. `P5-C`: tests unitarios + integracion de observations/actions.
 14. `P6-A`: hard-gate validacion de observations/actions en docB.
-15. `P6-B`: merge PR.
+15. `P6-B`: esperar instruccion explicita de merge del usuario.
 
 ## Active Prompt
 
-En ejecucion. Siguiente paso: `P6-A` (hard-gate de validacion observations/actions).
+En ejecucion. Siguiente paso: `P6-B` (esperar autorizacion explicita de merge).
 
 ---
 
