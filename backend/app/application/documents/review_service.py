@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 
@@ -27,9 +28,131 @@ from backend.app.application.field_normalizers import (
     _normalize_weight,
     normalize_microchip_digits_only,
 )
+from backend.app.application.processing.candidate_mining import _mine_interpretation_candidates
 from backend.app.domain.models import ReviewStatus
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
+
+_VISIT_REASON_LABEL_PREFIX_RE = re.compile(
+    r"^(?:visita|consulta|control|revisi[oó]n|seguimiento|ingreso|alta)\b",
+    re.IGNORECASE,
+)
+_SUMMARY_CLAUSE_PREFIX_RE = re.compile(
+    r"^(?:visita|consulta|control|revisi[oó]n|seguimiento|ingreso)\b",
+    re.IGNORECASE,
+)
+_DATE_TOKEN_RE = re.compile(
+    r"^(?:\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}|\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4})\b"
+)
+_CLAUSE_SPLIT_RE = re.compile(r";|\.(?=\s|$)")
+_ACTION_VERB_RE = re.compile(
+    r"\b("
+    r"se\s+recomienda|se\s+prescribe|se\s+administra|se\s+aplica|"
+    r"se\s+indica|se\s+pauta|se\s+realiza|"
+    r"recomendar|recomiendo|recomendamos|prescribir|administrar|aplicar|iniciar|continuar|"
+    r"mantener|mezclar|cambiar|esterilizar|castrar|lavados?|"
+    r"damos|pongo|ponemos|vacunar|vacunamos|se\s+vacuna|vacunaci[oó]n|"
+    r"vamos\s+a\s+(?:hacer|pasar|repetir|valorar|tratar|controlar|cambiar)|"
+    r"cogemos\s+cita|poner\s+cita|repetiremos|volveremos\s+a\s+tratar|"
+    r"controlamos|podemos\s+esterilizar|le\s+comentamos|"
+    r"curas?\b|observar|acudir\s+de\s+urgencias|contactamos|llamo|"
+    r"recalcamos|preguntar|preguntamos|desparasitar|heptavalente|novibac|"
+    r"hospitalizad[oa]|hospitalizar|dieta\b|"
+    r"coger\s+muestra|conservar\s+en\s+fr[ií]o|plan\s+cachorro|"
+    r"mando|mandamos|enviar\s+por\s+mail|mandar\s+por\s+mail|por\s+mail|"
+    r"volvemos\s+a\s+revisar|traer\s+fotos|castraremos|repetir\s+test"
+    r")\b",
+    re.IGNORECASE,
+)
+_THERAPEUTIC_ACTION_RE = re.compile(
+    r"\b("
+    r"pongo\s+vacuna|ponemos\s+vacuna|se\s+vacuna|vacunamos|vacunaci[oó]n|"
+    r"damos|administrar|administra(?:mos)?|aplicar|aplica(?:mos)?|"
+    r"comprimid[oa]s?|c[aá]psul[ae]s?|"
+    r"gotas?|sobre(?:s)?|ml|mg|cada\s+\d+\s*(?:h|horas?|d[ií]as?)|"
+    r"durante\s+\d+\s*(?:d[ií]as?|semanas?|meses?)|"
+    r"revisi[oó]n|seguimiento|control|lata\s+i/d|"
+    r"mantener|mezclar|insistir|cambiar|esterilizar|castrar"
+    r")\b",
+    re.IGNORECASE,
+)
+_DIAGNOSTIC_CONTEXT_RE = re.compile(
+    r"\b("
+    r"test|anal[ií]tica|coprol[oó]gic[oa]|perfil\s+heces|"
+    r"ecograf[ií]a|radiograf[ií]a|rx|biopsia|colonoscopia|"
+    r"saco\s+sangre|extra(?:er|emos?)\s+sangre|muestra(?:s)?\s+de\s+heces|"
+    r"resultado(?:s)?|negativ[oa]s?|positiv[oa]s?|descarta(?:mos|r)?"
+    r")\b",
+    re.IGNORECASE,
+)
+_INLINE_ACTION_SPLIT_RE = re.compile(
+    r"\s+(?=(?:"
+    r"pongo\s+vacuna|ponemos\s+vacuna|se\s+recomienda|se\s+prescribe|"
+    r"se\s+administra|se\s+aplica|se\s+indica|se\s+pauta|damos|"
+    r"tratamie?nto\s*:|tto\s*:|"
+    r"vamos\s+a\s+(?:hacer|pasar|repetir|valorar|tratar|controlar|cambiar)|"
+    r"cogemos\s+cita|poner\s+cita|seguimiento|recomiendo|recomendamos|"
+    r"mezcla\s+progresiva|observar|curas?\s+con|"
+    r"por\s+lo\s+que\s+(?:mando|mandamos)"
+    r")\b)",
+    re.IGNORECASE,
+)
+_TREATMENT_LABEL_RE = re.compile(
+    r"^\s*(?:tratamie?nto|tto)\b(?:\s*[:\-])?",
+    re.IGNORECASE,
+)
+_IMPERATIVE_DAR_RE = re.compile(r"^\s*dar\s+\d", re.IGNORECASE)
+_IMPERATIVE_SEGUIR_RE = re.compile(r"^\s*[-*•]?\s*seguir\s+con\b", re.IGNORECASE)
+_ANAMNESIS_INTENT_RE = re.compile(r"\b(?:anamnesis|acude\s+para)\b", re.IGNORECASE)
+_PERFORMED_ACTION_RE = re.compile(
+    r"\b(?:pongo|ponemos|damos|se\s+administra|se\s+aplica|se\s+pauta|se\s+prescribe)\b",
+    re.IGNORECASE,
+)
+_DOSAGE_INSTRUCTION_RE = re.compile(
+    r"\b(?:\d+(?:[.,]\d+)?\s*(?:ml|mg)|"
+    r"\d+\s*(?:/\s*\d+)?\s*comprimid[oa]s?|"
+    r"(?:comprimid[oa]s?|c[aá]psul[ae]s?|gotas?|sobres?)\b)"
+    r".{0,40}\b(?:cada|durante)\b",
+    re.IGNORECASE,
+)
+_PLAN_RECOMMENDATION_RE = re.compile(
+    r"^(?:importante\s+ofrecer|es\s+importante\s+que|"
+    r"en\s+\d+\s*(?:d[ií]as?|semanas?|mes(?:es)?)\s+deber[ií]a|"
+    r"si\s+se\s+mantiene|si\s+evoluciona|si\s+no\s+hay\s+mejor[ií]a|"
+    r"introduciremos|revisaremos|ser[aá]\s+necesario\s+realizar|"
+    r"(?:y\s+)?si\s+no\s+haremos|tenemos\s+que\s+descartar|si\s+empeora)\b",
+    re.IGNORECASE,
+)
+_OBSERVATION_HEADER_RE = re.compile(
+    r"^(?:exploraci[oó]n|exploracion|anamnesis)\b",
+    re.IGNORECASE,
+)
+_TRAILING_STUB_RE = re.compile(r"\b(?:les|le|se)\s*$", re.IGNORECASE)
+_ACTION_CONTINUATION_RE = re.compile(
+    r"^(?:el\s+test\s+de|la\s+anal[ií]tica|el\s+coprol[oó]gico|"
+    r"mezclado\s+con|pienso\s+digestivo|limpiezas?|lata\s+i/d)\b|^en\s+casa$",
+    re.IGNORECASE,
+)
+_LEADING_DAY_DATETIME_RE = re.compile(
+    r"^d[ií]a\s+\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}\s+\d{1,2}:\d{2}(?::\d{2})?\s*",
+    re.IGNORECASE,
+)
+_ADMIN_ACTION_CONTINUATION_RE = re.compile(
+    r"^(?:recordatorios?|vacuna|f|pr[oó]xima|f\.?\s*pr[oó]xima|aplicada|s[ií])$",
+    re.IGNORECASE,
+)
+_OBSERVATION_FINDING_RE = re.compile(
+    r"\b(?:no\s+parecen?\s+hongos|inflamaci[oó]n|alopecia|mordisco)\b",
+    re.IGNORECASE,
+)
+_HOME_STATUS_OBSERVATION_RE = re.compile(
+    r"^(?:en\s+casa\s+comentan|en\s+casa\b.*\best[aá]\s+bien\b)",
+    re.IGNORECASE,
+)
+_ADMIN_ACTION_RE = re.compile(
+    r"\b(?:recordatorios?\s+vacunaciones|vacunaci[oó]n\s+\w+)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -401,6 +524,450 @@ def _resolve_visit_from_anchor(
     return date_visits[visit_index]
 
 
+def _find_line_start_offset(*, text: str, offset: int) -> int:
+    safe_offset = max(0, min(offset, len(text)))
+    previous_break = text.rfind("\n", 0, safe_offset)
+    return 0 if previous_break < 0 else previous_break + 1
+
+
+def _resolve_visit_segment_bounds(
+    *,
+    anchor_offset: int,
+    raw_text: str,
+    visit_boundary_offsets: list[int],
+    ordered_anchor_offsets: list[int],
+) -> tuple[int, int]:
+    line_start = _find_line_start_offset(text=raw_text, offset=anchor_offset)
+
+    start_offset = line_start
+    for boundary_offset in visit_boundary_offsets:
+        if boundary_offset > anchor_offset:
+            break
+        if boundary_offset >= line_start:
+            start_offset = boundary_offset
+
+    end_offset = len(raw_text)
+    for boundary_offset in visit_boundary_offsets:
+        if boundary_offset > anchor_offset:
+            end_offset = min(end_offset, boundary_offset)
+            break
+
+    for candidate_anchor in ordered_anchor_offsets:
+        if candidate_anchor <= anchor_offset:
+            continue
+        candidate_line_start = _find_line_start_offset(text=raw_text, offset=candidate_anchor)
+        end_offset = min(end_offset, candidate_line_start)
+        break
+
+    if end_offset < start_offset:
+        end_offset = start_offset
+    return start_offset, end_offset
+
+
+def _extract_reason_for_visit_from_segment(*, segment_text: str) -> str | None:
+    for raw_line in segment_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        # Normalize common prefixes so the first clause becomes clinical content.
+        line = line.lstrip("-*• \t")
+        line = _VISIT_REASON_LABEL_PREFIX_RE.sub("", line, count=1).strip()
+
+        while True:
+            compact = line.lstrip(" :,-\t")
+            date_match = _DATE_TOKEN_RE.match(compact)
+            if date_match is None:
+                line = compact
+                break
+            line = compact[date_match.end() :].strip()
+
+        if not line:
+            continue
+
+        line = line.lstrip(":,- \t")
+        if not line:
+            continue
+
+        for separator in (".", ";"):
+            if separator in line:
+                line = line.split(separator, 1)[0].strip()
+                break
+
+        normalized = " ".join(line.split()).strip()
+        if normalized:
+            return normalized
+
+    return None
+
+
+def _normalize_segment_clause(*, raw_clause: str) -> str:
+    clause = raw_clause.strip()
+    if not clause:
+        return ""
+
+    clause = clause.lstrip("-*• \t")
+    clause = re.sub(r"^[^\wáéíóúüñÁÉÍÓÚÜÑ]+", "", clause)
+    clause = _LEADING_DAY_DATETIME_RE.sub("", clause).strip()
+    clause = _SUMMARY_CLAUSE_PREFIX_RE.sub("", clause, count=1).strip()
+
+    while True:
+        compact = clause.lstrip(" :,-\t")
+        date_match = _DATE_TOKEN_RE.match(compact)
+        if date_match is None:
+            clause = compact
+            break
+        clause = compact[date_match.end() :].strip()
+
+    normalized = " ".join(clause.strip(" :,-\t").split())
+    normalized = _TRAILING_STUB_RE.sub("", normalized).strip()
+    return normalized
+
+
+def _split_segment_into_observations_actions(*, segment_text: str) -> tuple[str | None, str | None]:
+    observations: list[str] = []
+    actions: list[str] = []
+    seen_observations: set[str] = set()
+    seen_actions: set[str] = set()
+
+    for raw_line in segment_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+
+        raw_clauses = [line]
+        if "." in line or ";" in line:
+            split_clauses = [part for part in _CLAUSE_SPLIT_RE.split(line) if part.strip()]
+            if split_clauses:
+                raw_clauses = split_clauses
+
+        expanded_clauses: list[str] = []
+        for raw_clause in raw_clauses:
+            inline_split = [
+                part for part in _INLINE_ACTION_SPLIT_RE.split(raw_clause) if part.strip()
+            ]
+            if inline_split:
+                expanded_clauses.extend(inline_split)
+            else:
+                expanded_clauses.append(raw_clause)
+
+        for raw_clause in expanded_clauses:
+            normalized_clause = _normalize_segment_clause(raw_clause=raw_clause)
+            if not normalized_clause:
+                continue
+
+            key = normalized_clause.casefold()
+            is_therapeutic_action = _THERAPEUTIC_ACTION_RE.search(normalized_clause) is not None
+            is_diagnostic_context = _DIAGNOSTIC_CONTEXT_RE.search(normalized_clause) is not None
+            is_generic_action = _ACTION_VERB_RE.search(normalized_clause) is not None
+            has_treatment_label = _TREATMENT_LABEL_RE.search(raw_clause) is not None
+            has_imperative_dar = _IMPERATIVE_DAR_RE.search(raw_clause) is not None
+            has_imperative_seguir = _IMPERATIVE_SEGUIR_RE.search(raw_clause) is not None
+            has_anamnesis_intent = _ANAMNESIS_INTENT_RE.search(normalized_clause) is not None
+            has_performed_action = _PERFORMED_ACTION_RE.search(normalized_clause) is not None
+            has_dosage_instruction = _DOSAGE_INSTRUCTION_RE.search(normalized_clause) is not None
+            has_plan_recommendation = _PLAN_RECOMMENDATION_RE.search(normalized_clause) is not None
+            has_observation_header = _OBSERVATION_HEADER_RE.search(normalized_clause) is not None
+            is_action_continuation = _ACTION_CONTINUATION_RE.search(normalized_clause) is not None
+            has_observation_finding = _OBSERVATION_FINDING_RE.search(normalized_clause) is not None
+            has_home_status_observation = (
+                _HOME_STATUS_OBSERVATION_RE.search(normalized_clause) is not None
+            )
+            is_admin_action = _ADMIN_ACTION_RE.search(normalized_clause) is not None
+            is_admin_action_continuation = (
+                _ADMIN_ACTION_CONTINUATION_RE.search(normalized_clause) is not None
+            )
+
+            if has_anamnesis_intent and not has_performed_action:
+                if key in seen_observations:
+                    continue
+                seen_observations.add(key)
+                observations.append(normalized_clause)
+                continue
+
+            if has_observation_header and not has_treatment_label:
+                if key in seen_observations:
+                    continue
+                seen_observations.add(key)
+                observations.append(normalized_clause)
+                continue
+
+            if has_observation_finding and not has_treatment_label and not has_dosage_instruction:
+                if key in seen_observations:
+                    continue
+                seen_observations.add(key)
+                observations.append(normalized_clause)
+                continue
+
+            if has_home_status_observation:
+                if key in seen_observations:
+                    continue
+                seen_observations.add(key)
+                observations.append(normalized_clause)
+                continue
+
+            if is_admin_action:
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if is_admin_action_continuation and actions:
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if is_action_continuation and actions:
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if (
+                has_treatment_label
+                or has_imperative_dar
+                or has_imperative_seguir
+                or has_dosage_instruction
+                or has_plan_recommendation
+                or is_therapeutic_action
+            ):
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if (
+                is_diagnostic_context
+                and not has_treatment_label
+                and not has_imperative_dar
+                and not has_imperative_seguir
+                and not is_therapeutic_action
+                and not is_generic_action
+            ):
+                if key in seen_observations:
+                    continue
+                seen_observations.add(key)
+                observations.append(normalized_clause)
+                continue
+
+            if is_generic_action:
+                if key in seen_actions:
+                    continue
+                seen_actions.add(key)
+                actions.append(normalized_clause)
+                continue
+
+            if key in seen_observations:
+                continue
+            seen_observations.add(key)
+            observations.append(normalized_clause)
+
+    observation_value = " ".join(observations).strip() or None
+    action_value = " ".join(actions).strip() or None
+    return observation_value, action_value
+
+
+def _append_visit_segment_summary_field(
+    *,
+    visit_fields: list[object],
+    visit_id: str,
+    key: str,
+    value: str,
+) -> None:
+    visit_fields.append(
+        {
+            "field_id": f"derived-{key}-{visit_id}",
+            "key": key,
+            "value": value,
+            "value_type": "string",
+            "scope": "visit",
+            "section": "visits",
+            "classification": "medical_record",
+            "origin": "derived",
+            "evidence": {"snippet": value},
+        }
+    )
+
+
+def _populate_visit_observations_actions_from_segments(
+    *,
+    assigned_visits: list[dict[str, object]],
+    visit_segments_by_id: dict[str, str],
+) -> None:
+    for visit in assigned_visits:
+        visit_id = visit.get("visit_id")
+        if not isinstance(visit_id, str) or not visit_id:
+            continue
+
+        segment_text = visit_segments_by_id.get(visit_id)
+        if not isinstance(segment_text, str) or not segment_text.strip():
+            continue
+
+        visit_fields = visit.get("fields")
+        if not isinstance(visit_fields, list):
+            visit_fields = []
+            visit["fields"] = visit_fields
+
+        existing_keys = {
+            field.get("key")
+            for field in visit_fields
+            if isinstance(field, dict) and isinstance(field.get("key"), str)
+        }
+
+        observation_value, action_value = _split_segment_into_observations_actions(
+            segment_text=segment_text
+        )
+        if "observations" not in existing_keys and isinstance(observation_value, str):
+            _append_visit_segment_summary_field(
+                visit_fields=visit_fields,
+                visit_id=visit_id,
+                key="observations",
+                value=observation_value,
+            )
+
+        if "actions" not in existing_keys and isinstance(action_value, str):
+            _append_visit_segment_summary_field(
+                visit_fields=visit_fields,
+                visit_id=visit_id,
+                key="actions",
+                value=action_value,
+            )
+
+
+def _build_visit_segment_text_by_visit_id(
+    *,
+    raw_text: str | None,
+    visit_occurrences_by_date: dict[str, list[dict[str, object]]],
+    raw_text_date_occurrences: list[tuple[str, int]],
+    visit_boundary_offsets: list[int],
+) -> dict[str, str]:
+    if not isinstance(raw_text, str) or not raw_text.strip():
+        return {}
+
+    ordered_anchor_offsets = [offset for _, offset in raw_text_date_occurrences]
+    consumed_occurrences: dict[str, int] = {}
+    visit_segments: dict[str, str] = {}
+
+    for visit_date, anchor_offset in raw_text_date_occurrences:
+        date_visits = visit_occurrences_by_date.get(visit_date, [])
+        if not date_visits:
+            continue
+
+        visit_index = consumed_occurrences.get(visit_date, 0)
+        if visit_index >= len(date_visits):
+            visit_index = len(date_visits) - 1
+        consumed_occurrences[visit_date] = consumed_occurrences.get(visit_date, 0) + 1
+
+        target_visit = date_visits[visit_index]
+        visit_id = target_visit.get("visit_id")
+        if not isinstance(visit_id, str) or not visit_id:
+            continue
+        if visit_id in visit_segments:
+            continue
+
+        start_offset, end_offset = _resolve_visit_segment_bounds(
+            anchor_offset=anchor_offset,
+            raw_text=raw_text,
+            visit_boundary_offsets=visit_boundary_offsets,
+            ordered_anchor_offsets=ordered_anchor_offsets,
+        )
+        segment_text = raw_text[start_offset:end_offset].strip()
+        if segment_text:
+            visit_segments[visit_id] = segment_text
+
+    return visit_segments
+
+
+def _populate_missing_reason_for_visit_from_segments(
+    *,
+    assigned_visits: list[dict[str, object]],
+    visit_segments_by_id: dict[str, str],
+) -> None:
+    for visit in assigned_visits:
+        reason_for_visit = visit.get("reason_for_visit")
+        if isinstance(reason_for_visit, str) and reason_for_visit.strip():
+            continue
+        if reason_for_visit is not None and not isinstance(reason_for_visit, str):
+            continue
+
+        visit_id = visit.get("visit_id")
+        if not isinstance(visit_id, str) or not visit_id:
+            continue
+
+        segment_text = visit_segments_by_id.get(visit_id)
+        if not isinstance(segment_text, str) or not segment_text.strip():
+            continue
+
+        extracted_reason = _extract_reason_for_visit_from_segment(segment_text=segment_text)
+        if extracted_reason is not None:
+            visit["reason_for_visit"] = extracted_reason
+
+
+def _populate_visit_scoped_fields_from_segment_candidates(
+    *,
+    assigned_visits: list[dict[str, object]],
+    visit_segments_by_id: dict[str, str],
+    candidate_keys: tuple[str, ...],
+) -> None:
+    for visit in assigned_visits:
+        visit_id = visit.get("visit_id")
+        if not isinstance(visit_id, str) or not visit_id:
+            continue
+
+        segment_text = visit_segments_by_id.get(visit_id)
+        if not isinstance(segment_text, str) or not segment_text.strip():
+            continue
+
+        visit_fields = visit.get("fields")
+        if not isinstance(visit_fields, list):
+            visit_fields = []
+            visit["fields"] = visit_fields
+
+        existing_keys = {
+            field.get("key")
+            for field in visit_fields
+            if isinstance(field, dict) and isinstance(field.get("key"), str)
+        }
+
+        mined_candidates = _mine_interpretation_candidates(segment_text)
+        for candidate_key in candidate_keys:
+            if candidate_key in existing_keys:
+                continue
+
+            key_candidates = mined_candidates.get(candidate_key)
+            if not isinstance(key_candidates, list) or not key_candidates:
+                continue
+
+            first_candidate = key_candidates[0]
+            if not isinstance(first_candidate, dict):
+                continue
+
+            candidate_value = first_candidate.get("value")
+            if not isinstance(candidate_value, str) or not candidate_value.strip():
+                continue
+
+            evidence = first_candidate.get("evidence")
+            visit_fields.append(
+                {
+                    "field_id": f"derived-{candidate_key}-{visit_id}",
+                    "key": candidate_key,
+                    "value": candidate_value,
+                    "value_type": "string",
+                    "scope": "visit",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "derived",
+                    "evidence": evidence if isinstance(evidence, dict) else None,
+                }
+            )
+            existing_keys.add(candidate_key)
+
+
 def _normalize_canonical_review_scoping(
     data: dict[str, object], *, raw_text: str | None = None
 ) -> dict[str, object]:
@@ -415,8 +982,9 @@ def _normalize_canonical_review_scoping(
     detected_visit_dates: list[str] = []
     seen_detected_visit_dates: set[str] = set()
     raw_text_detected_visit_dates = _detect_visit_dates_from_raw_text(raw_text=raw_text)
+    raw_text_date_occurrences = _locate_visit_date_occurrences_from_raw_text(raw_text=raw_text)
     raw_text_offsets_by_date: dict[str, list[int]] = {}
-    for normalized_date, offset in _locate_visit_date_occurrences_from_raw_text(raw_text=raw_text):
+    for normalized_date, offset in raw_text_date_occurrences:
         raw_text_offsets_by_date.setdefault(normalized_date, []).append(offset)
     visit_boundary_offsets = _locate_visit_boundary_offsets_from_raw_text(raw_text=raw_text)
 
@@ -604,6 +1172,26 @@ def _normalize_canonical_review_scoping(
             target_visit_fields = []
             target_visit["fields"] = target_visit_fields
         target_visit_fields.append(visit_field)
+
+    visit_segments_by_id = _build_visit_segment_text_by_visit_id(
+        raw_text=raw_text,
+        visit_occurrences_by_date=visit_occurrences_by_date,
+        raw_text_date_occurrences=raw_text_date_occurrences,
+        visit_boundary_offsets=visit_boundary_offsets,
+    )
+    _populate_missing_reason_for_visit_from_segments(
+        assigned_visits=assigned_visits,
+        visit_segments_by_id=visit_segments_by_id,
+    )
+    _populate_visit_scoped_fields_from_segment_candidates(
+        assigned_visits=assigned_visits,
+        visit_segments_by_id=visit_segments_by_id,
+        candidate_keys=("diagnosis", "symptoms", "medication", "procedure"),
+    )
+    _populate_visit_observations_actions_from_segments(
+        assigned_visits=assigned_visits,
+        visit_segments_by_id=visit_segments_by_id,
+    )
 
     metadata_values_for_unassigned: dict[str, object] = {}
     for metadata_key in _VISIT_GROUP_METADATA_KEYS:

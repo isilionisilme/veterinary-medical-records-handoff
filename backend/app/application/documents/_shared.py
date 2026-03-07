@@ -149,6 +149,8 @@ _VISIT_GROUP_METADATA_KEYS: tuple[str, ...] = (
 )
 
 _VISIT_SCOPED_KEYS: tuple[str, ...] = (
+    "observations",
+    "actions",
     "symptoms",
     "diagnosis",
     "procedure",

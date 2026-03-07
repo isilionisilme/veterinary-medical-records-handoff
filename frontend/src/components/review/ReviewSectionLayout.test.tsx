@@ -88,11 +88,16 @@ function createContext(
       {field.label}
     </div>
   ));
-  const renderRepeatableReviewField = vi.fn((field: ReviewDisplayField) => (
-    <div key={`repeatable-${field.id}`} data-testid={`repeatable-${field.key}`}>
-      {field.label}
-    </div>
-  ));
+  const renderRepeatableReviewField = vi.fn(
+    (
+      field: ReviewDisplayField,
+      _options?: { showUnassignedHint?: boolean; hideFieldTitle?: boolean },
+    ) => (
+      <div key={`repeatable-${field.id}`} data-testid={`repeatable-${field.key}`}>
+        {field.label}
+      </div>
+    ),
+  );
 
   return {
     isCanonicalContract: false,
@@ -160,6 +165,18 @@ describe("ReviewSectionLayout", () => {
   it("renders canonical visits by episode and unassigned group", () => {
     const validatedReviewFields: ReviewField[] = [
       createReviewField({
+        field_id: "visit-field-obs-1",
+        key: "observations",
+        value: "Prurito auricular",
+        visit_group_id: "visit-1",
+      }),
+      createReviewField({
+        field_id: "visit-field-actions-1",
+        key: "actions",
+        value: "Tratamiento con gotas",
+        visit_group_id: "visit-1",
+      }),
+      createReviewField({
         field_id: "visit-field-1",
         key: "diagnosis",
         value: "Otitis",
@@ -189,14 +206,34 @@ describe("ReviewSectionLayout", () => {
         isCanonicalContract: true,
         validatedReviewFields,
         reviewVisits,
-        canonicalVisitFieldOrder: ["visit_date", "reason_for_visit", "diagnosis", "symptoms"],
+        canonicalVisitFieldOrder: [
+          "visit_date",
+          "reason_for_visit",
+          "observations",
+          "actions",
+          "diagnosis",
+          "symptoms",
+        ],
       },
     );
 
     expect(screen.getByText("Visita 1")).toBeInTheDocument();
     expect(screen.getByTestId("visit-episode-1")).toBeInTheDocument();
+    expect(screen.getByTestId("visit-date-section-1")).toBeInTheDocument();
+    expect(screen.getByTestId("visit-summary-section-1")).toBeInTheDocument();
+    expect(screen.getByText("Resumen")).toBeInTheDocument();
+    expect(screen.getByTestId("repeatable-observations")).toBeInTheDocument();
+    expect(screen.getByTestId("repeatable-actions")).toBeInTheDocument();
     expect(screen.getByTestId("visit-unassigned-group")).toBeInTheDocument();
     expect(screen.getByText("No asociadas a visita")).toBeInTheDocument();
+    const observationsCall = ctx.renderRepeatableReviewField.mock.calls.find(
+      (call) => call[0]?.key === "observations",
+    );
+    const actionsCall = ctx.renderRepeatableReviewField.mock.calls.find(
+      (call) => call[0]?.key === "actions",
+    );
+    expect(observationsCall?.[1]).toEqual({ hideFieldTitle: true });
+    expect(actionsCall?.[1]).toEqual({ hideFieldTitle: true });
     expect(ctx.renderScalarReviewField).toHaveBeenCalled();
     expect(ctx.renderRepeatableReviewField).toHaveBeenCalled();
   });

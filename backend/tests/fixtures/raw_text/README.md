@@ -18,3 +18,8 @@ These fixtures are a regression mini dataset built from the only two real source
   - Covers owner name + address adjacency (`NOMBRE DEMO` + `C/ CALLE DEMO...`) used by owner trimming tests.
   - Covers date-like and microchip-like numeric patterns.
   - Includes a `Vet` line for vet-context handling.
+
+- `docB_multi_visit_rich.txt`
+  - Synthetic multi-visit text with two visit segments (`11/02/2026` and `18/02/2026`).
+  - Contains rich clinical language (symptoms, diagnosis, medication, procedure) for staged per-visit extraction rollout.
+  - Used as baseline fixture to assert visits are detected but start with empty `fields` before phase-specific extraction logic is enabled.

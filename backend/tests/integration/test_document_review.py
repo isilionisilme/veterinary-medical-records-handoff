@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -23,6 +24,7 @@ _US46_BASELINE_PATH = (
     / "review_baselines"
     / f"{_US46_BASELINE_VERSION}.json"
 )
+_RAW_TEXT_FIXTURES_PATH = Path(__file__).resolve().parents[1] / "fixtures" / "raw_text"
 
 _US46_VISIT_SCOPED_KEYS = {
     "symptoms",
@@ -197,6 +199,10 @@ def _collect_visit_grouping_stats(visits: object) -> dict[str, object]:
     }
 
 
+def _load_raw_text_fixture(name: str) -> str:
+    return (_RAW_TEXT_FIXTURES_PATH / name).read_text(encoding="utf-8")
+
+
 def _extract_assigned_visits(visits: object) -> list[dict[str, object]]:
     if not isinstance(visits, list):
         return []
@@ -214,6 +220,29 @@ def _extract_top_level_fields_by_key(data: dict[str, object], key: str) -> list[
     if not isinstance(fields, list):
         return []
     return [field for field in fields if isinstance(field, dict) and field.get("key") == key]
+
+
+def _extract_visit_field_value(visit: dict[str, object], *, key: str) -> str:
+    fields = visit.get("fields")
+    if not isinstance(fields, list):
+        return ""
+    for field in fields:
+        if not isinstance(field, dict):
+            continue
+        if field.get("key") != key:
+            continue
+        value = field.get("value")
+        if isinstance(value, str):
+            return value
+    return ""
+
+
+def _coverage_ratio(source_text: str, candidate_text: str) -> float:
+    normalized_source = re.sub(r"\W+", "", source_text.casefold())
+    normalized_candidate = re.sub(r"\W+", "", candidate_text.casefold())
+    if not normalized_source:
+        return 0.0
+    return len(normalized_candidate) / len(normalized_source)
 
 
 def _get_calibration_counts(
@@ -1219,6 +1248,664 @@ def test_document_review_docb_raw_text_multi_visit_detects_multiple_assigned_vis
         visit.get("visit_date") for visit in assigned if isinstance(visit.get("visit_date"), str)
     }
     assert {"2026-02-11", "2026-02-18"}.issubset(assigned_dates)
+
+
+def test_document_review_multi_visit_rich_raw_text_populates_visit_fields_from_segments(
+    test_client,
+):
+    """Per-visit segment mining should populate clinical fields for detected visits."""
+
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        _load_raw_text_fixture("docB_multi_visit_rich.txt"),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assert len(assigned) >= 2
+    for visit in assigned:
+        fields = visit.get("fields")
+        assert isinstance(fields, list)
+        keys = {field.get("key") for field in fields if isinstance(field, dict)}
+        assert {"diagnosis", "symptoms"}.intersection(keys)
+
+
+def test_document_review_multi_visit_rich_raw_text_extracts_reason_for_visit_from_segments(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        _load_raw_text_fixture("docB_multi_visit_rich.txt"),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assert len(assigned) >= 2
+    assigned_by_date = {
+        visit.get("visit_date"): visit
+        for visit in assigned
+        if isinstance(visit.get("visit_date"), str)
+    }
+
+    assert (
+        assigned_by_date["2026-02-11"].get("reason_for_visit")
+        == "dolor de oido y prurito auricular"
+    )
+    assert (
+        assigned_by_date["2026-02-18"].get("reason_for_visit")
+        == "mejora parcial, persiste inflamacion leve"
+    )
+
+
+def test_document_review_multi_visit_docb_populates_observations_actions_with_high_coverage(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        _load_raw_text_fixture("docB_multi_visit_rich.txt"),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+    assigned_by_date = {
+        visit.get("visit_date"): visit
+        for visit in assigned
+        if isinstance(visit, dict) and isinstance(visit.get("visit_date"), str)
+    }
+
+    expected_segment_by_date = {
+        "2026-02-11": (
+            "Consulta 11/02/2026: dolor de oido y prurito auricular. "
+            "Se diagnostica otitis externa y se realiza limpieza de oido. "
+            "Se indica medicacion: gotas oticas 4 gotas cada 12 horas por 7 dias."
+        ),
+        "2026-02-18": (
+            "Control 18/02/2026: mejora parcial, persiste inflamacion leve. "
+            "Diagnostico de seguimiento: otitis externa en resolucion. "
+            "Procedimiento: limpieza auricular de control. "
+            "Tratamiento: mantener gotas oticas y revaluar en 5 dias."
+        ),
+    }
+
+    for visit_date, expected_segment in expected_segment_by_date.items():
+        visit = assigned_by_date.get(visit_date)
+        assert isinstance(visit, dict)
+
+        observations = _extract_visit_field_value(visit, key="observations")
+        actions = _extract_visit_field_value(visit, key="actions")
+        assert observations or actions
+
+        coverage = _coverage_ratio(expected_segment, f"{observations} {actions}".strip())
+        assert coverage >= 0.8
+
+
+def test_document_review_multi_visit_reason_for_visit_does_not_override_existing_value(test_client):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-existing-1",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": "Motivo original preservado",
+                    "fields": [],
+                }
+            ],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        "Consulta 11/02/2026: dolor de oido y prurito auricular.\n",
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+    assert len(assigned) == 1
+    assert assigned[0].get("reason_for_visit") == "Motivo original preservado"
+
+
+def test_document_review_multi_visit_reason_for_visit_backfills_when_existing_value_is_empty_string(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-existing-1",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": "",
+                    "fields": [],
+                }
+            ],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        "Consulta 11/02/2026: dolor de oido y prurito auricular.\n",
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+    assert len(assigned) == 1
+    assert assigned[0].get("reason_for_visit") == "dolor de oido y prurito auricular"
+
+
+def test_document_review_multi_visit_extracts_diagnosis_and_symptoms_from_segments(test_client):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        (
+            "Consulta 11/02/2026: dolor de oido.\n"
+            "Sintomas: dolor de oido y prurito auricular.\n"
+            "Diagnostico: otitis externa.\n\n"
+            "Control 18/02/2026: mejora parcial.\n"
+            "Sintomas: inflamacion leve.\n"
+            "Diagnostico de seguimiento: otitis externa en resolucion.\n"
+        ),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assigned_by_date = {
+        visit.get("visit_date"): visit
+        for visit in assigned
+        if isinstance(visit.get("visit_date"), str)
+    }
+    first_visit_fields = assigned_by_date["2026-02-11"].get("fields", [])
+    second_visit_fields = assigned_by_date["2026-02-18"].get("fields", [])
+
+    first_keys = {field.get("key") for field in first_visit_fields if isinstance(field, dict)}
+    second_keys = {field.get("key") for field in second_visit_fields if isinstance(field, dict)}
+
+    assert "diagnosis" in first_keys
+    assert "symptoms" in first_keys
+    assert "diagnosis" in second_keys
+    assert "symptoms" in second_keys
+
+
+def test_document_review_multi_visit_segment_mining_does_not_duplicate_existing_diagnosis(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-existing-1",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "vf-diagnosis-existing",
+                            "key": "diagnosis",
+                            "value": "Diagnostico preservado",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                        }
+                    ],
+                }
+            ],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        (
+            "Consulta 11/02/2026: dolor de oido.\n"
+            "Diagnostico: otitis externa.\n"
+            "Sintomas: prurito auricular.\n"
+        ),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assert len(assigned) == 1
+    fields = assigned[0].get("fields", [])
+    diagnosis_values = [
+        field.get("value")
+        for field in fields
+        if isinstance(field, dict) and field.get("key") == "diagnosis"
+    ]
+    assert diagnosis_values == ["Diagnostico preservado"]
+
+
+def test_document_review_multi_visit_extracts_medication_and_procedure_from_segments(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+                {
+                    "field_id": "f-visit-date-2",
+                    "key": "visit_date",
+                    "value": "18/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        (
+            "Consulta 11/02/2026: dolor de oido.\n"
+            "Medicacion: gotas oticas 4 gotas cada 12 horas.\n"
+            "Procedimiento: limpieza auricular.\n\n"
+            "Control 18/02/2026: mejora parcial.\n"
+            "Tratamiento: mantener gotas oticas y revaluar en 5 dias.\n"
+            "Procedimiento: limpieza auricular de control.\n"
+        ),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assigned_by_date = {
+        visit.get("visit_date"): visit
+        for visit in assigned
+        if isinstance(visit.get("visit_date"), str)
+    }
+    first_visit_fields = assigned_by_date["2026-02-11"].get("fields", [])
+    second_visit_fields = assigned_by_date["2026-02-18"].get("fields", [])
+
+    first_keys = {field.get("key") for field in first_visit_fields if isinstance(field, dict)}
+    second_keys = {field.get("key") for field in second_visit_fields if isinstance(field, dict)}
+
+    assert "medication" in first_keys
+    assert "procedure" in first_keys
+    assert "medication" in second_keys
+    assert "procedure" in second_keys
+
+
+def test_document_review_multi_visit_segment_mining_does_not_duplicate_existing_medication(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "11/02/2026",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-existing-1",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "vf-medication-existing",
+                            "key": "medication",
+                            "value": "Tratamiento preservado",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                        }
+                    ],
+                }
+            ],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        (
+            "Consulta 11/02/2026: dolor de oido.\n"
+            "Medicacion: gotas oticas 4 gotas cada 12 horas.\n"
+            "Procedimiento: limpieza auricular.\n"
+        ),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    visits = response.json()["active_interpretation"]["data"]["visits"]
+    assigned = _extract_assigned_visits(visits)
+
+    assert len(assigned) == 1
+    fields = assigned[0].get("fields", [])
+    medication_values = [
+        field.get("value")
+        for field in fields
+        if isinstance(field, dict) and field.get("key") == "medication"
+    ]
+    assert medication_values == ["Tratamiento preservado"]
 
 
 def test_document_review_detects_additional_visit_from_raw_text_context(test_client):

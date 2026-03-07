@@ -35,6 +35,8 @@ def test_global_schema_contract_order() -> None:
         "admission_date",
         "discharge_date",
         "reason_for_visit",
+        "observations",
+        "actions",
         "diagnosis",
         "symptoms",
         "procedure",
@@ -53,7 +55,7 @@ def test_global_schema_contract_order() -> None:
     ]
 
     assert list(GLOBAL_SCHEMA_KEYS) == expected_keys
-    assert len(GLOBAL_SCHEMA_KEYS) == 35
+    assert len(GLOBAL_SCHEMA_KEYS) == 37
 
 
 def test_global_schema_contract_critical_subset() -> None:

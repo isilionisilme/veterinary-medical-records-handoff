@@ -98,11 +98,11 @@ function renderScalarWithContext(
 function renderRepeatableWithContext(
   field: ReviewDisplayField,
   contextOverrides?: Partial<ReviewFieldRenderersContext>,
-  showUnassignedHint?: boolean,
+  options?: { showUnassignedHint?: boolean; hideFieldTitle?: boolean },
 ) {
   const ctx = createContext(contextOverrides);
   const { renderRepeatableReviewField } = createReviewFieldRenderers(ctx);
-  render(<>{renderRepeatableReviewField(field, { showUnassignedHint })}</>);
+  render(<>{renderRepeatableReviewField(field, options)}</>);
   return ctx;
 }
 
@@ -217,6 +217,22 @@ describe("ReviewFieldRenderers", () => {
     renderRepeatableWithContext(field);
 
     expect(screen.getByText("Sin elementos")).toBeInTheDocument();
+  });
+
+  it("hides repeatable field title row when requested", () => {
+    const field = createDisplayField({
+      id: "summary-observations",
+      key: "observations",
+      label: "Observaciones",
+      repeatable: true,
+      items: [createSelectableField({ id: "summary-item", repeatable: true })],
+      isEmptyList: false,
+    });
+
+    renderRepeatableWithContext(field, undefined, { hideFieldTitle: true });
+
+    expect(screen.queryByText("1 elemento")).not.toBeInTheDocument();
+    expect(screen.getByTestId("field-trigger-summary-item")).toBeInTheDocument();
   });
 
   it("shows fallback tooltip when confidence config is missing", () => {

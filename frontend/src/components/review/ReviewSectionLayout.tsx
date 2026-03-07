@@ -48,7 +48,7 @@ export type ReviewSectionLayoutContext = {
   renderScalarReviewField: (field: ReviewDisplayField) => ReactNode;
   renderRepeatableReviewField: (
     field: ReviewDisplayField,
-    options?: { showUnassignedHint?: boolean },
+    options?: { showUnassignedHint?: boolean; hideFieldTitle?: boolean },
   ) => ReactNode;
 };
 
@@ -306,15 +306,16 @@ export function createReviewSectionLayoutRenderer(
             return buildDisplayField(visitBlock.id, key, fields, fieldIndex + 1);
           });
 
-          const metadataFields = visitFields.filter((field) =>
-            (CANONICAL_VISIT_METADATA_KEYS as readonly string[]).includes(field.key),
+          const summaryKeys = new Set(["observations", "actions"]);
+          const visitDateField = visitFields.find((field) => field.key === "visit_date");
+          const summaryFields = ["observations", "actions"]
+            .map((summaryKey) => visitFields.find((field) => field.key === summaryKey))
+            .filter((field): field is ReviewDisplayField => Boolean(field));
+          const remainingFields = visitFields.filter(
+            (field) => field.key !== "visit_date" && !summaryKeys.has(field.key),
           );
-          const scalarClinicalFields = visitFields.filter(
-            (field) =>
-              !(CANONICAL_VISIT_METADATA_KEYS as readonly string[]).includes(field.key) &&
-              !field.repeatable,
-          );
-          const repeatableClinicalFields = visitFields.filter((field) => field.repeatable);
+          const scalarClinicalFields = remainingFields.filter((field) => !field.repeatable);
+          const repeatableClinicalFields = remainingFields.filter((field) => field.repeatable);
           const hasVisitDate = !isFieldValueEmpty(visitBlock.visitDate ?? null);
           const hasReasonForVisit = !isFieldValueEmpty(visitBlock.reasonForVisit ?? null);
           const visitDateLabel = hasVisitDate
@@ -361,37 +362,57 @@ export function createReviewSectionLayoutRenderer(
                 <Separator />
 
                 <CardContent className="pt-3">
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
-                    {metadataFields.map((field) => ctx.renderScalarReviewField(field))}
-                  </div>
-
-                  {scalarClinicalFields.length > 0 && (
-                    <>
-                      <Separator className="my-2" />
-                      <div className="space-y-1">
-                        <span className="text-sm font-semibold text-textSecondary">
-                          Campos clínicos
-                        </span>
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
-                          {scalarClinicalFields.map((field) => ctx.renderScalarReviewField(field))}
-                        </div>
-                      </div>
-                    </>
+                  {visitDateField && (
+                    <div data-testid={`visit-date-section-${visitBlock.visitNumber}`}>
+                      {ctx.renderScalarReviewField(visitDateField)}
+                    </div>
                   )}
 
-                  {repeatableClinicalFields.length > 0 && (
+                  <Separator className="my-2" />
+
+                  <div
+                    className="space-y-1"
+                    data-testid={`visit-summary-section-${visitBlock.visitNumber}`}
+                  >
+                    <span className="text-sm font-semibold text-textSecondary">Resumen</span>
+                    <div className="space-y-2">
+                      {summaryFields.map((field) =>
+                        field.repeatable
+                          ? ctx.renderRepeatableReviewField(field, { hideFieldTitle: true })
+                          : ctx.renderScalarReviewField(field),
+                      )}
+                    </div>
+                  </div>
+
+                  <Separator className="my-2" />
+
+                  {(scalarClinicalFields.length > 0 || repeatableClinicalFields.length > 0) && (
                     <>
-                      <Separator className="my-2" />
-                      <div className="space-y-1">
-                        <span className="text-sm font-semibold text-textSecondary">
-                          Listas clínicas
-                        </span>
-                        <div className="space-y-2">
-                          {repeatableClinicalFields.map((field) =>
-                            ctx.renderRepeatableReviewField(field),
-                          )}
+                      {scalarClinicalFields.length > 0 && (
+                        <div className="space-y-1">
+                          <span className="text-sm font-semibold text-textSecondary">
+                            Campos clínicos
+                          </span>
+                          <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
+                            {scalarClinicalFields.map((field) =>
+                              ctx.renderScalarReviewField(field),
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {repeatableClinicalFields.length > 0 && (
+                        <div className="space-y-1">
+                          <span className="text-sm font-semibold text-textSecondary">
+                            Listas clínicas
+                          </span>
+                          <div className="space-y-2">
+                            {repeatableClinicalFields.map((field) =>
+                              ctx.renderRepeatableReviewField(field),
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </CardContent>

@@ -420,6 +420,20 @@ def test_implementation_plan_router_tracks_us46_propagation() -> None:
     assert "US-46 — Deterministic Visit Assignment Coverage MVP (Schema)" in release_6_text
 
 
+def test_implementation_plan_multi_visit_plan_rename_propagates_to_owner_entry() -> None:
+    source_text = _read_text(IMPLEMENTATION_PLAN)
+    entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
+
+    assert "COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md" in source_text
+    assert "COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md" in source_text
+    assert "PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md" in source_text
+
+    assert "Multi-visit plan series normalization (2026-03-07)" in entry_text
+    assert "COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md" in entry_text
+    assert "COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md" in entry_text
+    assert "PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md" in entry_text
+
+
 def test_ci_does_not_ignore_markdown_only_changes() -> None:
     text = _read_text(CI_WORKFLOW)
     assert "paths-ignore" not in text

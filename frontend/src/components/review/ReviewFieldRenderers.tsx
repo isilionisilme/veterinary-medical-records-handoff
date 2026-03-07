@@ -66,7 +66,7 @@ export function createReviewFieldRenderers(ctx: ReviewFieldRenderersContext): {
   renderScalarReviewField: (field: ReviewDisplayField) => ReactNode;
   renderRepeatableReviewField: (
     field: ReviewDisplayField,
-    options?: { showUnassignedHint?: boolean },
+    options?: { showUnassignedHint?: boolean; hideFieldTitle?: boolean },
   ) => ReactNode;
 } {
   const buildFieldTooltip = (
@@ -274,27 +274,30 @@ export function createReviewFieldRenderers(ctx: ReviewFieldRenderersContext): {
 
   const renderRepeatableReviewField = (
     field: ReviewDisplayField,
-    options?: { showUnassignedHint?: boolean },
+    options?: { showUnassignedHint?: boolean; hideFieldTitle?: boolean },
   ) => {
     const countLabel = field.items.length === 1 ? "1 elemento" : `${field.items.length} elementos`;
     const shouldShowUnassignedVisitHintForField =
       options?.showUnassignedHint ?? ctx.hasUnassignedVisitGroup;
+    const shouldHideFieldTitle = options?.hideFieldTitle ?? false;
     const firstUnassignedItemIndex = field.items.findIndex(
       (item) => item.visitGroupId?.trim().toLowerCase() === "unassigned",
     );
     return (
       <FieldBlock key={field.id} className="px-1 py-1">
-        <div className="flex items-center justify-between gap-2 pb-1">
-          <div className="flex items-center gap-1.5">
-            <p className="text-xs font-semibold text-text">{field.label}</p>
-            {field.isCritical && <CriticalBadge testId={`critical-indicator-${field.key}`} />}
+        {!shouldHideFieldTitle && (
+          <div className="flex items-center justify-between gap-2 pb-1">
+            <div className="flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-text">{field.label}</p>
+              {field.isCritical && <CriticalBadge testId={`critical-indicator-${field.key}`} />}
+            </div>
+            {field.items.length > 0 && (
+              <span className="rounded-full bg-surfaceMuted px-2 py-0.5 text-[10px] font-semibold text-textSecondary">
+                {countLabel}
+              </span>
+            )}
           </div>
-          {field.items.length > 0 && (
-            <span className="rounded-full bg-surfaceMuted px-2 py-0.5 text-[10px] font-semibold text-textSecondary">
-              {countLabel}
-            </span>
-          )}
-        </div>
+        )}
         <RepeatableList>
           {field.isEmptyList && (
             <p className="py-0.5 text-sm italic text-missing">{EMPTY_LIST_PLACEHOLDER}</p>

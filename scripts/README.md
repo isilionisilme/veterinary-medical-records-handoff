@@ -25,6 +25,9 @@ Utility scripts organized by domain. Run from the **repo root**.
 # Reset development database
 ./scripts/dev/reset-dev-db.ps1
 
+# Reset test environment (docker dev + DB wipe + health checks)
+./scripts/dev/reset-test-env.ps1
+
 # Validate documentation links
 node scripts/docs/check_docs_links.mjs
 ```

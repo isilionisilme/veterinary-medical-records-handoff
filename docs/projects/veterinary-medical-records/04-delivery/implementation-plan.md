@@ -2612,7 +2612,7 @@ _Acceptance criteria defined in the linked plan._
 
 **Status:** Implemented (2026-03-06)
 
-**Plan:** [COMPLETED_2026-03-06_MULTI-VISIT-RAWTEXT-BOUNDARIES.md](plans/completed/COMPLETED_2026-03-06_MULTI-VISIT-RAWTEXT-BOUNDARIES.md)
+**Plan:** [COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md](plans/completed/COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md)
 
 **User Story**
 As a veterinarian, I want the system to detect every clinical visit present in a medical record — even when visit dates are embedded in prose rather than in structured fields — so that no visit is silently omitted from the extracted data.
@@ -2623,9 +2623,9 @@ _Acceptance criteria defined in the linked plan._
 
 ## US-65 — View clinical data assigned to each specific visit
 
-**Status:** Active
+**Status:** Implemented (2026-03-07)
 
-**Plan:** [PLAN_2026-03-07_PER-VISIT-FIELD-EXTRACTION.md](plans/PLAN_2026-03-07_PER-VISIT-FIELD-EXTRACTION.md)
+**Plan:** [COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md](plans/completed/COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md)
 
 **User Story**
 As a veterinarian, I want each extracted clinical field (diagnosis, treatment, weight, etc.) to be assigned to the visit it belongs to so that I can review the history of a patient visit by visit.
@@ -2638,7 +2638,7 @@ _Acceptance criteria defined in the linked plan._
 
 **Status:** Planned (conditional)
 
-**Plan:** [PLAN_2026-03-07_VISIT-SCOPING-OBSERVABILITY.md](plans/PLAN_2026-03-07_VISIT-SCOPING-OBSERVABILITY.md)
+**Plan:** [PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md](plans/PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md)
 
 **User Story**
 As a developer, I want observability endpoints or logs that show how the system assigned each data field to a visit so that I can diagnose and fix incorrect visit scoping without guesswork.
