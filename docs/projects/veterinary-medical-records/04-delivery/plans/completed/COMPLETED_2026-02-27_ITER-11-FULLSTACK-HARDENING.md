@@ -3,7 +3,7 @@
 > **Operational rules:** See [execution-rules.md](execution-rules.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Rama:** `improvement/iteration-11`
-**PR:** #167 (single PR → `main`)
+**PR:** [#167](https://github.com/isilionisilme/veterinary-medical-records/pull/167)
 **Prerequisito:** Iteration 10 (#165) merged to `main`.
 
 ## Context

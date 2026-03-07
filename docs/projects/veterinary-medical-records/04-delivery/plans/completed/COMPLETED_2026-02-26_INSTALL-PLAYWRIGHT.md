@@ -1,5 +1,7 @@
 # Plan de ejecución AI — Playwright E2E (Producción)
 
+**PR:** [#159](https://github.com/isilionisilme/veterinary-medical-records/pull/159)
+
 ## Objetivo
 Integrar y estabilizar Playwright E2E en este repositorio para uso local (VS Code) y CI, dejando una PR lista para merge a `main`.
 

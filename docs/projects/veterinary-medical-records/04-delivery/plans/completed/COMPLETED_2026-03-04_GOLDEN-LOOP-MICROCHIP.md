@@ -3,7 +3,7 @@
 > **Operational rules:** See [execution-rules.md](../../03-ops/execution-rules.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Rama:** `feat/golden-loop-paciente-microchip`
-**PR:** _(pending)_
+**PR:** [#201](https://github.com/isilionisilme/veterinary-medical-records/pull/201)
 **Prerequisito:** `main` estable con tests verdes.
 
 ## Context

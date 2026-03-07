@@ -1,7 +1,7 @@
 # Completed: Iteration 8 — Bugs + CI governance + AppWorkspace round 3 + coverage
 
 **Date:** 2026-02-26
-**PRs:** #156 (PR A — CI governance), #157 (PR B — refactor + coverage)
+**PRs:** [#156](https://github.com/isilionisilme/veterinary-medical-records/pull/156) (PR A — CI governance), [#157](https://github.com/isilionisilme/veterinary-medical-records/pull/157) (PR B — refactor + coverage)
 **Branches:** `improvement/iteration-8-ci`, `improvement/iteration-8-refactor` → `main`
 
 ## Context
