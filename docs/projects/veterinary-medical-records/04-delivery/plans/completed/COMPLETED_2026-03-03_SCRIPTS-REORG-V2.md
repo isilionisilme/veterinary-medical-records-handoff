@@ -5,6 +5,7 @@
 **Scope:** Reorganize `scripts/` flat directory into domain folders (34 scripts).
 **Out of scope:** New functionality. Only move existing scripts + update references.
 **Branch:** `chore/scripts-reorg-v2` (from `main` @ `a0e66aec`)
+**PR:** [#190](https://github.com/isilionisilme/veterinary-medical-records/pull/190)
 **Objective:** Every script in a domain folder. Every reference updated. Verified per commit.
 
 ## Key Differences vs. v1

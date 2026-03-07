@@ -3,7 +3,7 @@
 > **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Branch:** `veterinary-medical-records-golden-loop/fix/multi-visit-rawtext-detection`
-**PR:** [#216](https://github.com/isilionisilme/veterinary-medical-records/pull/216) (draft)
+**PR:** [#216](https://github.com/isilionisilme/veterinary-medical-records/pull/216)
 **Prerequisite:** `main` estable con tests verdes y baseline reproducible en `test_document_review.py`.
 **Worktree:** `d:/Git/veterinary-medical-records-golden-loop`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)

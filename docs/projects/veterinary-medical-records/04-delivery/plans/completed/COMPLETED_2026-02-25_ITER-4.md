@@ -1,7 +1,7 @@
 # Completed: Iteration 4 — Docs + lint polish
 
 **Date:** 2026-02-25
-**PR:** #150
+**PR:** [#150](https://github.com/isilionisilme/veterinary-medical-records/pull/150)
 **Branch:** `improvement/iteration-4` → `main`
 
 ## Context
