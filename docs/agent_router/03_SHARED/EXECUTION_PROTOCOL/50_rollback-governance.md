@@ -20,25 +20,6 @@ If a completed step introduces regressions:
   - with delivered docs, or
   - with `no-doc-needed` rationale.
 
-<<<<<<< HEAD
-### Git policy by automation mode
-
-- `commit`:
-  - `Supervisado`: requires explicit user confirmation.
-  - `Semiautomatico`: may be executed automatically.
-  - `Automatico`: may be executed automatically.
-- `push`: always manual/user-triggered in all modes.
-- Merge: always explicit user approval.
-
-### PR policy
-
-- PR is required before merge.
-- PR creation/update is user-triggered only.
-- Agent never auto-creates PR unless user explicitly requests it in that moment.
-
-### Pre-PR Commit History Review (Hard Rule)
-
-=======
 ### Agent commit confirmation (hard rule)
 
 Outside of an active plan with an explicit commit task (`CT-*`), the agent must
@@ -62,7 +43,6 @@ An explicit commit task (`CT-*`) is the only case where auto-commit without user
 
 ### Pre-PR Commit History Review (Hard Rule)
 
->>>>>>> origin/veterinary-medical-records/docs/planning-hardening-pr1
 Before recommending PR creation/update:
 1. Review actual branch history.
 2. Ensure commit grouping tells a coherent technical narrative.
