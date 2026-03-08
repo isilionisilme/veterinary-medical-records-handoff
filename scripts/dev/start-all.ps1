@@ -186,9 +186,9 @@ function Stop-PortProcess {
         if ($parts.Count -lt 5) {
             continue
         }
-        $pid = 0
-        if ([int]::TryParse($parts[-1], [ref]$pid) -and $pid -gt 0) {
-            Stop-ProcessSubtree -RootPid $pid
+        $portPid = 0
+        if ([int]::TryParse($parts[-1], [ref]$portPid) -and $portPid -gt 0) {
+            Stop-ProcessSubtree -RootPid $portPid
         }
     }
 }
@@ -225,9 +225,9 @@ function Stop-TrackedProcesses {
 
     try {
         $state = Get-Content $processStateFile -Raw | ConvertFrom-Json
-        foreach ($pid in @($state.pids)) {
-            if ($pid -is [int] -and $pid -gt 0) {
-                Stop-ProcessSubtree -RootPid $pid
+        foreach ($trackedPid in @($state.pids)) {
+            if ($trackedPid -is [int] -and $trackedPid -gt 0) {
+                Stop-ProcessSubtree -RootPid $trackedPid
             }
         }
     } catch {
