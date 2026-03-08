@@ -97,6 +97,12 @@ If a completed step introduces regressions:
   - with delivered docs, or
   - with `no-doc-needed` rationale.
 
+### Agent commit confirmation (hard rule)
+
+Outside of an active plan with an explicit commit task (`CT-*`), the agent must
+wait for explicit confirmation before running `git commit`.
+An explicit commit task (`CT-*`) is the only case where auto-commit without user confirmation is permitted by this protocol.
+
 ### Git policy by automation mode
 
 - `commit`:
