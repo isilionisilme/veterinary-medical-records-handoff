@@ -70,6 +70,30 @@ export type ProcessingHistoryResponse = {
   runs: ProcessingHistoryRun[];
 };
 
+export type VisitScopingMetricsSummary = {
+  total_visits: number;
+  assigned_visits: number;
+  anchored_visits: number;
+  unassigned_field_count: number;
+  raw_text_available: boolean;
+};
+
+export type VisitScopingMetricsVisitRow = {
+  visit_index: number;
+  visit_id: string | null;
+  visit_date: string | null;
+  field_count: number;
+  anchored_in_raw_text: boolean;
+  raw_context_chars: number;
+};
+
+export type VisitScopingMetricsResponse = {
+  document_id: string;
+  run_id: string;
+  summary: VisitScopingMetricsSummary;
+  visits: VisitScopingMetricsVisitRow[];
+};
+
 export type RawTextArtifactResponse = {
   run_id: string;
   artifact_type: string;

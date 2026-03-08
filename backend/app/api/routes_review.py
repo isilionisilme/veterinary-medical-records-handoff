@@ -18,6 +18,7 @@ from backend.app.api.schemas import (
     LatestCompletedRunReviewResponse,
     RawTextArtifactAvailabilityResponse,
     ReviewStatusToggleResponse,
+    VisitScopingMetricsResponse,
 )
 from backend.app.application.document_service import (
     apply_interpretation_edits,
@@ -40,6 +41,12 @@ _NEXT_VISIT_BOUNDARY_PATTERN = re.compile(
     r"(?:\s*)?visita\s+(?:consulta\s+general|administrativa)\s+del\s+d[ií]a",
     re.IGNORECASE,
 )
+_NON_ANCHORED_RAW_CONTEXT_SENTINELS = {
+    "Raw text no disponible para este run.",
+    "No se pudieron inferir offsets de contexto en raw text.",
+    "Sin ancla de fecha para recortar contexto.",
+    "Sin ventana de contexto disponible.",
+}
 
 
 def _render_visit_debug_html(*, document_id: str, visit_sections: list[dict[str, str]]) -> str:
@@ -169,6 +176,119 @@ def _build_visit_debug_sections(*, visits: object, raw_text: str | None) -> list
     return [section for section, _ in sections_with_offsets]
 
 
+def _build_visit_scoping_metrics(*, visits: object, raw_text: str | None) -> dict[str, object]:
+    if not isinstance(visits, list):
+        return {
+            "summary": {
+                "total_visits": 0,
+                "assigned_visits": 0,
+                "anchored_visits": 0,
+                "unassigned_field_count": 0,
+                "raw_text_available": bool(raw_text and raw_text.strip()),
+            },
+            "visits": [],
+        }
+
+    assigned_visits = [
+        visit
+        for visit in visits
+        if isinstance(visit, dict) and visit.get("visit_id") != "unassigned"
+    ]
+    raw_text_available = bool(isinstance(raw_text, str) and raw_text.strip())
+    debug_sections = _build_visit_debug_sections(visits=visits, raw_text=raw_text)
+    metrics_rows: list[dict[str, object]] = []
+
+    for index, visit in enumerate(assigned_visits):
+        fields = visit.get("fields")
+        field_count = (
+            len([field for field in fields if isinstance(field, dict)])
+            if isinstance(fields, list)
+            else 0
+        )
+        section = debug_sections[index] if index < len(debug_sections) else None
+        raw_context = section["raw_context"] if isinstance(section, dict) else ""
+        anchored = (
+            raw_text_available
+            and bool(raw_context)
+            and (raw_context not in _NON_ANCHORED_RAW_CONTEXT_SENTINELS)
+        )
+
+        metrics_rows.append(
+            {
+                "visit_index": index + 1,
+                "visit_id": visit.get("visit_id"),
+                "visit_date": visit.get("visit_date"),
+                "field_count": field_count,
+                "anchored_in_raw_text": anchored,
+                "raw_context_chars": len(raw_context) if anchored else 0,
+            }
+        )
+
+    unassigned_field_count = 0
+    for visit in visits:
+        if not isinstance(visit, dict) or visit.get("visit_id") != "unassigned":
+            continue
+        fields = visit.get("fields")
+        if isinstance(fields, list):
+            unassigned_field_count += len([field for field in fields if isinstance(field, dict)])
+
+    anchored_visits = len(
+        [
+            visit_metrics
+            for visit_metrics in metrics_rows
+            if visit_metrics["anchored_in_raw_text"] is True
+        ]
+    )
+
+    return {
+        "summary": {
+            "total_visits": len(visits),
+            "assigned_visits": len(assigned_visits),
+            "anchored_visits": anchored_visits,
+            "unassigned_field_count": unassigned_field_count,
+            "raw_text_available": raw_text_available,
+        },
+        "visits": metrics_rows,
+    }
+
+
+def _resolve_review_context(
+    *,
+    document_id: str,
+    repository: DocumentRepository,
+    storage: FileStorage,
+) -> tuple[object | None, str | None] | JSONResponse:
+    review = get_document_review(
+        document_id=document_id,
+        repository=repository,
+        storage=storage,
+    )
+    if review is None or review.review is None:
+        reason = (review.unavailable_reason if review is not None else None) or "NO_COMPLETED_RUN"
+        message = (
+            "Review is not available until a completed run exists."
+            if reason == "NO_COMPLETED_RUN"
+            else "Review interpretation is not available for the latest completed run."
+        )
+        return error_response(
+            status_code=status.HTTP_409_CONFLICT,
+            error_code="CONFLICT",
+            message=message,
+            details={"reason": reason},
+        )
+
+    raw_text: str | None = None
+    run_id = review.review.latest_completed_run.run_id
+    if storage.exists_raw_text(document_id=document_id, run_id=run_id):
+        try:
+            raw_text = storage.resolve_raw_text(document_id=document_id, run_id=run_id).read_text(
+                encoding="utf-8"
+            )
+        except OSError:
+            raw_text = None
+    return review.review, raw_text
+
+
 @router.get(
     "/documents/{document_id}/review",
     response_model=DocumentReviewResponse,
@@ -273,42 +393,52 @@ def get_document_review_visit_debug_page(
             message="Document not found.",
         )
 
-    review = get_document_review(
-        document_id=document_id,
-        repository=repository,
-        storage=storage,
+    resolved = _resolve_review_context(
+        document_id=document_id, repository=repository, storage=storage
     )
-    if review is None or review.review is None:
-        reason = (review.unavailable_reason if review is not None else None) or "NO_COMPLETED_RUN"
-        message = (
-            "Review is not available until a completed run exists."
-            if reason == "NO_COMPLETED_RUN"
-            else "Review interpretation is not available for the latest completed run."
-        )
-        return error_response(
-            status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
-            message=message,
-            details={"reason": reason},
-        )
-
-    raw_text: str | None = None
-    if storage.exists_raw_text(
-        document_id=document_id,
-        run_id=review.review.latest_completed_run.run_id,
-    ):
-        try:
-            raw_text = storage.resolve_raw_text(
-                document_id=document_id,
-                run_id=review.review.latest_completed_run.run_id,
-            ).read_text(encoding="utf-8")
-        except OSError:
-            raw_text = None
-
-    visits = review.review.active_interpretation.data.get("visits")
+    if isinstance(resolved, JSONResponse):
+        return resolved
+    review_data, raw_text = resolved
+    visits = review_data.active_interpretation.data.get("visits")
     visit_sections = _build_visit_debug_sections(visits=visits, raw_text=raw_text)
     html_body = _render_visit_debug_html(document_id=document_id, visit_sections=visit_sections)
     return HTMLResponse(content=html_body, status_code=status.HTTP_200_OK)
+
+
+@router.get(
+    "/documents/{document_id}/review/debug/visit-scoping",
+    response_model=VisitScopingMetricsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get visit scoping observability metrics",
+    description="Return per-visit assignment and raw text anchoring coverage metrics.",
+    responses={
+        404: {"description": "Document not found (NOT_FOUND)."},
+        409: {"description": "No completed run available for review (CONFLICT)."},
+    },
+)
+def get_document_review_visit_scoping_observability(
+    request: Request, document_id: DocumentIdPath
+) -> JSONResponse:
+    repository = cast(DocumentRepository, request.app.state.document_repository)
+    storage = cast(FileStorage, request.app.state.file_storage)
+    if get_document(document_id=document_id, repository=repository) is None:
+        return error_response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            error_code="NOT_FOUND",
+            message="Document not found.",
+        )
+
+    resolved = _resolve_review_context(
+        document_id=document_id, repository=repository, storage=storage
+    )
+    if isinstance(resolved, JSONResponse):
+        return resolved
+    review_data, raw_text = resolved
+    visits = review_data.active_interpretation.data.get("visits")
+    payload = _build_visit_scoping_metrics(visits=visits, raw_text=raw_text)
+    payload["document_id"] = document_id
+    payload["run_id"] = review_data.latest_completed_run.run_id
+    return JSONResponse(content=payload, status_code=status.HTTP_200_OK)
 
 
 @router.post(

@@ -5,6 +5,7 @@ import {
   fetchDocumentDetails,
   fetchDocumentReview,
   fetchProcessingHistory,
+  fetchVisitScopingMetrics,
 } from "../api/documentApi";
 import { type DocumentListResponse } from "../types/appWorkspace";
 
@@ -17,6 +18,7 @@ type DocumentListQueryLike = {
 
 type UseActiveDocumentQueriesParams = {
   activeId: string | null;
+  shouldFetchVisitScopingMetrics: boolean;
   documentList: DocumentListQueryLike;
   showRefreshFeedback: boolean;
   setShowRefreshFeedback: (value: boolean) => void;
@@ -26,6 +28,7 @@ type UseActiveDocumentQueriesParams = {
 
 export function useActiveDocumentQueries({
   activeId,
+  shouldFetchVisitScopingMetrics,
   documentList,
   showRefreshFeedback,
   setShowRefreshFeedback,
@@ -50,6 +53,12 @@ export function useActiveDocumentQueries({
     queryKey: ["documents", "review", activeId],
     queryFn: () => fetchDocumentReview(activeId ?? ""),
     enabled: Boolean(activeId),
+    retry: false,
+  });
+  const visitScopingMetrics = useQuery({
+    queryKey: ["documents", "review", "visit-scoping", activeId],
+    queryFn: () => fetchVisitScopingMetrics(activeId ?? ""),
+    enabled: Boolean(activeId) && shouldFetchVisitScopingMetrics,
     retry: false,
   });
   const rawTextRunId = documentDetails.data?.latest_run?.run_id ?? null;
@@ -135,6 +144,7 @@ export function useActiveDocumentQueries({
     documentDetails,
     processingHistory,
     documentReview,
+    visitScopingMetrics,
     rawTextRunId,
     latestState,
     latestRunId,

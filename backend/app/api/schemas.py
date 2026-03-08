@@ -164,6 +164,44 @@ class DocumentReviewResponse(BaseModel):
     )
 
 
+class VisitScopingMetricsVisitRowResponse(BaseModel):
+    visit_index: int = Field(..., description="1-based index for assigned visits in review order.")
+    visit_id: str | None = Field(None, description="Visit identifier when available.")
+    visit_date: str | None = Field(
+        None, description="Normalized visit date (YYYY-MM-DD) when available."
+    )
+    field_count: int = Field(..., description="Number of structured fields assigned to the visit.")
+    anchored_in_raw_text: bool = Field(
+        ..., description="Whether a raw text context window was inferred for the visit."
+    )
+    raw_context_chars: int = Field(
+        ..., ge=0, description="Character count of the inferred raw text window."
+    )
+
+
+class VisitScopingMetricsSummaryResponse(BaseModel):
+    total_visits: int = Field(
+        ..., ge=0, description="Total visits entries in interpretation data, including unassigned."
+    )
+    assigned_visits: int = Field(
+        ..., ge=0, description="Visits with a concrete visit_id (excluding unassigned)."
+    )
+    anchored_visits: int = Field(..., ge=0, description="Assigned visits with raw text anchors.")
+    unassigned_field_count: int = Field(
+        ..., ge=0, description="Field count currently grouped under the unassigned visit bucket."
+    )
+    raw_text_available: bool = Field(
+        ..., description="Whether raw text artifact was available and readable."
+    )
+
+
+class VisitScopingMetricsResponse(BaseModel):
+    document_id: str = Field(..., description="Unique identifier of the document.")
+    run_id: str = Field(..., description="Latest completed run identifier used for review.")
+    summary: VisitScopingMetricsSummaryResponse
+    visits: list[VisitScopingMetricsVisitRowResponse]
+
+
 class ReviewStatusToggleResponse(BaseModel):
     document_id: str = Field(..., description="Unique identifier of the document.")
     review_status: str = Field(..., description="Updated human review state.")

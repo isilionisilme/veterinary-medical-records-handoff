@@ -14,6 +14,7 @@ import {
   type ProcessingHistoryResponse,
   type RawTextArtifactResponse,
   type ReviewToggleResponse,
+  type VisitScopingMetricsResponse,
   UiError,
 } from "../types/appWorkspace";
 
@@ -185,6 +186,37 @@ export async function fetchProcessingHistory(
     throw new UiError(
       errorMessage,
       `HTTP ${response.status} calling ${API_BASE_URL}/documents/${documentId}/processing-history`,
+    );
+  }
+  return response.json();
+}
+
+export async function fetchVisitScopingMetrics(
+  documentId: string,
+): Promise<VisitScopingMetricsResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/documents/${documentId}/review/debug/visit-scoping`);
+  } catch (error) {
+    if (isNetworkFetchError(error)) {
+      throw new UiError(
+        "No se pudo conectar con el servidor.",
+        `Network error calling ${API_BASE_URL}/documents/${documentId}/review/debug/visit-scoping`,
+      );
+    }
+    throw error;
+  }
+  if (!response.ok) {
+    let errorMessage = "No pudimos cargar la observabilidad de visitas.";
+    try {
+      const payload = await response.json();
+      errorMessage = resolveFriendlyPayloadMessage(payload?.message, errorMessage);
+    } catch {
+      // Ignore JSON parse errors for non-JSON responses.
+    }
+    throw new UiError(
+      errorMessage,
+      `HTTP ${response.status} calling ${API_BASE_URL}/documents/${documentId}/review/debug/visit-scoping`,
     );
   }
   return response.json();

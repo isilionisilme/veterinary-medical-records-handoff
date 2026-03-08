@@ -7,6 +7,7 @@ import {
   fetchDocumentDetails,
   fetchDocumentReview,
   fetchProcessingHistory,
+  fetchVisitScopingMetrics,
 } from "../api/documentApi";
 import { useActiveDocumentQueries } from "./useActiveDocumentQueries";
 
@@ -14,11 +15,13 @@ vi.mock("../api/documentApi", () => ({
   fetchDocumentDetails: vi.fn(),
   fetchDocumentReview: vi.fn(),
   fetchProcessingHistory: vi.fn(),
+  fetchVisitScopingMetrics: vi.fn(),
 }));
 
 const mockedFetchDocumentDetails = vi.mocked(fetchDocumentDetails);
 const mockedFetchDocumentReview = vi.mocked(fetchDocumentReview);
 const mockedFetchProcessingHistory = vi.mocked(fetchProcessingHistory);
+const mockedFetchVisitScopingMetrics = vi.mocked(fetchVisitScopingMetrics);
 
 function createHarness() {
   const queryClient = new QueryClient({
@@ -78,12 +81,25 @@ describe("useActiveDocumentQueries", () => {
       reviewed_at: null,
       reviewed_by: null,
     });
+    mockedFetchVisitScopingMetrics.mockResolvedValueOnce({
+      document_id: "doc-1",
+      run_id: "run-1",
+      summary: {
+        total_visits: 1,
+        assigned_visits: 1,
+        anchored_visits: 1,
+        unassigned_field_count: 0,
+        raw_text_available: true,
+      },
+      visits: [],
+    });
 
     const { wrapper, queryClient } = createHarness();
     const { result } = renderHook(
       () =>
         useActiveDocumentQueries({
           activeId: "doc-1",
+          shouldFetchVisitScopingMetrics: true,
           documentList: {
             refetch: vi.fn(),
             isFetching: false,
@@ -118,6 +134,7 @@ describe("useActiveDocumentQueries", () => {
       () =>
         useActiveDocumentQueries({
           activeId: null,
+          shouldFetchVisitScopingMetrics: false,
           documentList: {
             refetch: listRefetch,
             isFetching: false,

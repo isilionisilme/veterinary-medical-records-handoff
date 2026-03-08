@@ -175,6 +175,7 @@ export function App() {
     documentDetails,
     processingHistory,
     documentReview,
+    visitScopingMetrics,
     rawTextRunId,
     isProcessing,
     handleRefresh,
@@ -182,6 +183,7 @@ export function App() {
     clearRawTextRefreshKey,
   } = useActiveDocumentQueries({
     activeId,
+    shouldFetchVisitScopingMetrics: activeViewerTab === "technical",
     documentList,
     showRefreshFeedback,
     setShowRefreshFeedback,
@@ -557,6 +559,10 @@ export function App() {
     processingHistory.error,
     "No se pudo cargar el historial de procesamiento.",
   );
+  const visitScopingErrorMessage = getUserErrorMessage(
+    visitScopingMetrics.error,
+    "No pudimos cargar la observabilidad de visitas.",
+  );
   const structuredDataPanel = (
     <StructuredDataPanel
       activeId={activeId}
@@ -738,6 +744,10 @@ export function App() {
                 processingHistoryIsError={processingHistory.isError}
                 processingHistoryErrorMessage={processingHistoryErrorMessage}
                 processingHistoryRuns={processingHistory.data?.runs ?? []}
+                visitScopingMetrics={visitScopingMetrics.data ?? null}
+                visitScopingIsLoading={visitScopingMetrics.isLoading}
+                visitScopingIsError={visitScopingMetrics.isError}
+                visitScopingErrorMessage={visitScopingErrorMessage}
                 expandedSteps={expandedSteps}
                 onToggleStepDetails={toggleStepDetails}
                 formatRunHeader={formatRunHeader}

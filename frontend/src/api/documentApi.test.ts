@@ -8,6 +8,7 @@ import {
   fetchDocuments,
   fetchOriginalPdf,
   fetchProcessingHistory,
+  fetchVisitScopingMetrics,
   fetchRawText,
   markDocumentReviewed,
   reopenDocumentReview,
@@ -190,6 +191,43 @@ describe("documentApi", () => {
     });
     await expect(fetchProcessingHistory("doc-1")).rejects.toMatchObject<Partial<UiError>>({
       userMessage: "No pudimos cargar el historial de procesamiento.",
+    });
+  });
+
+  it("fetchVisitScopingMetrics returns payload on success and maps network failures", async () => {
+    vi.mocked(globalThis.fetch)
+      .mockResolvedValueOnce(
+        jsonResponse({
+          document_id: "doc-1",
+          run_id: "run-1",
+          summary: {
+            total_visits: 2,
+            assigned_visits: 2,
+            anchored_visits: 1,
+            unassigned_field_count: 0,
+            raw_text_available: true,
+          },
+          visits: [],
+        }),
+      )
+      .mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    await expect(fetchVisitScopingMetrics("doc-1")).resolves.toMatchObject({ run_id: "run-1" });
+    await expect(fetchVisitScopingMetrics("doc-1")).rejects.toMatchObject<Partial<UiError>>({
+      userMessage: "No se pudo conectar con el servidor.",
+    });
+  });
+
+  it("fetchVisitScopingMetrics maps API payload and fallback errors", async () => {
+    vi.mocked(globalThis.fetch)
+      .mockResolvedValueOnce(jsonResponse({ message: "Metrics unavailable" }, 409))
+      .mockResolvedValueOnce(new Response("broken", { status: 500 }));
+
+    await expect(fetchVisitScopingMetrics("doc-1")).rejects.toMatchObject<Partial<UiError>>({
+      userMessage: "Ocurrió un error inesperado. Intenta de nuevo.",
+    });
+    await expect(fetchVisitScopingMetrics("doc-1")).rejects.toMatchObject<Partial<UiError>>({
+      userMessage: "No pudimos cargar la observabilidad de visitas.",
     });
   });
 
