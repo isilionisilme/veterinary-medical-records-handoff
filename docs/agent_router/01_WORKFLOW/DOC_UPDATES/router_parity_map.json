@@ -58,18 +58,6 @@
       ]
     },
     {
-      "source_doc": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
-      "description": "Project EXECUTION_RULES must remain discoverable from project docs entry.",
-      "router_modules": [
-        {
-          "path": "docs/agent_router/04_PROJECT/00_entry.md",
-          "required_terms": [
-            "Project Docs (Modules)"
-          ]
-        }
-      ]
-    },
-    {
       "source_doc": "docs/projects/veterinary-medical-records/04-delivery/copilot-usage.md",
       "description": "Project COPILOT_USAGE must remain discoverable from project docs entry.",
       "router_modules": [
@@ -240,7 +228,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL must map to execution protocol owner module.",
+      "description": "Project PLAN_EXECUTION_PROTOCOL (including user-triggered PR opening policy) must map to execution protocol owner module.",
       "router_modules": [
         {
           "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md",
@@ -252,7 +240,7 @@
       ]
     },
     {
-      "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-management.md",
+      "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
       "description": "Project PLAN_MANAGEMENT must remain discoverable through project docs owner routing.",
       "router_modules": [
         {
@@ -408,3 +396,4 @@
     }
   ]
 }
+
