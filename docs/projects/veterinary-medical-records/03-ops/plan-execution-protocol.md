@@ -225,7 +225,7 @@ Commits must remain coherent to the currently closed implementation step(s) and 
 
 ### CI Mode 2 — Pipeline Execution (Depth-1)
 
-**Core principle:** Do not wait for CI between auto-chain steps. After pushing the commit bundle defined by the active commit task, immediately start the next implementation step. CI is checked *before starting* step N+2, keeping a maximum pipeline depth of 1.
+**Core principle:** Do not wait for CI between auto-chain steps. After pushing the commit bundle defined by the active implementation step scope, immediately start the next implementation step. CI is checked *before starting* step N+2, keeping a maximum pipeline depth of 1.
 
 #### Flow
 
@@ -387,9 +387,9 @@ The planning agent records the decision, commits, prepares the prompt, and direc
 
 ## 13. SCOPE BOUNDARY Procedure
 
-> **Activation rule:** Any commit or push during active plan execution MUST go through this procedure. If the user requests "commit", "push", or any git operation while a plan step is active, treat it as a SCOPE BOUNDARY trigger — not as an isolated command.
+> **Activation rule:** Any commit or push request during active plan execution MUST go through this procedure. If the user requests "commit", "push", or another git operation while a plan step is active, treat it as a SCOPE BOUNDARY trigger — not as an isolated command.
 
-Execute these steps **IN THIS EXACT ORDER**:
+Execute the **applicable** steps in the order below. For commit-only requests, execute STEP 0/STEP A/STEP B and skip push/PR/CI steps unless explicitly requested.
 
 ### STEP 0 — Branch Verification
 1. Read `**Branch:**` from the plan file.
@@ -404,14 +404,19 @@ Execute these steps **IN THIS EXACT ORDER**:
 1. Apply completion rules per §3.
 2. Stage and commit plan file only.
 
-### STEP C — Push Both Commits
+### STEP C — Push Both Commits (Conditional)
+Run this step only if the user explicitly requested push in the current step.
 1. `git push origin <branch>`
 2. If the user explicitly requested PR creation/update in this step, apply PR workflow rules per §14. Otherwise, skip PR creation/update.
 
-### STEP D — Update Active PR Description
-Update PR body per §7.
+### STEP D — Update Active PR Description (Conditional)
+Run this step only if:
+1. STEP C ran, and
+2. the user explicitly requested PR creation/update in the current step.
+Then update PR body per §7.
 
-### STEP E — CI Gate
+### STEP E — CI Gate (Conditional)
+Run this step only if STEP C ran.
 1. Check CI: `gh run list --branch <branch> --limit 1 --json status,conclusion,databaseId`
 2. If in_progress: wait 30s and retry (up to 10).
 3. Apply CI failure rules per §7 and AUTO-HANDOFF GUARD per §8.
@@ -552,8 +557,3 @@ If the requested story is not yet scheduled in any release, schedule it in the R
 - Story appears in **User Story Details** with required fields.
 - Formatting and section structure remain consistent with existing stories.
 - No unrelated documentation edits are bundled.
-
-
-
-
-

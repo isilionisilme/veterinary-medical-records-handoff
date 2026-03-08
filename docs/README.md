@@ -58,7 +58,7 @@ docs/
   - `02-tech/extraction-quality.md`
   - `02-tech/frontend-implementation.md`
   - `02-tech/technical-design.md`
-  - `03-ops/execution-rules.md`
+  - `03-ops/execution-rules.md` (compatibility stub)
   - `03-ops/manual-qa-regression-checklist.md`
   - `03-ops/plan-execution-protocol.md`
   - `03-ops/plan-e2e-test-coverage.md`

@@ -10,7 +10,7 @@ Commits must remain coherent to the currently closed implementation step(s) and 
 
 ### CI Mode 2 — Pipeline Execution (Depth-1)
 
-**Core principle:** Do not wait for CI between auto-chain steps. After pushing the commit bundle defined by the active commit task, immediately start the next implementation step. CI is checked *before starting* step N+2, keeping a maximum pipeline depth of 1.
+**Core principle:** Do not wait for CI between auto-chain steps. After pushing the commit bundle defined by the active implementation step scope, immediately start the next implementation step. CI is checked *before starting* step N+2, keeping a maximum pipeline depth of 1.
 
 #### Flow
 
