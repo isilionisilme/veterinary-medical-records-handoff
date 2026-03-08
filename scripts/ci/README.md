@@ -1,53 +1,24 @@
-# scripts/ci — Local preflight system
+# scripts/ci
 
-## Architecture
+Scripts de preflight local y hooks de Git.
 
-```
-Hook (sh)  ──→  test-L{1,2,3}.ps1  ──→  preflight-ci-local.ps1  (engine)
-Human (PS) ──→  test-L{1,2,3}.ps1  ──→  preflight-ci-local.ps1  (engine)
-```
+## Qué hace cada script
 
-All validation logic lives in a single engine: **`preflight-ci-local.ps1`** (~480 lines).
-The `test-L*.ps1` files are thin wrappers (presets) that call the engine with the right flags.
+| Script | Qué hace |
+|---|---|
+| `preflight-ci-local.ps1` | Motor principal de preflight. Ejecuta checks por alcance de diff (ruff/pytest/npm/doc guards/pip-audit/docker/e2e según modo y flags). |
+| `preflight-ci-local.bat` | Wrapper CMD para lanzar `preflight-ci-local.ps1`. |
+| `test-L1.ps1` | Preset rápido (`Mode Quick`) para pre-commit. |
+| `test-L1.bat` | Wrapper CMD de `test-L1.ps1`. |
+| `test-L2.ps1` | Preset de push (`Mode Push`) para pre-push. |
+| `test-L2.bat` | Wrapper CMD de `test-L2.ps1`. |
+| `test-L3.ps1` | Preset completo (`Mode Full`) para validación previa a PR. |
+| `test-L3.bat` | Wrapper CMD de `test-L3.ps1`. |
+| `install-pre-commit-hook.ps1` | Instala `.githooks/pre-commit` en `.git/hooks/pre-commit` (usa L1). |
+| `install-pre-push-hook.ps1` | Instala `.githooks/pre-push` en `.git/hooks/pre-push` (usa L2). |
+| `validate-branch-name.ps1` | Valida formato de rama (`<worktree>/<category>/<slug>`; permite legacy con warning). |
 
-## Files
+## Notas rápidas
 
-| File | Role |
-|------|------|
-| `preflight-ci-local.ps1` | Engine — runs ruff, pytest, npm, doc guards, pip-audit, docker, e2e (path-scoped) |
-| `preflight-ci-local.bat` | CMD launcher for the engine |
-| `test-L1.ps1` / `.bat` | **L1 — Quick** preset (`-Mode Quick`). Pre-commit gate. |
-| `test-L2.ps1` / `.bat` | **L2 — Push** preset (`-Mode Push -SkipDocker -ForceFrontend`). Pre-push gate. |
-| `test-L3.ps1` / `.bat` | **L3 — Full** preset (`-Mode Full -SkipDocker -SkipE2E -ForceFrontend -ForceFull`). Pre-PR gate. |
-| `install-pre-commit-hook.ps1` | Installs `.githooks/pre-commit` (runs L1) |
-| `install-pre-push-hook.ps1` | Installs `.githooks/pre-push` (runs L2) |
-
-## Why PowerShell?
-
-- Git hooks (`.githooks/*`) are `sh` scripts. They invoke `pwsh` to run the `.ps1` wrappers.
-- `.bat` files exist as a convenience for CMD terminals; they just call the `.ps1` via `powershell`.
-- The engine uses PowerShell for diff parsing, conditional execution, and cross-platform compatibility.
-
-A `.bat` cannot replace the `.ps1` wrappers because:
-1. Hooks are `sh` and call `pwsh` directly — they cannot invoke `.bat`.
-2. A `.bat` would still need to launch PowerShell to reach the engine anyway (extra layer, no benefit).
-
-## When to run each level
-
-| Level | When | Enforced by |
-|-------|------|-------------|
-| L1 | Before every commit | `.githooks/pre-commit` |
-| L2 | Before every push | `.githooks/pre-push` |
-| L3 | Before PR creation/update | Manual (documented in engineering playbook) |
-
-## Common flags
-
-Pass these to any wrapper or directly to the engine:
-
-| Flag | Effect |
-|------|--------|
-| `-BaseRef <ref>` | Compare against a specific ref instead of `main` (L1 uses `HEAD`) |
-| `-ForceFrontend` | Run frontend checks even if no frontend paths changed |
-| `-ForceFull` | Run all scopes regardless of diff |
-| `-SkipDocker` | Skip docker build check |
-| `-SkipE2E` | Skip end-to-end tests |
+- Los hooks de Git (`.githooks/*`) invocan scripts PowerShell.
+- Los `.bat` existen como comodidad para terminal CMD.
