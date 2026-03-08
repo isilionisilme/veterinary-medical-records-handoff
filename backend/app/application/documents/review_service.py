@@ -222,7 +222,8 @@ def _extract_latest_visit_weight_from_raw_text(raw_text: str | None) -> dict[str
     return {
         "date": best_date,
         "value": best_weight,
-        "evidence": {"page": 1, "snippet": best_snippet},
+        # Raw timeline extraction works on aggregated text; page may be unknown.
+        "evidence": {"snippet": best_snippet},
     }
 
 
