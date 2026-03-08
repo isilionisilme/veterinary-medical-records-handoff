@@ -59,6 +59,7 @@ export function useDisplayFieldMapping({
       repeatable: boolean;
       critical: boolean;
       aliases?: string[];
+      slotScope?: "document" | "visit";
     }> = [];
     if (isCanonicalContract) {
       if (hasMalformedCanonicalFieldSlots) {
@@ -97,6 +98,7 @@ export function useDisplayFieldMapping({
           repeatable: false,
           critical: criticalFromSchema || criticalFromFields || isCriticalSlot,
           aliases: slot.aliases,
+          slotScope: "document" as const,
         };
       });
       const visitDefinitions: Array<{
@@ -107,6 +109,7 @@ export function useDisplayFieldMapping({
         value_type: string;
         repeatable: boolean;
         critical: boolean;
+        slotScope?: "document" | "visit";
       }> = [];
       const seenVisitKeys = new Set<string>();
       validatedReviewFields
@@ -124,6 +127,7 @@ export function useDisplayFieldMapping({
             value_type: field.value_type,
             repeatable: true,
             critical: Boolean(field.is_critical),
+            slotScope: "visit",
           });
         });
       coreDefinitions = [...slotDefinitions, ...visitDefinitions];
@@ -209,11 +213,19 @@ export function useDisplayFieldMapping({
         }
         const bestCandidate = candidates
           .filter((candidate) => !isFieldValueEmpty(candidate.value))
-          .sort(
-            (a, b) =>
+          .sort((a, b) => {
+            if (isCanonicalContract && definition.slotScope === "document") {
+              const aDocumentScoped = a.scope === "document" ? 1 : 0;
+              const bDocumentScoped = b.scope === "document" ? 1 : 0;
+              if (aDocumentScoped !== bDocumentScoped) {
+                return bDocumentScoped - aDocumentScoped;
+              }
+            }
+            return (
               clampConfidence(resolveMappingConfidence(b) ?? -1) -
-              clampConfidence(resolveMappingConfidence(a) ?? -1),
-          )[0];
+              clampConfidence(resolveMappingConfidence(a) ?? -1)
+            );
+          })[0];
         const displayValue = bestCandidate
           ? formatFieldValue(bestCandidate.value, bestCandidate.value_type)
           : MISSING_VALUE_PLACEHOLDER;
