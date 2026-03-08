@@ -106,6 +106,28 @@ function Filter-ChangedExtensions {
     return @($result)
 }
 
+function Convert-ToFrontendRelativePath {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if ($Path.StartsWith("frontend/", [System.StringComparison]::OrdinalIgnoreCase)) {
+        return $Path.Substring("frontend/".Length)
+    }
+
+    return $Path
+}
+
+function Invoke-FrontendCommand {
+    param([Parameter(Mandatory = $true)][scriptblock]$Action)
+
+    Push-Location (Join-Path $repoRoot "frontend")
+    try {
+        & $Action
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Test-MatchesAny {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
@@ -367,7 +389,10 @@ if ($runFrontendQuick) {
     if ($frontendLintFiles.Count -gt 0) {
         Invoke-Step "Frontend quick lint (changed files)" {
             foreach ($frontendLintFile in $frontendLintFiles) {
-                & $npm --prefix frontend exec eslint $frontendLintFile
+                $frontendRelativePath = Convert-ToFrontendRelativePath $frontendLintFile
+                Invoke-FrontendCommand {
+                    & $npm exec eslint $frontendRelativePath
+                }
                 if (-not $?) {
                     throw "ESLint failed for $frontendLintFile"
                 }
@@ -384,7 +409,10 @@ if ($runFrontendQuick) {
     if ($frontendFormatFiles.Count -gt 0) {
         Invoke-Step "Frontend quick format check (changed files)" {
             foreach ($frontendFormatFile in $frontendFormatFiles) {
-                & $npm --prefix frontend exec prettier --check $frontendFormatFile
+                $frontendRelativePath = Convert-ToFrontendRelativePath $frontendFormatFile
+                Invoke-FrontendCommand {
+                    & $npm exec prettier --check $frontendRelativePath
+                }
                 if (-not $?) {
                     throw "Prettier check failed for $frontendFormatFile"
                 }
@@ -401,29 +429,41 @@ if ($runFrontendQuick) {
 
 if ($runFrontendFull) {
     Invoke-Step "Frontend dependencies" {
-        & $npm --prefix frontend ci
+        Invoke-FrontendCommand {
+            & $npm ci
+        }
     }
 
     Invoke-Step "Frontend lint" {
-        & $npm --prefix frontend run lint
+        Invoke-FrontendCommand {
+            & $npm run lint
+        }
     }
 
     Invoke-Step "Frontend format check" {
-        & $npm --prefix frontend run format:check
+        Invoke-FrontendCommand {
+            & $npm run format:check
+        }
     }
 
     Invoke-Step "Frontend tests (coverage)" {
-        & $npm --prefix frontend run test:coverage
+        Invoke-FrontendCommand {
+            & $npm run test:coverage
+        }
     }
 
     Invoke-Step "Frontend build" {
-        & $npm --prefix frontend run build
+        Invoke-FrontendCommand {
+            & $npm run build
+        }
     }
 }
 
 if ($runE2E) {
     Invoke-Step "Frontend E2E (Playwright)" {
-        & $npm --prefix frontend run test:e2e
+        Invoke-FrontendCommand {
+            & $npm run test:e2e
+        }
     }
 }
 
@@ -433,7 +473,9 @@ if ($runFrontendGuards) {
     }
 
     Invoke-Step "Frontend design system guard" {
-        & $npm --prefix frontend run check:design-system
+        Invoke-FrontendCommand {
+            & $npm run check:design-system
+        }
     }
 }
 
