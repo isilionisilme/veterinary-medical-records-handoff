@@ -368,6 +368,7 @@ def test_commit_confirmation_policy_is_documented_across_general_and_plan_modes(
 
     assert "explicit commit task (`CT-*`)" in plan_protocol
     assert "only case where auto-commit without user confirmation is permitted" in plan_protocol
+    assert "may auto-commit only when the active step explicitly defines" in plan_protocol
 
 
 def test_owner_entries_track_iteration_4_doc_propagation() -> None:

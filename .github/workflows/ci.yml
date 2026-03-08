@@ -319,7 +319,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start Docker stack for E2E
         env:
-          FRONTEND_PORT: "80"
+          FRONTEND_PORT: "5173"
           BACKEND_DATA_DIR: /tmp/vet-backend-data
           BACKEND_STORAGE_DIR: /tmp/vet-backend-storage
         run: |
@@ -330,6 +330,9 @@ jobs:
         if: failure()
         run: docker compose logs --tail 200
       - name: Run Playwright E2E suite
+        env:
+          PLAYWRIGHT_EXTERNAL_SERVERS: "1"
+          PLAYWRIGHT_BASE_URL: "http://127.0.0.1:5173"
         run: npm --prefix frontend run test:e2e
       - name: Upload Playwright report on failure
         if: failure()

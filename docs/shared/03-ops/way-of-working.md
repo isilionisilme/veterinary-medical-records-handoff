@@ -38,7 +38,7 @@ Before making any new changes (code, docs, config, etc.), create a new branch of
    - Switch to base and update it (`git switch main` then `git pull origin main`).
 3. Create the branch before editing any files:
    - If already on a correctly named branch for the same work item, proceed.
-   - Otherwise, build `<branch-name>` using the canonical format `<worktree>/<category>/<slug>` and create it from the updated base (`git switch -c <branch-name>`).
+   - Otherwise, build `<branch-name>` using the canonical format `codex/<worktree>/<category>/<slug>` and create it from the updated base (`git switch -c <branch-name>`).
    - Derive `worktree` from the current repository top-level folder name.
    - category mapping defined in Section 1.
    - user story -> `feature`
@@ -60,7 +60,7 @@ Before making any new changes (code, docs, config, etc.), create a new branch of
 ### Branch Naming Conventions
 
 Canonical format:
-- `<worktree>/<category>/<slug>`
+- `codex/<worktree>/<category>/<slug>`
 
 Creation-time rule:
 - During `Starting New Work`, the agent must derive and create branch names in canonical format, using the category mapping defined in Section 1.
@@ -102,14 +102,15 @@ Exemptions:
 - Detached HEAD is exempt from this naming convention.
 
 Transition policy:
+- Legacy format `<worktree>/<category>/<slug>` is temporarily allowed during migration.
 - Legacy format `<category>/<slug>` is temporarily allowed during migration.
 - Legacy branches must emit a warning in branch-name validation but must not be blocked.
 
 Examples:
-- `veterinary-medical-records/feature/us-42-pet-owner-export`
-- `veterinary-medical-records-golden-loop/improvement/prescription-print-layout`
-- `golden-2/chore/preflight-branch-name-hook`
-- `docs/docs/branching-convention-refresh`
+- `codex/veterinary-medical-records/feature/us-42-pet-owner-export`
+- `codex/veterinary-medical-records-golden-loop/improvement/prescription-print-layout`
+- `codex/golden-2/chore/preflight-branch-name-hook`
+- `codex/docs/docs/branching-convention-refresh`
 
 Branches must be **short-lived** and focused on a single user story or a single technical concern.
 

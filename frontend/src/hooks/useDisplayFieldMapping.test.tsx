@@ -112,4 +112,64 @@ describe("useDisplayFieldMapping", () => {
     expect(result.current.otherDisplayFields).toHaveLength(1);
     expect(result.current.otherDisplayFields[0]?.key).toBe("custom_note");
   });
+
+  it("prioritizes document-scoped candidate for canonical document slots", () => {
+    const visitWeight: ReviewField = {
+      field_id: "visit-weight-1",
+      key: "weight",
+      value: "12.5 kg",
+      value_type: "string",
+      scope: "visit",
+      section: "visits",
+      classification: "medical_record",
+      origin: "machine",
+      field_mapping_confidence: 0.95,
+    };
+    const derivedDocumentWeight: ReviewField = {
+      field_id: "derived-weight-current",
+      key: "weight",
+      value: "29.6 kg",
+      value_type: "string",
+      scope: "document",
+      section: "patient",
+      classification: "medical_record",
+      origin: "derived",
+      field_mapping_confidence: 0.1,
+    };
+    const validatedReviewFields: ReviewField[] = [visitWeight, derivedDocumentWeight];
+    const matchesByKey = new Map<string, ReviewField[]>([
+      ["weight", [visitWeight, derivedDocumentWeight]],
+    ]);
+    const interpretationData = buildInterpretationData({
+      medical_record_view: {
+        version: "mvp-1",
+        sections: ["patient", "visits"],
+        field_slots: [
+          {
+            canonical_key: "weight",
+            scope: "document",
+            section: "patient",
+            aliases: [],
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useDisplayFieldMapping({
+        isCanonicalContract: true,
+        hasMalformedCanonicalFieldSlots: false,
+        interpretationData,
+        validatedReviewFields,
+        matchesByKey,
+        buildSelectableField,
+        explicitOtherReviewFields: [],
+      }),
+    );
+
+    const weightField = result.current.coreDisplayFields.find((field) => field.key === "weight");
+    expect(weightField).toBeDefined();
+    expect(weightField?.items[0]?.displayValue).toBe("29.6 kg");
+    expect(weightField?.items[0]?.rawField?.field_id).toBe("derived-weight-current");
+  });
 });

@@ -126,23 +126,11 @@ test.describe("extracted data panel", () => {
     await expect(page.getByTestId("structured-column-stack")).toBeVisible({ timeout: 60_000 });
   });
 
-  test("shows extracted data panel headers and at least one section", async ({ page }) => {
+  test("shows extracted data panel and at least one extracted field", async ({ page }) => {
     await expect(page.getByText("Datos extraídos")).toBeVisible();
-
-    const sectionCandidates = [
-      "Paciente",
-      "Propietario",
-      "Centro Veterinario",
-      "Visitas",
-      "Notas internas",
-    ];
-    let visibleSections = 0;
-    for (const sectionTitle of sectionCandidates) {
-      if ((await page.getByText(sectionTitle, { exact: true }).count()) > 0) {
-        visibleSections += 1;
-      }
-    }
-    expect(visibleSections).toBeGreaterThan(0);
+    const extractedFieldTriggers = page.locator('[data-testid^="field-trigger-"]');
+    await expect(extractedFieldTriggers.first()).toBeVisible();
+    expect(await extractedFieldTriggers.count()).toBeGreaterThan(0);
   });
 
   test("shows formatted values and placeholder for missing fields", async ({ page }) => {

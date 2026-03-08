@@ -313,8 +313,9 @@ def test_way_of_working_branch_naming_worktree_prefix_is_propagated() -> None:
 
     required_terms = (
         "Canonical format:",
-        "<worktree>/<category>/<slug>",
+        "codex/<worktree>/<category>/<slug>",
         "Category-specific branch patterns:",
+        "Legacy format `<worktree>/<category>/<slug>` is temporarily allowed during migration.",
         "Legacy format `<category>/<slug>` is temporarily allowed during migration.",
         "Detached HEAD is exempt from this naming convention.",
     )
@@ -331,7 +332,7 @@ def test_way_of_working_canonical_branch_creation_rules_are_propagated() -> None
     branching_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "BRANCHING" / "00_entry.md")
 
     start_work_terms = (
-        "build `<branch-name>` using the canonical format `<worktree>/<category>/<slug>`",
+        "build `<branch-name>` using the canonical format `codex/<worktree>/<category>/<slug>`",
         "Derive `worktree` from the current repository top-level folder name",
         "user story -> `feature`",
         "user-facing improvement -> `improvement`",

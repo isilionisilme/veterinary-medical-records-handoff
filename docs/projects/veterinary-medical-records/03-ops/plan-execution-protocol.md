@@ -66,7 +66,7 @@ In both cases, the agent MUST explain the reason briefly and wait for explicit u
 
 ## 2. Atomic Iterations
 
-Never mix scope between steps. Each step in Execution Status is an atomic unit: execute its objective and mark progress. Commit behavior is governed by automation mode: `Supervisado` requires explicit confirmation, `Semiautomatico` and `Automatico` may auto-commit. Push is always manual. If a step fails, report — do not continue to the next one.
+Never mix scope between steps. Each step in Execution Status is an atomic unit: execute its objective and mark progress. Commit behavior is governed by automation mode: `Supervisado` requires explicit confirmation, while `Semiautomatico` and `Automatico` may auto-commit only when the active step explicitly defines an explicit commit task (`CT-*`). That explicit commit task (`CT-*`) is the only case where auto-commit without user confirmation is permitted. Push is always manual. If a step fails, report — do not continue to the next one.
 
 **Plan-mode governance (hard rule):** While a plan is active, all git operations (commit, push, branch) are governed by this protocol. Ad-hoc user requests that imply git operations are interpreted through the lens of the active plan step and routed to SCOPE BOUNDARY (§13). There is no "just commit and push" shortcut.
 

@@ -16,7 +16,7 @@ Scripts de preflight local y hooks de Git.
 | `test-L3.bat` | Wrapper CMD de `test-L3.ps1`. |
 | `install-pre-commit-hook.ps1` | Instala `.githooks/pre-commit` en `.git/hooks/pre-commit` (usa L1). |
 | `install-pre-push-hook.ps1` | Instala `.githooks/pre-push` en `.git/hooks/pre-push` (usa L2). |
-| `validate-branch-name.ps1` | Valida formato de rama (`<worktree>/<category>/<slug>`; permite legacy con warning). |
+| `validate-branch-name.ps1` | Valida formato de rama (`codex/<worktree>/<category>/<slug>`; permite legacy con warning). |
 
 ## Notas rápidas
 

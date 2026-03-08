@@ -35,22 +35,28 @@ if ([string]::IsNullOrWhiteSpace($expectedWorktree)) {
 }
 
 $escapedWorktree = [Regex]::Escape($expectedWorktree)
-$newFormatPattern = "^${escapedWorktree}/(${allowedCategories})/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+$newFormatPattern = "^codex/${escapedWorktree}/(${allowedCategories})/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+$legacyWorktreePattern = "^${escapedWorktree}/(${allowedCategories})/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
 $legacyPattern = "^(${allowedCategories})/.+"
 
 if ($currentBranch -match $newFormatPattern) {
-    Write-Host "Branch naming validation passed: '$currentBranch' matches '<worktree>/<category>/<slug>'."
+    Write-Host "Branch naming validation passed: '$currentBranch' matches 'codex/<worktree>/<category>/<slug>'."
+    exit 0
+}
+
+if ($currentBranch -match $legacyWorktreePattern) {
+    Write-Warning "Branch '$currentBranch' matches legacy '<worktree>/<category>/<slug>' format. Allowed temporarily during transition; please migrate to 'codex/$expectedWorktree/<category>/<slug>'."
     exit 0
 }
 
 if ($currentBranch -match $legacyPattern) {
-    Write-Warning "Branch '$currentBranch' matches legacy '<category>/<slug>' format. Allowed temporarily during transition; please migrate to '$expectedWorktree/<category>/<slug>'."
+    Write-Warning "Branch '$currentBranch' matches legacy '<category>/<slug>' format. Allowed temporarily during transition; please migrate to 'codex/$expectedWorktree/<category>/<slug>'."
     exit 0
 }
 
 Write-Error (
-    "Invalid branch name '$currentBranch'. Expected format: '<worktree>/<category>/<slug>' " +
+    "Invalid branch name '$currentBranch'. Expected format: 'codex/<worktree>/<category>/<slug>' " +
     "with worktree '$expectedWorktree' and category in [feature, fix, docs, chore, refactor, ci, improvement]. " +
-    "Legacy '<category>/<slug>' is temporarily allowed with warning only."
+    "Legacy '<worktree>/<category>/<slug>' and '<category>/<slug>' are temporarily allowed with warning only."
 )
 exit 1
