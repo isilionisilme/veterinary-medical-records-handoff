@@ -4,6 +4,7 @@
 Synced in Iteration 11 docs propagation cycle (F18-T/F18-U).
 Updated in PR-154 CI remediation to align doc/test sync required guard touches.
 Updated in PR-221 split follow-up to keep implementation-plan propagation changes in sync.
+Updated in PR-229 follow-up to keep implementation-plan completed-plan propagation in sync.
 """
 
 from __future__ import annotations

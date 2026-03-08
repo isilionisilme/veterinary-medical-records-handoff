@@ -1,10 +1,10 @@
 # Plan: Golden Loop - `owner_address` (Direccion del propietario)
 
-> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Branch:** `golden-2/feat/golden-loop-propietario-direccion`
 **PR:** [#215](https://github.com/isilionisilme/veterinary-medical-records/pull/215) (Phase 0 baseline, merged), [#226](https://github.com/isilionisilme/veterinary-medical-records/pull/226) (post-gate closure sync)
-**User Story:** [US-63](../implementation-plan.md)
+**User Story:** [US-63](../../implementation-plan.md)
 **Prerequisite:** `main` estable con tests verdes.
 **Iteracion:** 20 (propuesta)
 **Worktree:** `D:/Git/golden-2`
@@ -100,7 +100,7 @@
 - [x] P4-B 🔄 - Actualizar `test_doc_b_golden_goal_fields_regression` para exigir `owner_address` poblado y mantener invariantes de no-regresion en `clinic_address`. — ✅ `c78bd5bb`
 - [x] P4-C 🔄 - Ejecutar benchmark de `owner_address` + suite focalizada de regresion (`owner_address`, `clinic_address`, `docB`) y reportar delta EM/null misses/false positives. — ✅ `c78bd5bb`
 - [x] P4-D 🚧 - Hard-gate: validacion de usuario del comportamiento en `docB` (GO/NO-GO para retomar `P3-D`). — ✅ `GO (user confirmation in chat)`
-- [ ] P5-A 🚧 - Documentacion wiki: actualizar wiki tecnica de extraction quality para `owner_address` o cerrar con `no-doc-needed` justificado (Planning agent)
+- [x] P5-A 🚧 - Documentacion wiki: cerrar con `no-doc-needed` justificado; la documentacion tecnica ya quedo actualizada en `docs/projects/veterinary-medical-records/02-tech/extraction-quality.md` durante `P3-D`. — ✅ `no-commit (no-doc-needed)`
 
 ---
 
