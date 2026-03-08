@@ -153,6 +153,77 @@ _ADMIN_ACTION_RE = re.compile(
     r"\b(?:recordatorios?\s+vacunaciones|vacunaci[oó]n\s+\w+)\b",
     re.IGNORECASE,
 )
+_RAW_TIMELINE_HEADER_RE = re.compile(
+    r"^\s*[-*•]?\s*(\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4})\s*[-–—]\s*\d{1,2}:\d{2}(?::\d{2})?",
+    re.IGNORECASE,
+)
+_RAW_WEIGHT_TOKEN_RE = re.compile(
+    r"(?i)\b(?:peso|pv|p\.)?\s*([0-9]+(?:[\.,][0-9]+)?)\s*(kg|kgs|g)\b"
+)
+
+
+def _weight_evidence_offset(field: dict[str, object], *, default: float = -1.0) -> float:
+    evidence = field.get("evidence")
+    if isinstance(evidence, dict):
+        offset = evidence.get("offset")
+        if isinstance(offset, int | float):
+            return float(offset)
+    return default
+
+
+def _weight_effective_visit_date(
+    *, visit: dict[str, object], weight_field: dict[str, object]
+) -> str | None:
+    raw_visit_date = visit.get("visit_date")
+    normalized_visit_date = _normalize_visit_date_candidate(raw_visit_date)
+    if normalized_visit_date is not None:
+        return normalized_visit_date
+
+    # Fallback: if visit_date comes in a non-normalizable shape, try date token
+    # from the weight evidence snippet before discarding the candidate.
+    evidence_snippet = _extract_evidence_snippet(weight_field)
+    normalized_from_evidence = _normalize_visit_date_candidate(evidence_snippet)
+    if normalized_from_evidence is not None:
+        return normalized_from_evidence
+
+    return None
+
+
+def _extract_latest_visit_weight_from_raw_text(raw_text: str | None) -> dict[str, object] | None:
+    if not isinstance(raw_text, str) or not raw_text.strip():
+        return None
+
+    current_visit_date: str | None = None
+    candidates: list[tuple[str, int, str, str]] = []
+    lines = raw_text.splitlines()
+
+    for line_index, line in enumerate(lines):
+        header_match = _RAW_TIMELINE_HEADER_RE.search(line)
+        if header_match is not None:
+            current_visit_date = _normalize_visit_date_candidate(header_match.group(1))
+
+        token_match = _RAW_WEIGHT_TOKEN_RE.search(line)
+        if token_match is None or current_visit_date is None:
+            continue
+
+        raw_number = token_match.group(1)
+        raw_unit = token_match.group(2).lower()
+        normalized_weight = _normalize_weight(f"{raw_number} {raw_unit}")
+        if not normalized_weight:
+            continue
+
+        candidates.append((current_visit_date, line_index, normalized_weight, line.strip()))
+
+    if not candidates:
+        return None
+
+    # Latest chronological visit date first, then latest line index for deterministic tie-break.
+    best_date, _, best_weight, best_snippet = max(candidates, key=lambda item: (item[0], item[1]))
+    return {
+        "date": best_date,
+        "value": best_weight,
+        "evidence": {"page": 1, "snippet": best_snippet},
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -943,15 +1014,28 @@ def _populate_visit_scoped_fields_from_segment_candidates(
             if not isinstance(key_candidates, list) or not key_candidates:
                 continue
 
-            first_candidate = key_candidates[0]
-            if not isinstance(first_candidate, dict):
+            selected_candidate = key_candidates[0]
+            if candidate_key == "weight":
+                weighted_candidates = [c for c in key_candidates if isinstance(c, dict)]
+                if weighted_candidates:
+                    selected_candidate = max(
+                        weighted_candidates,
+                        key=lambda candidate: (
+                            float(candidate.get("evidence", {}).get("offset"))
+                            if isinstance(candidate.get("evidence"), dict)
+                            and isinstance(candidate.get("evidence", {}).get("offset"), int | float)
+                            else -1.0
+                        ),
+                    )
+
+            if not isinstance(selected_candidate, dict):
                 continue
 
-            candidate_value = first_candidate.get("value")
+            candidate_value = selected_candidate.get("value")
             if not isinstance(candidate_value, str) or not candidate_value.strip():
                 continue
 
-            evidence = first_candidate.get("evidence")
+            evidence = selected_candidate.get("evidence")
             visit_fields.append(
                 {
                     "field_id": f"derived-{candidate_key}-{visit_id}",
@@ -1009,6 +1093,24 @@ def _normalize_canonical_review_scoping(
             continue
 
         if key in _VISIT_SCOPED_KEY_SET:
+            if key == "weight":
+                field_scope = item.get("scope")
+                field_section = item.get("section")
+                is_explicit_visit_scoped = (
+                    isinstance(field_scope, str) and field_scope.strip().casefold() == "visit"
+                ) or (
+                    isinstance(field_section, str) and field_section.strip().casefold() == "visits"
+                )
+                evidence_snippet = _extract_evidence_snippet(item)
+                has_visit_date_evidence = bool(
+                    _extract_visit_date_candidates_from_text(text=evidence_snippet)
+                )
+                if not is_explicit_visit_scoped and not has_visit_date_evidence:
+                    # Keep header/global weight at document scope; do not force
+                    # visit assignment only by key name.
+                    fields_to_keep.append(item)
+                    continue
+
             visit_field = dict(item)
             visit_field["scope"] = "visit"
             visit_field["section"] = "visits"
@@ -1031,7 +1133,7 @@ def _normalize_canonical_review_scoping(
         seen_detected_visit_dates.add(normalized_visit_date)
         detected_visit_dates.append(normalized_visit_date)
 
-    if not visit_scoped_fields and not visit_group_metadata:
+    if not visit_scoped_fields and not visit_group_metadata and not raw_text_detected_visit_dates:
         return projected
 
     raw_visits = projected.get("visits")
@@ -1186,7 +1288,7 @@ def _normalize_canonical_review_scoping(
     _populate_visit_scoped_fields_from_segment_candidates(
         assigned_visits=assigned_visits,
         visit_segments_by_id=visit_segments_by_id,
-        candidate_keys=("diagnosis", "symptoms", "medication", "procedure"),
+        candidate_keys=("diagnosis", "symptoms", "medication", "procedure", "weight"),
     )
     _populate_visit_observations_actions_from_segments(
         assigned_visits=assigned_visits,
@@ -1220,6 +1322,7 @@ def _normalize_canonical_review_scoping(
 
     # --- Weight post-processing (hybrid rule) ---
     # (b) Move weight fields from unassigned back to document-scoped.
+    unassigned_weight_fields_for_derivation: list[dict[str, object]] = []
     if unassigned_visit is not None:
         raw_unassigned_fields = unassigned_visit.get("fields")
         if isinstance(raw_unassigned_fields, list):
@@ -1236,6 +1339,7 @@ def _normalize_canonical_review_scoping(
                     if normalized_val:
                         restored["value"] = normalized_val
                     fields_to_keep.append(restored)
+                    unassigned_weight_fields_for_derivation.append(restored)
                 unassigned_visit["fields"] = [
                     f
                     for f in raw_unassigned_fields
@@ -1243,21 +1347,67 @@ def _normalize_canonical_review_scoping(
                 ]
 
     # (a) Derive document-level weight from most-recent visit.
-    visit_weights: list[tuple[str, dict[str, object]]] = []
-    for visit in assigned_visits:
-        vd = visit.get("visit_date")
-        if not isinstance(vd, str):
-            continue
+    visit_weights: list[tuple[str, float, int, int, dict[str, object]]] = []
+    for visit_index, visit in enumerate(assigned_visits):
         vf = visit.get("fields")
         if not isinstance(vf, list):
             continue
-        for field in vf:
+        for field_index, field in enumerate(vf):
             if isinstance(field, dict) and field.get("key") == "weight":
-                visit_weights.append((vd, field))
+                effective_visit_date = _weight_effective_visit_date(
+                    visit=visit,
+                    weight_field=field,
+                )
+                if effective_visit_date is None:
+                    continue
+                visit_weights.append(
+                    (
+                        effective_visit_date,
+                        _weight_evidence_offset(field),
+                        visit_index,
+                        field_index,
+                        field,
+                    )
+                )
+
+    # Include unassigned weights when they can be temporally anchored by evidence date.
+    # This prevents losing the true latest weight if assignment to a visit failed.
+    for unassigned_index, unassigned_weight in enumerate(unassigned_weight_fields_for_derivation):
+        effective_date = _normalize_visit_date_candidate(
+            _extract_evidence_snippet(unassigned_weight)
+        )
+        if effective_date is None:
+            continue
+        visit_weights.append(
+            (
+                effective_date,
+                _weight_evidence_offset(unassigned_weight),
+                len(assigned_visits),
+                unassigned_index,
+                unassigned_weight,
+            )
+        )
+
+    latest_weight_from_raw = _extract_latest_visit_weight_from_raw_text(raw_text)
+    if latest_weight_from_raw is not None:
+        visit_weights.append(
+            (
+                str(latest_weight_from_raw["date"]),
+                -1.0,
+                len(assigned_visits) + 1,
+                0,
+                {
+                    "value": latest_weight_from_raw["value"],
+                    "value_type": "string",
+                    "classification": "medical_record",
+                    "evidence": latest_weight_from_raw["evidence"],
+                },
+            )
+        )
 
     if visit_weights:
-        visit_weights.sort(key=lambda pair: pair[0])
-        most_recent_weight = visit_weights[-1][1]
+        visit_weights.sort(key=lambda entry: (entry[0], entry[1], entry[2], entry[3]))
+        most_recent_weight = visit_weights[-1][4]
         fields_to_keep = [
             f for f in fields_to_keep if not (isinstance(f, dict) and f.get("key") == "weight")
         ]

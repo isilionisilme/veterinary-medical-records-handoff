@@ -131,6 +131,13 @@ _WEIGHT_MED_OR_LAB_CONTEXT_RE = re.compile(
     r"predni|omepra|anal[ií]tica|laboratorio|hemograma|bioqu[ií]mica|glucosa|"
     r"urea|creatinina|mg\s*/\s*kg|ml\s*/\s*kg|mg\s*/\s*dL|mmol\s*/\s*L|U\s*/\s*L)\b"
 )
+_WEIGHT_STANDALONE_LINE_RE = re.compile(
+    r"^\s*(?:peso|pv|p\.)?\s*([0-9]+(?:[\.,][0-9]+)?)\s*(kg|kgs|g)\.?\s*$",
+    re.IGNORECASE,
+)
+_VISIT_TIMELINE_CONTEXT_RE = re.compile(
+    r"(?i)\b(?:visita|consulta|control|seguimiento|ingreso|alta)\b"
+)
 
 
 def _mine_interpretation_candidates(raw_text: str) -> dict[str, list[dict[str, object]]]:
@@ -830,6 +837,33 @@ def _mine_interpretation_candidates(raw_text: str) -> dict[str, list[dict[str, o
                     value=sex_value,
                     confidence=COVERAGE_CONFIDENCE_FALLBACK,
                     snippet=" ".join(lines[max(0, index - 1) : min(len(lines), index + 2)]),
+                )
+
+        standalone_weight_match = _WEIGHT_STANDALONE_LINE_RE.match(line)
+        if standalone_weight_match is not None:
+            value_raw = standalone_weight_match.group(1)
+            unit_raw = standalone_weight_match.group(2).lower()
+            unit = "kg" if unit_raw in {"kg", "kgs"} else unit_raw
+            candidate_value = f"{value_raw} {unit}".strip()
+
+            context_start = max(0, index - 3)
+            context_end = min(len(lines), index + 2)
+            context_lines = lines[context_start:context_end]
+            context_text = " ".join(context_lines)
+
+            has_date_context = _DATE_CANDIDATE_PATTERN.search(context_text) is not None
+            has_visit_context = _VISIT_TIMELINE_CONTEXT_RE.search(context_text) is not None
+            is_compact_fragment = len(lines) <= 5
+
+            # Keep this heuristic conservative: only when the standalone weight line
+            # is near an explicit date/visit timeline marker, or when mining
+            # already runs on a short per-visit segment fragment.
+            if has_date_context or has_visit_context or is_compact_fragment:
+                add_candidate(
+                    key="weight",
+                    value=candidate_value,
+                    confidence=COVERAGE_CONFIDENCE_FALLBACK,
+                    snippet="\n".join(context_lines),
                 )
 
         # ── pet_name unlabeled heuristic ──────────────────────────────
