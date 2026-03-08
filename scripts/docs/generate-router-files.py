@@ -7,6 +7,8 @@ router files from canonical documentation.
 Usage:
     python scripts/docs/generate-router-files.py          # generate all
     python scripts/docs/generate-router-files.py --check   # CI drift check
+
+Synced in PR-231 merge-conflict follow-up for doc-update guard compliance.
 """
 
 from __future__ import annotations

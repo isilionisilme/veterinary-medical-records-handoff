@@ -5,6 +5,8 @@ Synced in Iteration 11 CI remediation to track router-module propagation edits.
 Updated in PR-229 follow-up to keep implementation-plan owner propagation checks aligned.
 Updated in PR-230 merge-conflict follow-up to keep execution-protocol
 router propagation checks aligned.
+Updated in PR-231 merge-conflict follow-up to satisfy doc-sync guard
+requirements after stacked-base updates.
 """
 
 from __future__ import annotations
