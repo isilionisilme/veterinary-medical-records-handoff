@@ -526,6 +526,193 @@ def test_document_review_normalizes_microchip_suffix_to_digits_only(test_client)
     assert microchip_fields[0].get("value") == "00023035139"
 
 
+def test_document_review_derives_age_from_dob_using_latest_visit_date(test_client):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "global_schema": {
+                "dob": "15/03/2018",
+                "document_date": "01/02/2026",
+                "age": "",
+            },
+            "fields": [
+                {
+                    "field_id": "field-dob",
+                    "key": "dob",
+                    "value": "15/03/2018",
+                    "value_type": "date",
+                    "is_critical": False,
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Nacimiento: 15/03/2018"},
+                },
+                {
+                    "field_id": "field-visit-date-a",
+                    "key": "visit_date",
+                    "value": "01/02/2026",
+                    "value_type": "date",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 01/02/2026"},
+                },
+                {
+                    "field_id": "field-visit-date-b",
+                    "key": "visit_date",
+                    "value": "14/03/2026",
+                    "value_type": "date",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 14/03/2026"},
+                },
+            ],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+
+    data = response.json()["active_interpretation"]["data"]
+    assert data["global_schema"]["age"] == "7"
+    assert data["global_schema"]["age_origin"] == "derived"
+    assert data["global_schema"]["age_display"] == "7 años"
+
+    age_fields = _extract_top_level_fields_by_key(data, "age")
+    assert len(age_fields) == 1
+    assert age_fields[0]["value"] == "7"
+    assert age_fields[0]["origin"] == "derived"
+    assert age_fields[0]["display_value"] == "7 años"
+
+
+def test_document_review_keeps_manual_age_when_global_schema_is_out_of_sync(test_client):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "global_schema": {
+                "dob": "15/03/2018",
+                "document_date": "01/02/2026",
+            },
+            "fields": [
+                {
+                    "field_id": "field-age-human",
+                    "key": "age",
+                    "value": "99",
+                    "value_type": "string",
+                    "is_critical": True,
+                    "origin": "human",
+                    "evidence": {"page": 1, "snippet": "Edad: 99"},
+                },
+                {
+                    "field_id": "field-dob",
+                    "key": "dob",
+                    "value": "15/03/2018",
+                    "value_type": "date",
+                    "is_critical": False,
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Nacimiento: 15/03/2018"},
+                },
+                {
+                    "field_id": "field-visit-date-b",
+                    "key": "visit_date",
+                    "value": "14/03/2026",
+                    "value_type": "date",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 14/03/2026"},
+                },
+            ],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+
+    data = response.json()["active_interpretation"]["data"]
+    assert data["global_schema"]["age"] == "99"
+    assert data["global_schema"]["age_origin"] == "human"
+    assert data["global_schema"]["age_display"] == "99 años"
+
+    age_fields = _extract_top_level_fields_by_key(data, "age")
+    assert len(age_fields) == 1
+    assert age_fields[0]["value"] == "99"
+    assert age_fields[0]["origin"] == "human"
+    assert age_fields[0]["display_value"] == "99 años"
+
+
+def test_document_review_exposes_months_for_derived_age_under_one_year(test_client):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "global_schema": {
+                "dob": "01/10/2025",
+                "age": "",
+                "document_date": "14/03/2026",
+            },
+            "fields": [
+                {
+                    "field_id": "field-dob-under-one",
+                    "key": "dob",
+                    "value": "01/10/2025",
+                    "value_type": "date",
+                    "is_critical": False,
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Nacimiento: 01/10/2025"},
+                }
+            ],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+
+    data = response.json()["active_interpretation"]["data"]
+    assert data["global_schema"]["age"] == "0"
+    assert data["global_schema"]["age_origin"] == "derived"
+    assert data["global_schema"]["age_display"] == "5 meses"
+
+    age_fields = _extract_top_level_fields_by_key(data, "age")
+    assert len(age_fields) == 1
+    assert age_fields[0]["value"] == "0"
+    assert age_fields[0]["display_value"] == "5 meses"
+
+
 def test_document_review_weight_single_visit_assigned_to_visit_with_derived(test_client):
     """After P1-A: weight with visit-date snippet is assigned to the visit.
     A derived document-scoped weight is also created."""
