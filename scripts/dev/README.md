@@ -30,11 +30,11 @@ Scripts de soporte para desarrollo local y entorno Docker.
 | Script | Qué hace | Parámetros |
 |---|---|---|
 | `start-all.ps1` | Arranca entorno local de desarrollo en dos consolas: backend (`uvicorn --reload`) + frontend (`npm run dev`). También prepara `.venv` y dependencias si faltan. | `-NoBrowser` (actualmente sin efecto visible). |
-| `reset-local-dev-env.ps1` | Orquestador local: ejecuta reset local interno (`lib/reset-local-core.ps1`) y luego arranca backend + frontend con `start-all.ps1`. | `-NoStart` para hacer solo reset sin arrancar servicios. |
-| `reset-docker-dev-env.ps1` | Orquestador Docker: ejecuta reset/restart de Docker dev usando `lib/reset-docker-core.ps1`. | `-NoBuild`. |
+| `reset-local-dev-env.ps1` | Orquestador local: primero intenta `docker compose down` del proyecto (si Docker está disponible), luego ejecuta reset local interno (`lib/reset-local-core.ps1`) y arranca backend + frontend con `start-all.ps1`. | `-NoStart` para hacer solo reset sin arrancar servicios. |
+| `reset-docker-dev-env.ps1` | Orquestador Docker: detiene procesos locales de FE/BE, garantiza que Docker esté listo (arranca Docker Desktop en Windows si hace falta), y ejecuta reset/restart de Docker dev con health checks. | `-NoBuild`. |
 | `reload-vscode-window.ps1` | Enfoca VS Code y ejecuta `Developer: Reload Window` vía atajos de teclado. | `-FocusDelayMs` (default `250`). |
-| `lib/reset-local-core.ps1` | Capa interna: detiene procesos locales y limpia DB/storage local (`backend/data`, `backend/storage`). | Sin flags públicos. |
-| `lib/reset-docker-core.ps1` | Capa interna: `docker compose down/up`, wipe de DB y health checks backend/frontend. | `-NoBuild`. |
+| `lib/reset-local-core.ps1` | Capa interna: detiene el stack Docker del proyecto (best-effort), detiene procesos locales y limpia DB/storage local (`backend/data`, `backend/storage`). | Sin flags públicos. |
+| `lib/reset-docker-core.ps1` | Capa interna: detiene procesos locales, asegura Docker disponible (auto-start en Windows), ejecuta `docker compose down/up`, wipe de DB y health checks backend/frontend. | `-NoBuild`. |
 
 ## Scripts batch (`.bat`)
 
