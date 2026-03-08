@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 
 _WHITESPACE_PATTERN = re.compile(r"\s+")
@@ -85,6 +85,9 @@ SPECIES_TOKEN_TO_CANONICAL: dict[str, str] = {
 def normalize_canonical_fields(
     values: Mapping[str, object],
     evidence_map: Mapping[str, list[dict[str, object]]] | None = None,
+    *,
+    visits: Sequence[object] | None = None,
+    derive_age: bool = False,
 ) -> dict[str, object]:
     """Normalize selected canonical fields without changing semantics."""
 
@@ -109,7 +112,57 @@ def normalize_canonical_fields(
     normalized["admission_date"] = _normalize_date_value(normalized.get("admission_date"))
     normalized["discharge_date"] = _normalize_date_value(normalized.get("discharge_date"))
 
+    if derive_age:
+        normalized = _derive_age_from_dob(normalized, visits=visits)
+
     return normalized
+
+
+def _derive_age_from_dob(
+    values: dict[str, object],
+    *,
+    visits: Sequence[object] | None,
+) -> dict[str, object]:
+    from backend.app.application.age_derivation import (
+        calculate_age_in_years,
+        resolve_reference_date,
+    )
+
+    normalized = dict(values)
+
+    if _has_non_empty_value(normalized.get("age")):
+        normalized.pop("age_origin", None)
+        return normalized
+
+    dob_value = normalized.get("dob")
+    if not isinstance(dob_value, str) or not dob_value.strip():
+        normalized.pop("age_origin", None)
+        return normalized
+
+    reference_date = resolve_reference_date(
+        [visit for visit in visits or () if isinstance(visit, Mapping)],
+        normalized.get("document_date")
+        if isinstance(normalized.get("document_date"), str)
+        else None,
+    )
+    if not isinstance(reference_date, str):
+        normalized.pop("age_origin", None)
+        return normalized
+
+    derived_age = calculate_age_in_years(dob_value, reference_date)
+    if derived_age is None:
+        normalized.pop("age_origin", None)
+        return normalized
+
+    normalized["age"] = str(derived_age)
+    normalized["age_origin"] = "derived"
+    return normalized
+
+
+def _has_non_empty_value(value: object) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    return value not in (None, "")
 
 
 def normalize_microchip_digits_only(value: object) -> str | None:

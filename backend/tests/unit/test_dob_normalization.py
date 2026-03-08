@@ -147,3 +147,62 @@ def test_normalize_canonical_fields_two_digit_year_applies_to_all_date_fields() 
     assert normalized["document_date"] == "15/03/2018"
     assert normalized["admission_date"] == "05/04/2021"
     assert normalized["discharge_date"] == "06/04/2021"
+
+
+def test_normalize_canonical_fields_derives_age_from_latest_visit_when_enabled() -> None:
+    raw_fields = {
+        "dob": "15/03/2018",
+        "age": "",
+        "document_date": "01/02/2026",
+    }
+
+    normalized = normalize_canonical_fields(
+        raw_fields,
+        visits=[
+            {"visit_date": "01/02/2026"},
+            {"visit_date": "14/03/2026"},
+        ],
+        derive_age=True,
+    )
+
+    assert normalized["age"] == "7"
+    assert normalized["age_origin"] == "derived"
+
+
+def test_normalize_canonical_fields_does_not_overwrite_existing_age_when_enabled() -> None:
+    raw_fields = {
+        "dob": "15/03/2018",
+        "age": "99",
+        "document_date": "01/02/2026",
+    }
+
+    normalized = normalize_canonical_fields(
+        raw_fields,
+        visits=[{"visit_date": "14/03/2026"}],
+        derive_age=True,
+    )
+
+    assert normalized["age"] == "99"
+    assert "age_origin" not in normalized
+
+
+def test_normalize_canonical_fields_keeps_age_empty_when_dob_is_invalid() -> None:
+    normalized = normalize_canonical_fields(
+        {"dob": "31/02/2018", "age": "", "document_date": "14/03/2026"},
+        visits=[{"visit_date": "14/03/2026"}],
+        derive_age=True,
+    )
+
+    assert normalized["age"] == ""
+    assert "age_origin" not in normalized
+
+
+def test_normalize_canonical_fields_keeps_age_empty_when_dob_is_in_future() -> None:
+    normalized = normalize_canonical_fields(
+        {"dob": "15/03/2027", "age": "", "document_date": "14/03/2026"},
+        visits=[{"visit_date": "14/03/2026"}],
+        derive_age=True,
+    )
+
+    assert normalized["age"] == ""
+    assert "age_origin" not in normalized
