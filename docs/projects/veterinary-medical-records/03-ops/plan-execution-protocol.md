@@ -532,10 +532,11 @@ Examples:
 
 ## 18. How to Add a New User Story
 
-When asked to add a new User Story, update [`implementation-plan.md`](../04-delivery/implementation-plan.md) in two places:
+When asked to add a new User Story, update the delivery docs in three places:
 
 1. Add the story in the relevant **User Stories (in order)** list for its release.
-2. Add or update the full **User Story Details** section for that story.
+2. Create or update the dedicated backlog item file for that story.
+3. Add or update the story row in the **Backlog Index**.
 
 If the requested story is not yet scheduled in any release, schedule it in the Release Plan:
 - Add it to an existing release, or
@@ -559,7 +560,8 @@ If the requested story is not yet scheduled in any release, schedule it in the R
 ### Completion checklist
 
 - Story appears in release-level **User Stories (in order)**.
-- Story appears in **User Story Details** with required fields.
+- Story has a dedicated backlog item file with required fields.
+- Story appears in **Backlog Index** with the correct release assignment.
 - Formatting and section structure remain consistent with existing stories.
 - No unrelated documentation edits are bundled.
 

@@ -102,7 +102,7 @@ Options presented to user at plan approval:
 5. **When:** after P4-A (validation pass done).
    **Scope:** any files touched by normalization.
    **Suggested message:** `docs(normalization): run final doc-updates normalization and consistency pass`
-   **Expected validation:** `npm run lint:md` passes; all doc scripts in "How to test" pass.
+   **Expected validation:** `npm run docs:lint` passes; all doc scripts in "How to test" pass.
 
 ---
 
@@ -143,9 +143,9 @@ Options presented to user at plan approval:
 
 ### Phase 4 - Validation and closeout
 
-- [ ] P4-A 🔄 **[PR-1]** Run link/consistency checks and router/doc sync checks required by docs workflow.
-- [ ] P4-B 🚧 **[PR-1]** Re-evaluate PR partition thresholds against real diff; confirm with user if thresholds exceed original estimate.
-- [ ] P4-C 🔄 **[PR-1]** Prepare evidence summary (`How to test`, changed counts, residual gaps).
+- [x] P4-A 🔄 **[PR-1]** Run link/consistency checks and router/doc sync checks required by docs workflow.
+- [x] P4-B 🚧 **[PR-1]** Re-evaluate PR partition thresholds against real diff; confirm with user if thresholds exceed original estimate.
+- [x] P4-C 🔄 **[PR-1]** Prepare evidence summary (`How to test`, changed counts, residual gaps).
 
 ---
 
@@ -305,7 +305,7 @@ Options presented to user at plan approval:
    - `python scripts/docs/check_doc_test_sync.py`
    - `python scripts/docs/check_doc_router_parity.py`
    - `python scripts/docs/check_router_directionality.py`
-   - `npm run lint:md`
+   - `npm run docs:lint`
 2. Fix any failures that are directly caused by this plan's changes. Pre-existing failures should be reported but not fixed.
 3. **P4-B (hard gate):** Re-evaluate PR partition thresholds:
    - Run `git diff --stat origin/main` and report: changed files count, total changed lines.
@@ -343,6 +343,22 @@ Pending explicit user start signal for execution.
 - **Mitigated by batching:** extraction errors caught at batch boundaries rather than after all 80 files, reducing rework scope.
 - **Mitigated by dry-run:** link migration errors caught before file modification, avoiding partial/inconsistent states.
 
+## Execution evidence
+
+- Diff vs `origin/main`: 102 changed files, 3302 insertions, 2956 deletions.
+- File status counts: 82 added, 20 modified, 0 deleted.
+- Backlog extraction result: 80 backlog item files plus `Backlog/README.md` index.
+- Validation results:
+   - `python scripts/docs/generate-router-files.py --check` ✅
+   - `python scripts/docs/check_doc_test_sync.py --base-ref main` ✅
+   - `python scripts/docs/check_doc_router_parity.py --base-ref main` ✅
+   - `python scripts/docs/check_router_directionality.py --base-ref main` ✅
+   - `scripts/ci/test-L2.ps1 -BaseRef main` ✅
+   - `scripts/ci/test-L3.ps1 -BaseRef main` ✅
+   - `npm run docs:lint` ⚠️ blocked by local missing `markdownlint-cli2`; fallback `npx markdownlint-cli2 ...` reports pre-existing lint failures in historical files under `docs/projects/veterinary-medical-records/04-delivery/plans/completed/`.
+- Residual link gaps: none found by the P3 re-scan; the only real legacy story anchor replacement was migrated.
+- PR partition decision: keep Option A (single PR). The diff is larger than the numeric thresholds, but that exceedance matches the approved docs-only extraction/relink scope and does not introduce mixed runtime risk axes.
+
 ## How to test
 
 - `git diff --name-status`
@@ -350,4 +366,4 @@ Pending explicit user start signal for execution.
 - `python scripts/docs/check_doc_test_sync.py`
 - `python scripts/docs/check_doc_router_parity.py`
 - `python scripts/docs/check_router_directionality.py`
-- `npm run lint:md`
+- `npm run docs:lint`
