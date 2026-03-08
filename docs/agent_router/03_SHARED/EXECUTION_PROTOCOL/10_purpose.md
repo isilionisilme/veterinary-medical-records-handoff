@@ -19,13 +19,15 @@ AI assistants must stop and report the blocker when a protocol step cannot be co
 ## File Structure
 
 ```
+docs/projects/veterinary-medical-records/03-ops/
+└── plan-execution-protocol.md      ← YOU ARE HERE
+
 docs/projects/veterinary-medical-records/04-delivery/plans/
-├── PLAN_<date>_<slug>/
+├── PLAN_<date>_<slug>/             ← Active plan folder
 │   ├── PLAN_MASTER.md              ← Active plan source of truth
-│   ├── PR-1.md                     ← Optional per-PR annex
-│   └── PR-2.md                     ← Optional per-PR annex
+│   └── PR-*.md                     ← Optional per-PR annex
 └── completed/
-    └── PLAN_<date>_<slug>/         ← Completed plan folders (same file names)
+    └── PLAN_<date>_<slug>/         ← Completed plan folder (same file names)
 ```
 
 **Active plan file:** For new plans, the agent attaches `plans/<plan-folder>/PLAN_MASTER.md` when executing a continuation-intent request (for example: "continue", "go", "let's go", "proceed", "resume").
