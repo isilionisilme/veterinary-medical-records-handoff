@@ -394,7 +394,19 @@ def test_document_review_normalizes_partial_medical_record_view_to_canonical_sha
             "schema_contract": "visit-grouped-canonical",
             "medical_record_view": {"version": "mvp-1"},
             "global_schema": {"pet_name": "Luna"},
-            "fields": [],
+            "fields": [
+                {
+                    "field_id": "f-diagnosis-trigger",
+                    "key": "diagnosis",
+                    "value": "Otitis",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 11/02/2026: otitis"},
+                }
+            ],
         },
     )
 
@@ -764,6 +776,367 @@ def test_document_review_weight_global_only_stays_document_scoped(test_client):
             continue
         visit_keys = {field.get("key") for field in visit_fields if isinstance(field, dict)}
         assert "weight" not in visit_keys
+
+
+def test_document_review_weight_mixed_global_and_visit_prefers_visit_value(test_client):
+    """When both global and visit-scoped weight exist, derived value comes from visit."""
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-weight-global",
+                    "key": "weight",
+                    "value": "6.5 kg",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "patient",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Peso: 6.5 kg"},
+                },
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "2026-02-11",
+                    "value_type": "date",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 11/02/2026"},
+                },
+                {
+                    "field_id": "f-weight-visit",
+                    "key": "weight",
+                    "value": "7.2 kg",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "patient",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {
+                        "page": 1,
+                        "snippet": "Consulta 11/02/2026: Peso 7.2 kg",
+                        "offset": 120,
+                    },
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    data = response.json()["active_interpretation"]["data"]
+
+    top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
+    assert len(top_level_weight_fields) == 1
+    derived = top_level_weight_fields[0]
+    assert derived["value"] == "7.2 kg"
+    assert derived["origin"] == "derived"
+
+
+def test_document_review_weight_same_date_prefers_highest_offset(test_client):
+    """For same visit_date weights, choose deterministic winner using evidence offset."""
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-visit-date-1",
+                    "key": "visit_date",
+                    "value": "2026-02-11",
+                    "value_type": "date",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 11/02/2026"},
+                },
+                {
+                    "field_id": "f-weight-early",
+                    "key": "weight",
+                    "value": "7.0 kg",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "patient",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {
+                        "page": 1,
+                        "snippet": "Consulta 11/02/2026: Peso 7.0 kg",
+                        "offset": 30,
+                    },
+                },
+                {
+                    "field_id": "f-weight-late",
+                    "key": "weight",
+                    "value": "7.4 kg",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "patient",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {
+                        "page": 1,
+                        "snippet": "Consulta 11/02/2026: Peso 7.4 kg",
+                        "offset": 90,
+                    },
+                },
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    data = response.json()["active_interpretation"]["data"]
+
+    top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
+    assert len(top_level_weight_fields) == 1
+    derived = top_level_weight_fields[0]
+    assert derived["value"] == "7.4 kg"
+    assert derived["origin"] == "derived"
+
+
+def test_document_review_weight_uses_evidence_date_when_visit_date_is_not_normalizable(test_client):
+    """Most-recent selection should fallback to evidence date.
+
+    Applies when visit_date is non-normalizable.
+    """
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-diagnosis-trigger",
+                    "key": "diagnosis",
+                    "value": "Otitis",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 11/02/2026: otitis"},
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-001",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-v1",
+                            "key": "weight",
+                            "value": "7.0 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 11/02/2026: Peso 7.0 kg"},
+                        }
+                    ],
+                },
+                {
+                    "visit_id": "visit-002",
+                    "visit_date": "2026-02-18",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-v2",
+                            "key": "weight",
+                            "value": "7.2 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 18/02/2026: Peso 7.2 kg"},
+                        }
+                    ],
+                },
+                {
+                    "visit_id": "visit-003",
+                    "visit_date": "viernes veinticinco de febrero",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-v3",
+                            "key": "weight",
+                            "value": "7.8 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 25/02/2026: Peso 7.8 kg"},
+                        }
+                    ],
+                },
+            ],
+            "other_fields": [],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    data = response.json()["active_interpretation"]["data"]
+
+    top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
+    assert len(top_level_weight_fields) == 1
+    derived = top_level_weight_fields[0]
+    assert derived["value"] == "7.8 kg"
+    assert derived["origin"] == "derived"
+
+
+def test_document_review_weight_unassigned_latest_by_evidence_overrides_middle_visit(test_client):
+    """If latest weight lands in unassigned but has a newer evidence date, it must win."""
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-diagnosis-trigger-unassigned",
+                    "key": "diagnosis",
+                    "value": "Otitis",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "visits",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Consulta 11/02/2026: otitis"},
+                }
+            ],
+            "visits": [
+                {
+                    "visit_id": "visit-001",
+                    "visit_date": "2026-02-11",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-v1",
+                            "key": "weight",
+                            "value": "7.0 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 11/02/2026: Peso 7.0 kg"},
+                        }
+                    ],
+                },
+                {
+                    "visit_id": "visit-002",
+                    "visit_date": "2026-02-18",
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-v2",
+                            "key": "weight",
+                            "value": "7.2 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 18/02/2026: Peso 7.2 kg"},
+                        }
+                    ],
+                },
+                {
+                    "visit_id": "unassigned",
+                    "visit_date": None,
+                    "admission_date": None,
+                    "discharge_date": None,
+                    "reason_for_visit": None,
+                    "fields": [
+                        {
+                            "field_id": "f-weight-unassigned-late",
+                            "key": "weight",
+                            "value": "7.8 kg",
+                            "value_type": "string",
+                            "scope": "visit",
+                            "section": "visits",
+                            "classification": "medical_record",
+                            "origin": "machine",
+                            "evidence": {"page": 1, "snippet": "Consulta 25/02/2026: Peso 7.8 kg"},
+                        }
+                    ],
+                },
+            ],
+            "other_fields": [],
+        },
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    data = response.json()["active_interpretation"]["data"]
+
+    top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
+    assert len(top_level_weight_fields) == 1
+    derived = top_level_weight_fields[0]
+    assert derived["value"] == "7.8 kg"
+    assert derived["origin"] == "derived"
 
 
 def test_document_review_weight_ambiguous_date_generates_visit_with_derived(test_client):
@@ -1474,6 +1847,64 @@ def test_document_review_multi_visit_docb_populates_observations_actions_with_hi
 
         coverage = _coverage_ratio(expected_segment, f"{observations} {actions}".strip())
         assert coverage >= 0.8
+
+
+def test_document_review_derives_latest_weight_from_raw_timeline_without_seed_visit_fields(
+    test_client,
+):
+    document_id = _upload_sample_document(test_client)
+    run_id = str(uuid4())
+    _insert_run(
+        document_id=document_id,
+        run_id=run_id,
+        state=app_models.ProcessingRunState.COMPLETED,
+        failure_type=None,
+    )
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "fields": [
+                {
+                    "field_id": "f-weight-global",
+                    "key": "weight",
+                    "value": "6.3kg",
+                    "value_type": "string",
+                    "scope": "document",
+                    "section": "patient",
+                    "classification": "medical_record",
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "peso 6.3kg"},
+                }
+            ],
+            "visits": [],
+            "other_fields": [],
+        },
+    )
+
+    raw_text_path = get_storage_root() / document_id / "runs" / run_id / "raw-text.txt"
+    raw_text_path.parent.mkdir(parents=True, exist_ok=True)
+    raw_text_path.write_text(
+        (
+            "- 08/12/19 - 16:12 -\n"
+            "4.1kg\n"
+            "- 28/12/19 - 10:44 -\n"
+            "peso 6.3kg\n"
+            "- 19/09/20 - 09:40 -\n"
+            "29.6kg\n"
+        ),
+        encoding="utf-8",
+    )
+
+    response = test_client.get(f"/documents/{document_id}/review")
+    assert response.status_code == 200
+    data = response.json()["active_interpretation"]["data"]
+
+    top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
+    assert len(top_level_weight_fields) == 1
+    assert top_level_weight_fields[0].get("value") == "29.6 kg"
 
 
 def test_document_review_multi_visit_reason_for_visit_does_not_override_existing_value(test_client):
