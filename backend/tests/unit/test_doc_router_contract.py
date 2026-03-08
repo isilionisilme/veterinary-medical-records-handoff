@@ -217,7 +217,8 @@ def test_implementation_plan_us42_status_is_propagated() -> None:
         / "projects"
         / "veterinary-medical-records"
         / "04-delivery"
-        / "implementation-plan.md"
+        / "Backlog"
+        / "us-42-provide-evaluator-friendly-installation-execution.md"
     )
     owner_module = _read_text(
         ROUTER_ROOT

@@ -2,7 +2,8 @@
 
 Follow:
 - this document for **architecture and behavior**
-- `implementation-plan.md` for **scope and sequencing**
+- `implementation-plan.md` for **release sequencing**
+- the relevant backlog item file for **scope and acceptance criteria**
 
 If any conflict exists, **STOP and ask for clarification**.
 

@@ -111,8 +111,9 @@ If documents conflict, resolve in this order:
 1. [technical-design.md](projects/veterinary-medical-records/02-tech/technical-design.md) — contracts and invariants
 2. [ux-design.md](projects/veterinary-medical-records/01-product/ux-design.md) — interaction contract
 3. [product-design.md](projects/veterinary-medical-records/01-product/product-design.md) — system meaning and governance boundary
-4. [implementation-plan.md](projects/veterinary-medical-records/04-delivery/implementation-plan.md) — sequencing and acceptance criteria
-5. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation notes
+4. [implementation-plan.md](projects/veterinary-medical-records/04-delivery/implementation-plan.md) — release sequencing
+5. [Backlog/README.md](projects/veterinary-medical-records/04-delivery/Backlog/README.md) and backlog item files — story scope and acceptance criteria
+6. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation notes
 
 Shared docs (`docs/shared/*`) apply globally within their scope.
 

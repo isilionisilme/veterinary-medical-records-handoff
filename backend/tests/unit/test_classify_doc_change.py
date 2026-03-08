@@ -28,6 +28,11 @@ def _run_classifier_main(
     module: Any, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> dict[str, Any]:
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        module,
+        "_git_single_line",
+        lambda cmd, _error: "HEADSHA" if cmd[-1] == "HEAD" else "MERGEBASE",
+    )
     monkeypatch.setattr(sys, "argv", ["classify_doc_change.py", "--base-ref", "BASE"])
     assert module.main() == 0
     output_path = tmp_path / "doc_change_classification.json"
@@ -54,12 +59,26 @@ def _run_doc_sync_main(
     )
     if classification is not None:
         (tmp_path / "doc_change_classification.json").write_text(
-            json.dumps({"files": {}, "overall": classification}),
+            json.dumps(
+                {
+                    "files": {},
+                    "overall": classification,
+                    "meta": {
+                        "base_ref": "BASE",
+                        "head_sha": "HEADSHA",
+                    },
+                }
+            ),
             encoding="utf-8",
         )
 
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(module, "_run_changed_files", lambda _base: changed_files)
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(returncode=0, stdout="HEADSHA\n", stderr=""),
+    )
     monkeypatch.setattr(
         sys,
         "argv",
@@ -183,6 +202,7 @@ def test_run_git_uses_utf8_decoding(monkeypatch: pytest.MonkeyPatch) -> None:
     assert calls
     assert calls[0]["encoding"] == "utf-8"
     assert calls[0]["errors"] == "replace"
+    assert calls[0]["cwd"] == module.REPO_ROOT
 
 
 def test_run_git_raises_on_non_zero(monkeypatch: pytest.MonkeyPatch) -> None:

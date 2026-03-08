@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 DEFAULT_OUTPUT_PATH = Path("doc_change_classification.json")
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 RULE_SIGNALS = re.compile(
     r"\b("
@@ -33,6 +34,7 @@ NAV_PATTERNS = re.compile(
 def _run_git(cmd: list[str], error_prefix: str) -> str:
     result = subprocess.run(
         cmd,
+        cwd=REPO_ROOT,
         capture_output=True,
         text=True,
         encoding="utf-8",

@@ -4,7 +4,7 @@
 
 **Branch:** `veterinary-medical-records/feat/processing-history-ui`
 **PR:** Pending (branch PR not created yet)
-**User Story:** [US-78](../implementation-plan.md#us-78)
+**User Story:** [US-78](../Backlog/us-78-enhanced-processing-history-ui-for-evaluator-obser.md)
 **Prerequisite:** `main` stable with green tests.
 **Worktree:** `D:/Git/veterinary-medical-records`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)

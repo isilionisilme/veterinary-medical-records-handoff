@@ -5,6 +5,8 @@
     "docs/shared/*.md"
   ],
   "exclude_source_globs": [
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/*",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*",
     "docs/projects/veterinary-medical-records/04-delivery/plans/*",
     "docs/projects/veterinary-medical-records/04-delivery/plans/**/*"
   ],
