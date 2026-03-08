@@ -330,6 +330,8 @@ jobs:
         if: failure()
         run: docker compose logs --tail 200
       - name: Run Playwright E2E suite
+        env:
+          PLAYWRIGHT_EXTERNAL_SERVERS: "1"
         run: npm --prefix frontend run test:e2e
       - name: Upload Playwright report on failure
         if: failure()

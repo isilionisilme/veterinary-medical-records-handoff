@@ -1,11 +1,32 @@
 import { defineConfig } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:5173";
+const useExternalServers = process.env.PLAYWRIGHT_EXTERNAL_SERVERS === "1";
 const workers = process.env.PLAYWRIGHT_WORKERS
   ? Number(process.env.PLAYWRIGHT_WORKERS)
   : process.env.CI
     ? 6
     : 1;
+const webServer = useExternalServers
+  ? undefined
+  : [
+      {
+        command:
+          "python -m uvicorn backend.app.main:create_app --factory --host 127.0.0.1 --port 8000",
+        url: "http://127.0.0.1:8000/health",
+        cwd: "..",
+        // Backend may already be running (local or CI docker stack).
+        reuseExistingServer: true,
+        timeout: 120_000,
+      },
+      {
+        command: "npm run dev -- --host 127.0.0.1 --port 5173",
+        url: baseURL,
+        cwd: ".",
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
+    ];
 
 export default defineConfig({
   testDir: "./e2e",
@@ -41,23 +62,6 @@ export default defineConfig({
       timeout: 90_000,
     },
   ],
-  webServer: [
-    {
-      command:
-        "python -m uvicorn backend.app.main:create_app --factory --host 127.0.0.1 --port 8000",
-      url: "http://127.0.0.1:8000/health",
-      cwd: "..",
-      // Backend may already be running (local or CI docker stack).
-      reuseExistingServer: true,
-      timeout: 120_000,
-    },
-    {
-      command: "npm run dev -- --host 127.0.0.1 --port 5173",
-      url: baseURL,
-      cwd: ".",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-    },
-  ],
+  webServer,
   reporter: [["html", { outputFolder: "playwright-report", open: "never" }]],
 });

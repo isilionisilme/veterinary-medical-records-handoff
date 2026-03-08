@@ -24,7 +24,9 @@ def test_playwright_default_base_url_points_to_local_frontend_port() -> None:
 def test_playwright_declares_webserver_bootstrap_for_backend_and_frontend() -> None:
     text = _read_playwright_config()
 
-    assert "webServer: [" in text
+    assert 'PLAYWRIGHT_EXTERNAL_SERVERS === "1"' in text
+    assert "const webServer = useExternalServers" in text
+    assert "webServer," in text
     assert "uvicorn backend.app.main:create_app" in text
     assert 'url: "http://127.0.0.1:8000/health"' in text
     assert "npm run dev -- --host 127.0.0.1 --port 5173" in text
