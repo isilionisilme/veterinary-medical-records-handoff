@@ -19,7 +19,7 @@ The pipeline is **observable** and **step-based**.
 - Processing is **asynchronous** and runs in the background.
 - API requests must **never block** waiting for processing to complete.
 - Processing is executed internally (in-process worker or equivalent).
-This document describes an in-process execution model; story-specific scope boundaries live in [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](../IMPLEMENTATION_PLAN/00_entry.md).
+This document describes an in-process execution model; release sequencing lives in [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](../IMPLEMENTATION_PLAN/00_entry.md), while story-specific scope boundaries live in the corresponding backlog item files.
 
 ---
 
