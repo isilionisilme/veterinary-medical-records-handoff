@@ -112,6 +112,17 @@
       ]
     },
     {
+      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
+      "description": "Project EXECUTION_RULES compatibility stub changes require EXECUTION_PROTOCOL routing parity and doc-updates guard alignment.",
+      "required_any": [
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py",
+        "scripts/docs/check_router_directionality.py"
+      ]
+    },
+    {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
       "description": "Project PLAN_MANAGEMENT changes require project owner routing parity and doc-updates guard alignment.",
       "required_any": [

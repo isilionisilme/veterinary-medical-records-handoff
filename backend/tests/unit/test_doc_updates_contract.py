@@ -208,6 +208,9 @@ def test_doc_test_sync_map_has_minimum_rules() -> None:
     assert (
         '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/technical-design.md"' in text
     )
+    assert (
+        '"doc_glob": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md"' in text
+    )
     assert '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/adr/**/*.md"' in text
     assert '"owner_any"' in text
     assert '"docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md"' in text
@@ -236,6 +239,9 @@ def test_router_parity_map_has_product_design_rule() -> None:
         in text
     )
     assert '"source_doc": "docs/shared/03-ops/way-of-working.md"' in text
+    assert (
+        '"source_doc": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md"' in text
+    )
     assert (
         '"path": "docs/agent_router/04_PROJECT/PRODUCT_DESIGN/'
         '76_conceptual-model-local-schema-global-schema-and-mapping.md"' in text
