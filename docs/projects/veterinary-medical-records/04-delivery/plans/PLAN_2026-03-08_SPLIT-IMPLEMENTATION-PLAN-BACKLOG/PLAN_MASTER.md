@@ -114,25 +114,25 @@ Options presented to user at plan approval:
 
 ### Phase 0 - Discovery and extraction contract
 
-- [ ] P0-A 🔄 **[PR-1]** Inventory all `US-*` and `IMP-*` sections in `implementation-plan.md` and map IDs to target filenames.
-- [ ] P0-B 🔄 **[PR-1]** Validate backlink impact (`implementation-plan.md` references and anchor-style links in delivery plans/docs).
+- [x] P0-A 🔄 **[PR-1]** Inventory all `US-*` and `IMP-*` sections in `implementation-plan.md` and map IDs to target filenames.
+- [x] P0-B 🔄 **[PR-1]** Validate backlink impact (`implementation-plan.md` references and anchor-style links in delivery plans/docs).
 
 ### Phase 1 - Backlog creation and item extraction (batched)
 
-- [ ] P1-A1 🔄 **[PR-1]** Create `04-delivery/Backlog/` and extract items 1–20 (US-01 through US-20).
-- [ ] P1-A1-V 🔄 **[PR-1]** Validate batch 1: 20 files exist, headings are `#`-level, content matches source.
-- [ ] P1-A2 🔄 **[PR-1]** Extract items 21–40 (US-21 through US-40).
-- [ ] P1-A2-V 🔄 **[PR-1]** Validate batch 2: cumulative 40 files, spot-check 2 random items.
-- [ ] P1-A3 🔄 **[PR-1]** Extract items 41–60 (US-41 through US-60).
-- [ ] P1-A3-V 🔄 **[PR-1]** Validate batch 3: cumulative 60 files, spot-check 2 random items.
-- [ ] P1-A4 🔄 **[PR-1]** Extract items 61–80 (US-61 through US-75 + IMP-01 through IMP-05).
-- [ ] P1-A4-V 🔄 **[PR-1]** Validate batch 4: cumulative 80 files, full count verification.
-- [ ] P1-B 🔄 **[PR-1]** Create `Backlog/README.md` with consolidated index table (ID, title, release, link).
+- [x] P1-A1 🔄 **[PR-1]** Create `04-delivery/Backlog/` and extract items 1–20 (US-01 through US-20).
+- [x] P1-A1-V 🔄 **[PR-1]** Validate batch 1: 20 files exist, headings are `#`-level, content matches source.
+- [x] P1-A2 🔄 **[PR-1]** Extract items 21–40 (US-21 through US-40).
+- [x] P1-A2-V 🔄 **[PR-1]** Validate batch 2: cumulative 40 files, spot-check 2 random items.
+- [x] P1-A3 🔄 **[PR-1]** Extract items 41–60 (US-41 through US-60).
+- [x] P1-A3-V 🔄 **[PR-1]** Validate batch 3: cumulative 60 files, spot-check 2 random items.
+- [x] P1-A4 🔄 **[PR-1]** Extract items 61–80 (US-61 through US-75 + IMP-01 through IMP-05).
+- [x] P1-A4-V 🔄 **[PR-1]** Validate batch 4: cumulative 80 files, full count verification.
+- [x] P1-B 🔄 **[PR-1]** Create `Backlog/README.md` with consolidated index table (ID, title, release, link).
 
 ### Phase 2 - Implementation plan reduction
 
-- [ ] P2-A 🔄 **[PR-1]** Remove `User Story Details` and `Improvement Details` blocks from `implementation-plan.md`.
-- [ ] P2-B 🔄 **[PR-1]** Keep release plan sections and insert links to backlog index/items.
+- [x] P2-A 🔄 **[PR-1]** Remove `User Story Details` and `Improvement Details` blocks from `implementation-plan.md`.
+- [x] P2-B 🔄 **[PR-1]** Keep release plan sections and insert links to backlog index/items.
 
 ### Phase 3 - Link and routing propagation (dry-run + apply)
 

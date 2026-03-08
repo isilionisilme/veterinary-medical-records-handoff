@@ -393,15 +393,22 @@ def test_rules_index_contains_known_mapping_hints() -> None:
 
 def test_implementation_plan_tracks_us08_us09_us32_us39_as_implemented() -> None:
     text = _read_text(IMPLEMENTATION_PLAN)
-    assert "## US-08 — Edit structured data" in text
-    assert "## US-09 — Capture correction signals" in text
-    assert "## US-32 — Align review rendering to Global Schema template" in text
-    assert "## US-39 — Align veterinarian confidence signal with mapping confidence policy" in text
+    assert "[US-08 — Edit structured data](Backlog/us-08-edit-structured-data.md)" in text
     assert (
-        "## US-32 — Align review rendering to Global Schema template\n\n"
-        "**Status**: Implemented (2026-02-17)"
+        "[US-09 — Capture correction signals](Backlog/us-09-capture-correction-signals.md)"
     ) in text
-    assert text.count("**Status**: Implemented (2026-02-17)") >= 3
+    assert (
+        "[US-32 — Align review rendering to Global Schema template]"
+        "(Backlog/us-32-align-review-rendering-to-global-schema-template.md)"
+        " (Implemented 2026-02-17)"
+    ) in text
+    assert (
+        "[US-39 — Align veterinarian confidence signal with mapping confidence policy]"
+        "(Backlog/us-39-align-veterinarian-confidence-signal-with-mapping.md)"
+    ) in text
+    assert "User Story Details" not in text
+    assert "Improvement Details" not in text
+    assert "[Backlog Index](Backlog/README.md)" in text
 
 
 def test_implementation_plan_router_tracks_us45_propagation() -> None:
@@ -422,23 +429,34 @@ def test_implementation_plan_router_tracks_us46_propagation() -> None:
     entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
     release_6_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_RELEASE_6)
 
-    assert "## US-46 — Deterministic Visit Assignment Coverage MVP (Schema)" in source_text
+    assert (
+        "[US-46 — Deterministic Visit Assignment Coverage MVP (Schema)]"
+        "(Backlog/us-46-deterministic-visit-assignment-coverage-mvp-schema.md)" in source_text
+    )
     assert "279b_us-46-deterministic-visit-assignment-coverage-mvp-schema.md" in entry_text
     assert "US-46 — Deterministic Visit Assignment Coverage MVP (Schema)" in release_6_text
 
 
-def test_implementation_plan_multi_visit_plan_rename_propagates_to_owner_entry() -> None:
+def test_implementation_plan_backlog_split_propagates_to_owner_entry() -> None:
     source_text = _read_text(IMPLEMENTATION_PLAN)
     entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
+    add_story_text = _read_text(
+        REPO_ROOT
+        / "docs"
+        / "agent_router"
+        / "04_PROJECT"
+        / "IMPLEMENTATION_PLAN"
+        / "65_add-user-story-workflow.md"
+    )
 
-    assert "COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md" in source_text
-    assert "COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md" in source_text
-    assert "PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md" in source_text
-
-    assert "Multi-visit plan series normalization (2026-03-07)" in entry_text
-    assert "COMPLETED_2026-03-06_MULTI-VISIT_P1_RAWTEXT-BOUNDARIES.md" in entry_text
-    assert "COMPLETED_2026-03-07_MULTI-VISIT_P2_PER-VISIT-FIELD-EXTRACTION.md" in entry_text
-    assert "PLAN_2026-03-07_MULTI-VISIT_P3_VISIT-SCOPING-OBSERVABILITY.md" in entry_text
+    assert "[Backlog Index](Backlog/README.md)" in source_text
+    assert (
+        "Story and improvement specifications now live in "
+        "`docs/projects/veterinary-medical-records/04-delivery/Backlog/`"
+    ) in entry_text
+    assert "implementation-plan.md` reduced to release sequencing plus backlog links" in entry_text
+    assert "Create or update the dedicated backlog item file for the story" in add_story_text
+    assert "Add or update the consolidated index row for the story." in add_story_text
 
 
 def test_ci_does_not_ignore_markdown_only_changes() -> None:
