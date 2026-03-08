@@ -5,7 +5,7 @@
 >
 > **Governance:**
 > - This file is a canonical document maintained by humans.
-> - Router files under `docs/agent_router/` are derived outputs generated from this canonical source.
+> - Router modules are derived outputs generated from this canonical source.
 > - Flow is **canonical → router only**. Router files MUST NOT be edited directly.
 > - Any direct edit to a router file may be overwritten during the next regeneration cycle.
 
