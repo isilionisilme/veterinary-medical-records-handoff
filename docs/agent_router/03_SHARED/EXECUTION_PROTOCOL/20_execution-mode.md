@@ -3,19 +3,18 @@
 
 ## 1. Semi-Unattended Execution (Default Mode)
 
-Default behavior is semi-unattended execution controlled by plan steps and hard-gates.
+The default execution mode is **semi-unattended**. After completing the current task according to the active mode and closure rules, the agent applies the **decision table in §10** to determine whether to chain or stop.
 
-### Mandatory Plan-Start Choices (before Step 1)
+### Single-Chat Execution Rule (Hard Rule)
 
-Before executing the first step of any plan, collect and record in plan metadata:
+Keep execution in the current chat by default.
 
-1. Execution worktree.
-2. CI mode.
-3. Automation mode:
-   - `Supervisado`: commit manual, push manual, pause at hard-gates.
-   - `Semiautomatico`: commit automatic allowed, push manual, pause at hard-gates.
-   - `Automatico`: commit automatic allowed, push manual, pause at hard-gates (including final pre-PR gate).
+The agent may recommend switching chat only when:
+1. expected token-efficiency benefit is significant, or
+2. a hard capability blocker requires another agent/model.
 
-If UI supports option selectors, use selector UI. If not, use textual fallback.
+In both cases, the agent MUST explain the reason briefly and wait for explicit user decision.
+
+**Safety limit:** if the agent detects context exhaustion (truncated responses, state loss), it must stop at the current step, complete it cleanly (full SCOPE BOUNDARY) and generate the handoff.
 
 ---
