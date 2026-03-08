@@ -82,4 +82,40 @@ describe("usePdfDocument", () => {
     expect(destroyDoc).toHaveBeenCalled();
     expect(destroyLoadingTask).toHaveBeenCalled();
   });
+
+  it("retries PDF loading task after a transient failure", async () => {
+    const { scrollRef } = createScrollRef();
+    const cancelAllRenderTasks = vi.fn();
+    const mockDoc = { numPages: 2, destroy: vi.fn() };
+
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => new ArrayBuffer(8),
+    });
+
+    getDocumentMock
+      .mockReturnValueOnce({
+        promise: Promise.reject(new Error("transient parse error")),
+        destroy: vi.fn(),
+      })
+      .mockReturnValueOnce({
+        promise: Promise.resolve(mockDoc),
+        destroy: vi.fn(),
+      });
+
+    const { result } = renderHook(() =>
+      usePdfDocument({
+        fileUrl: "https://example.test/file.pdf",
+        scrollRef,
+        cancelAllRenderTasks,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeNull();
+      expect(result.current.totalPages).toBe(2);
+    });
+    expect(getDocumentMock).toHaveBeenCalledTimes(2);
+  });
 });

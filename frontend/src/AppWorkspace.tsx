@@ -171,6 +171,12 @@ export function App() {
     setActiveId(docId);
     requestPdfLoad(docId);
   };
+  useEffect(() => {
+    if (activeViewerTab !== "document" || !activeId || fileUrl) {
+      return;
+    }
+    requestPdfLoad(activeId);
+  }, [activeViewerTab, activeId, fileUrl, requestPdfLoad]);
   const {
     documentDetails,
     processingHistory,

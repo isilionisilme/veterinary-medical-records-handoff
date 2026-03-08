@@ -308,7 +308,7 @@ describe("PdfViewer", () => {
 
     await screen.findAllByTestId("pdf-page");
 
-    expect(globalThis.fetch).toHaveBeenCalledWith("blob://sample");
+    expect(globalThis.fetch).toHaveBeenCalledWith("blob://sample", { cache: "no-store" });
     const firstCall = getDocumentMock.mock.calls[0]?.[0] as { data?: Uint8Array };
     expect(firstCall).toMatchObject({
       isEvalSupported: false,
@@ -366,7 +366,7 @@ describe("PdfViewer", () => {
   it("shows error state when data-source load fails", async () => {
     const getDocumentMock = vi.mocked(pdfjsLib.getDocument);
     getDocumentMock.mockReset();
-    getDocumentMock.mockImplementationOnce(() => ({
+    getDocumentMock.mockImplementation(() => ({
       promise: Promise.reject(new Error("data load failed")),
     }));
 

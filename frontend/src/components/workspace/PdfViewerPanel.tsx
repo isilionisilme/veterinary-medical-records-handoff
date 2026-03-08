@@ -11,15 +11,8 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { type ProcessingHistoryRun } from "../../types/appWorkspace";
-import { groupProcessingSteps } from "../../lib/processingHistory";
-import {
-  formatDuration,
-  formatTime,
-  shouldShowDetails,
-  statusIcon,
-} from "../../lib/processingHistoryView";
-import { explainFailure } from "../../lib/appWorkspaceUtils";
 import { type VisitScopingMetricsResponse } from "../../types/appWorkspace";
+import { ProcessingHistorySection } from "./ProcessingHistorySection";
 import { UploadPanel } from "./UploadPanel";
 
 const PdfViewer = lazy(() =>
@@ -400,6 +393,21 @@ export function PdfViewerPanel({
                 </div>
               </div>
               <div className="mt-3 rounded-card border border-borderSubtle bg-surface p-3">
+                <ProcessingHistorySection
+                  activeId={activeId}
+                  isActiveDocumentProcessing={isActiveDocumentProcessing}
+                  reprocessPending={reprocessPending}
+                  onOpenRetryModal={onOpenRetryModal}
+                  processingHistoryIsLoading={processingHistoryIsLoading}
+                  processingHistoryIsError={processingHistoryIsError}
+                  processingHistoryErrorMessage={processingHistoryErrorMessage}
+                  processingHistoryRuns={processingHistoryRuns}
+                  expandedSteps={expandedSteps}
+                  onToggleStepDetails={onToggleStepDetails}
+                  formatRunHeader={formatRunHeader}
+                />
+              </div>
+              <div className="mt-3 rounded-card border border-borderSubtle bg-surface p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
                     Observabilidad de visitas
@@ -505,141 +513,6 @@ export function PdfViewerPanel({
                   </div>
                 )}
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-                  Historial de procesamiento
-                </p>
-                <Button
-                  type="button"
-                  disabled={!activeId || isActiveDocumentProcessing || reprocessPending}
-                  onClick={onOpenRetryModal}
-                >
-                  {isActiveDocumentProcessing
-                    ? "Procesando..."
-                    : reprocessPending
-                      ? "Reprocesando..."
-                      : "Reprocesar"}
-                </Button>
-              </div>
-              {!activeId && (
-                <p className="mt-2 text-xs text-muted">
-                  Selecciona un documento para ver los detalles técnicos.
-                </p>
-              )}
-              {activeId && processingHistoryIsLoading && (
-                <p className="mt-2 text-xs text-muted">Cargando historial...</p>
-              )}
-              {activeId && processingHistoryIsError && (
-                <p className="mt-2 text-xs text-statusError">{processingHistoryErrorMessage}</p>
-              )}
-              {activeId && processingHistoryRuns.length === 0 && (
-                <p className="mt-2 text-xs text-muted">
-                  No hay ejecuciones registradas para este documento.
-                </p>
-              )}
-              {activeId && processingHistoryRuns.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {processingHistoryRuns.map((run) => (
-                    <div
-                      key={run.run_id}
-                      className="rounded-card border border-borderSubtle bg-surface p-2"
-                    >
-                      <div className="text-xs font-semibold text-ink">{formatRunHeader(run)}</div>
-                      {run.failure_type && (
-                        <p className="mt-1 text-xs text-statusError">
-                          {explainFailure(run.failure_type)}
-                        </p>
-                      )}
-                      <div className="mt-2 space-y-1">
-                        {run.steps.length === 0 && (
-                          <p className="text-xs text-muted">Sin pasos registrados.</p>
-                        )}
-                        {run.steps.length > 0 &&
-                          groupProcessingSteps(run.steps).map((step, index) => {
-                            const stepKey = `${run.run_id}-${step.step_name}-${step.attempt}-${index}`;
-                            const duration = formatDuration(step.start_time, step.end_time);
-                            const startTime = formatTime(step.start_time);
-                            const endTime = formatTime(step.end_time);
-                            const timeRange =
-                              startTime && endTime
-                                ? `${startTime} → ${endTime}`
-                                : (startTime ?? "--:--");
-                            return (
-                              <div key={stepKey} className="rounded-control bg-surface p-2">
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                                  <span
-                                    className={
-                                      step.status === "FAILED"
-                                        ? "text-statusError"
-                                        : step.status === "COMPLETED"
-                                          ? "text-statusSuccess"
-                                          : "text-statusWarn"
-                                    }
-                                  >
-                                    {statusIcon(step.status)}
-                                  </span>
-                                  <span className="font-semibold text-ink">{step.step_name}</span>
-                                  <span>intento {step.attempt}</span>
-                                  <span>{timeRange}</span>
-                                  {duration && <span>{duration}</span>}
-                                </div>
-                                {step.status === "FAILED" && (
-                                  <p className="mt-1 text-xs text-statusError">
-                                    {explainFailure(
-                                      step.raw_events.find(
-                                        (event) => event.step_status === "FAILED",
-                                      )?.error_code,
-                                    )}
-                                  </p>
-                                )}
-                                {shouldShowDetails(step) && (
-                                  <div className="mt-1">
-                                    <button
-                                      type="button"
-                                      className="text-xs font-semibold text-muted"
-                                      onClick={() => onToggleStepDetails(stepKey)}
-                                    >
-                                      {expandedSteps[stepKey] ? "Ocultar detalles" : "Ver detalles"}
-                                    </button>
-                                  </div>
-                                )}
-                                {shouldShowDetails(step) && expandedSteps[stepKey] && (
-                                  <div className="mt-2 space-y-1 rounded-control bg-surface p-2">
-                                    {step.raw_events.map((event, eventIndex) => (
-                                      <div
-                                        key={`${stepKey}-event-${eventIndex}`}
-                                        className="text-xs text-muted"
-                                      >
-                                        <span className="font-semibold text-ink">
-                                          {event.step_status}
-                                        </span>
-                                        <span>
-                                          {event.started_at
-                                            ? ` · Inicio: ${formatTime(event.started_at) ?? "--:--"}`
-                                            : ""}
-                                        </span>
-                                        <span>
-                                          {event.ended_at
-                                            ? ` · Fin: ${formatTime(event.ended_at) ?? "--:--"}`
-                                            : ""}
-                                        </span>
-                                        {event.error_code && (
-                                          <span className="text-statusError">
-                                            {` · ${explainFailure(event.error_code)}`}
-                                          </span>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )}
         </div>

@@ -16,6 +16,12 @@ export function usePdfDocument({ fileUrl, scrollRef, cancelAllRenderTasks }: Use
   useEffect(() => {
     let cancelled = false;
     let loadingTask: pdfjsLib.PDFDocumentLoadingTask | null = null;
+    const maxAttempts = 3;
+
+    const delay = (ms: number) =>
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, ms);
+      });
 
     async function loadPdf() {
       if (!fileUrl) {
@@ -33,27 +39,48 @@ export function usePdfDocument({ fileUrl, scrollRef, cancelAllRenderTasks }: Use
       setLoading(true);
       setError(null);
       try {
-        let arrayBuffer: ArrayBuffer;
-        if (typeof fileUrl === "string") {
-          const response = await fetch(fileUrl);
-          if (!response.ok) {
-            throw new Error("Failed to fetch PDF data.");
+        let loadedDoc: pdfjsLib.PDFDocumentProxy | null = null;
+        let lastError: unknown = null;
+
+        for (let attempt = 0; attempt < maxAttempts && !cancelled; attempt += 1) {
+          try {
+            let arrayBuffer: ArrayBuffer;
+            if (typeof fileUrl === "string") {
+              const response = await fetch(fileUrl, { cache: "no-store" });
+              if (!response.ok) {
+                throw new Error("Failed to fetch PDF data.");
+              }
+              arrayBuffer = await response.arrayBuffer();
+            } else {
+              arrayBuffer = fileUrl;
+            }
+
+            // Use a fresh copy for each attempt to avoid edge cases with reused buffers.
+            const pdfBytes = new Uint8Array(arrayBuffer.slice(0));
+            loadingTask = pdfjsLib.getDocument({
+              data: pdfBytes,
+              isEvalSupported: false,
+            });
+            loadedDoc = await loadingTask.promise;
+            break;
+          } catch (attemptError) {
+            lastError = attemptError;
+            if (attempt < maxAttempts - 1) {
+              await delay(250);
+            }
           }
-          arrayBuffer = await response.arrayBuffer();
-        } else {
-          arrayBuffer = fileUrl;
         }
-        loadingTask = pdfjsLib.getDocument({
-          data: new Uint8Array(arrayBuffer),
-          isEvalSupported: false,
-        });
-        const doc = await loadingTask.promise;
+
+        if (!loadedDoc) {
+          throw lastError ?? new Error("Failed to load PDF.");
+        }
         if (cancelled) {
-          void doc.destroy();
+          void loadedDoc.destroy();
           return;
         }
-        setPdfDoc(doc);
-        setTotalPages(doc.numPages);
+
+        setPdfDoc(loadedDoc);
+        setTotalPages(loadedDoc.numPages);
       } catch (loadError) {
         if (!cancelled) {
           if (import.meta.env.DEV) {

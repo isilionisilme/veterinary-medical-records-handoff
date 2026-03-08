@@ -9,6 +9,16 @@ const SAMPLE_PDF_BUFFER = fs.readFileSync("e2e/fixtures/sample.pdf");
 
 async function setupReprocessScenario(page: Page): Promise<void> {
   let status: "COMPLETED" | "PROCESSING" = "COMPLETED";
+  let processingRuns = [
+    {
+      run_id: "run-e2e-reprocess-1",
+      state: "COMPLETED",
+      failure_type: null,
+      started_at: "2026-02-27T10:00:00Z",
+      completed_at: "2026-02-27T10:00:08Z",
+      steps: [],
+    },
+  ];
 
   await pinSidebar(page);
   await page.goto("/");
@@ -44,10 +54,7 @@ async function setupReprocessScenario(page: Page): Promise<void> {
   });
 
   await page.route("**/documents/*/download**", async (route) => {
-    const url = new URL(route.request().url());
-    const match = url.pathname.match(/\/documents\/([^/]+)\/download\/?$/);
-    const routeDocumentId = match?.[1];
-    if (!routeDocumentId || routeDocumentId !== DOC_ID) {
+    if (route.request().method() !== "GET") {
       await route.fallback();
       return;
     }
@@ -94,6 +101,55 @@ async function setupReprocessScenario(page: Page): Promise<void> {
     });
   });
 
+  await page.route("**/documents/*/processing-history", async (route) => {
+    const url = new URL(route.request().url());
+    const match = url.pathname.match(/\/documents\/([^/]+)\/processing-history\/?$/);
+    const routeDocumentId = match?.[1];
+    if (route.request().method() !== "GET" || !routeDocumentId || routeDocumentId !== DOC_ID) {
+      await route.fallback();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        document_id: DOC_ID,
+        runs: processingRuns,
+      }),
+    });
+  });
+
+  await page.route("**/runs/*/artifacts/raw-text", async (route) => {
+    const url = new URL(route.request().url());
+    const match = url.pathname.match(/\/runs\/([^/]+)\/artifacts\/raw-text\/?$/);
+    const runId = match?.[1];
+    if (route.request().method() !== "GET" || !runId) {
+      await route.fallback();
+      return;
+    }
+    if (runId === "run-e2e-reprocess-1") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          run_id: runId,
+          artifact_type: "RAW_TEXT",
+          content_type: "text/plain",
+          text: "Raw text run 1",
+        }),
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 410,
+      contentType: "application/json",
+      body: JSON.stringify({
+        error_code: "ARTIFACT_MISSING",
+        message: "Raw text artifact is missing.",
+      }),
+    });
+  });
+
   await page.route("**/documents/*/reprocess", async (route) => {
     const url = new URL(route.request().url());
     const match = url.pathname.match(/\/documents\/([^/]+)\/reprocess\/?$/);
@@ -103,6 +159,17 @@ async function setupReprocessScenario(page: Page): Promise<void> {
       return;
     }
     status = "PROCESSING";
+    processingRuns = [
+      ...processingRuns,
+      {
+        run_id: "run-e2e-reprocess-2",
+        state: "QUEUED",
+        failure_type: null,
+        started_at: "2026-02-27T10:10:00Z",
+        completed_at: null,
+        steps: [],
+      },
+    ];
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -140,5 +207,33 @@ test.describe("reprocess workflow", () => {
 
     await expect(page.getByText("Reprocesamiento iniciado.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Procesando..." })).toBeVisible();
+  });
+
+  test("technical tab shows two runs with latest-first order and per-run raw text", async ({ page }) => {
+    test.setTimeout(180_000);
+    await setupReprocessScenario(page);
+
+    await page.getByTestId("viewer-tab-technical").click();
+    await expect(page.getByTestId("processing-run-card-run-e2e-reprocess-1")).toBeVisible();
+    await page
+      .getByTestId("processing-run-card-run-e2e-reprocess-1")
+      .getByRole("button", { name: "Ver texto extraído" })
+      .click();
+    await expect(page.getByText("Raw text run 1")).toBeVisible();
+
+    await page.getByRole("button", { name: "Reprocesar" }).click();
+    await page.getByTestId("reprocess-confirm-btn").click();
+    await expect(page.getByText("Reprocesamiento iniciado.")).toBeVisible();
+
+    await expect(page.getByTestId("processing-run-card-run-e2e-reprocess-2")).toBeVisible();
+    await expect(page.locator('[data-testid^="processing-run-card-"]').first()).toHaveAttribute(
+      "data-testid",
+      "processing-run-card-run-e2e-reprocess-2",
+    );
+    await expect(page.getByTestId("processing-run-state-run-e2e-reprocess-2")).toContainText(
+      "En cola",
+    );
+    await expect(page.getByText("Última")).toBeVisible();
+
   });
 });

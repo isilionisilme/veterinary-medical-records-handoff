@@ -53,4 +53,44 @@ describe("useDocumentLoader", () => {
     expect(result.current.pendingAutoOpenDocumentIdRef.current).toBeNull();
     expect(onUploadFeedback).toHaveBeenCalledTimes(1);
   });
+
+  it("retries once for regular document load failures and eventually succeeds", async () => {
+    mockedFetchOriginalPdf
+      .mockRejectedValueOnce(new Error("temporary failure"))
+      .mockResolvedValueOnce({
+        data: "pdf-data-retry",
+        filename: "record-retry.pdf",
+      });
+
+    const onUploadFeedback = vi.fn();
+    const { result } = renderHook(() => useDocumentLoader({ onUploadFeedback }), {
+      wrapper: createWrapper(),
+    });
+
+    act(() => {
+      result.current.requestPdfLoad("doc-retry");
+    });
+
+    await waitFor(
+      () => {
+        expect(result.current.fileUrl).toBe("pdf-data-retry");
+        expect(result.current.filename).toBe("record-retry.pdf");
+        expect(mockedFetchOriginalPdf).toHaveBeenCalledTimes(2);
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it("keeps requestPdfLoad stable across rerenders", () => {
+    const onUploadFeedback = vi.fn();
+    const { result, rerender } = renderHook(() => useDocumentLoader({ onUploadFeedback }), {
+      wrapper: createWrapper(),
+    });
+
+    const firstReference = result.current.requestPdfLoad;
+    rerender();
+    const secondReference = result.current.requestPdfLoad;
+
+    expect(secondReference).toBe(firstReference);
+  });
 });
