@@ -1,7 +1,36 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { FieldEditDialog } from "./FieldEditDialog";
+
+vi.mock("../ui/dialog", () => {
+  type DialogProps = {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    children?: ReactNode;
+  };
+
+  return {
+    Dialog: ({ open, onOpenChange, children }: DialogProps) => (
+      <div data-testid="mock-dialog" data-open={String(Boolean(open))}>
+        <button type="button" onClick={() => onOpenChange?.(false)}>
+          mock-request-close
+        </button>
+        <button type="button" onClick={() => onOpenChange?.(true)}>
+          mock-request-open
+        </button>
+        {children}
+      </div>
+    ),
+    DialogContent: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    DialogClose: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    DialogDescription: ({ children }: { children?: ReactNode }) => <p>{children}</p>,
+    DialogFooter: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    DialogHeader: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    DialogTitle: ({ children }: { children?: ReactNode }) => <h2>{children}</h2>,
+  };
+});
 
 function renderSpeciesDialog(options?: {
   value?: string;
