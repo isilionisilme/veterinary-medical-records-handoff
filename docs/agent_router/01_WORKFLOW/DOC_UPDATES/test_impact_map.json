@@ -30,7 +30,7 @@
     },
     {
       "doc_glob": "docs/agent_router/**/*.md",
-      "description": "Router workflow changes, including propagated plan-root naming rules, must keep router/doc-updates contract tests aligned.",
+      "description": "Router workflow and owner-module propagation changes (including plan-root naming and IMPLEMENTATION_PLAN owner sync) must keep router/doc-updates contract tests aligned.",
       "rule_change_only": true,
       "owner_any": [
         "docs/agent_router/**/*.md"
