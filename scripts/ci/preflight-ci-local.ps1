@@ -165,7 +165,7 @@ function Get-ChangedFiles {
 
 function Filter-ChangedFiles {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Files,
+        [Parameter()][AllowEmptyCollection()][string[]]$Files = @(),
         [Parameter(Mandatory = $true)][string[]]$Patterns
     )
 
@@ -182,7 +182,7 @@ function Filter-ChangedFiles {
 
 function Filter-ChangedExtensions {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Files,
+        [Parameter()][AllowEmptyCollection()][string[]]$Files = @(),
         [Parameter(Mandatory = $true)][string[]]$Extensions
     )
 
