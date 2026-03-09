@@ -44,6 +44,11 @@ def _normalize_review_interpretation_data(
     raw_microchip = global_schema.get("microchip_id")
     normalized_microchip = normalize_microchip_digits_only(raw_microchip)
     if normalized_microchip == raw_microchip:
+        fields_changed = _upsert_microchip_field_from_global_schema(
+            normalized_data=normalized_data,
+            normalized_microchip=normalized_microchip,
+        )
+        changed = changed or fields_changed
         base_data = normalized_data if changed else data
         projected = _project_review_payload_to_canonical(dict(base_data), raw_text=raw_text)
         return _normalize_age_from_review_projection(projected)
@@ -104,7 +109,8 @@ def _project_review_payload_to_canonical(
     if not isinstance(projected.get("other_fields"), list):
         projected["other_fields"] = []
 
-    # Keep visit/other scoping behavior centralized where visit assignment still lives.
+    # Temporary bridge for PR-1: visit scoping stays in review_service until PR-2
+    # extracts that responsibility into its own engine.
     from backend.app.application.documents import review_service as _review_service
 
     return _review_service._normalize_canonical_review_scoping(projected, raw_text=raw_text)
