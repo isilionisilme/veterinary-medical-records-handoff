@@ -385,10 +385,13 @@ if ($runDocs) {
     }
 }
 
-if ($Mode -eq "Push" -or $Mode -eq "Full") {
+if ($Mode -eq "Push") {
     Invoke-Step "Remote base sync guard" {
         Assert-RemoteBaseUpToDate -BaseRefValue $BaseRef
     }
+}
+
+if ($Mode -eq "Push" -or $Mode -eq "Full") {
     Invoke-Step "Plan execution guard" {
         & $python "scripts/ci/check_plan_execution_guard.py"
     }

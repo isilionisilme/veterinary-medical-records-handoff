@@ -34,7 +34,7 @@ Ejecucion manual:
 
 ```powershell
 python scripts/ci/check_plan_execution_guard.py
-python scripts/ci/check_plan_execution_guard.py --branch "codex/veterinary-medical-records/docs/imp-03-plan-execution-guard"
+python scripts/ci/check_plan_execution_guard.py --branch "feature/us-3-plan-execution-guard"
 python scripts/ci/check_plan_execution_guard.py --branch "my-branch" --plan-root "docs/projects/veterinary-medical-records/04-delivery/plans"
 ```
 
@@ -65,4 +65,4 @@ Uso:
 
 - Los hooks de Git (`.githooks/*`) invocan scripts PowerShell.
 - Los `.bat` existen como comodidad para terminal CMD.
-- In `Mode Push` and `Mode Full`, `preflight-ci-local.ps1` runs a remote-base sync guard that executes `git fetch origin <base>` and fails if `HEAD` does not contain `origin/<base>`.
+- In `Mode Push`, `preflight-ci-local.ps1` runs a remote-base sync guard that executes `git fetch origin <base>` and fails if `HEAD` does not contain `origin/<base>`.
