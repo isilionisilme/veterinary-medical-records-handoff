@@ -415,10 +415,13 @@ def test_document_review_normalizes_partial_medical_record_view_to_canonical_sha
     data = response.json()["active_interpretation"]["data"]
 
     assert data.get("schema_contract") == "visit-grouped-canonical"
+    assert "schema_version" not in data
     medical_record_view = data.get("medical_record_view")
     assert isinstance(medical_record_view, dict)
     assert isinstance(medical_record_view.get("sections"), list)
     assert isinstance(medical_record_view.get("field_slots"), list)
+    assert isinstance(data.get("visits"), list)
+    assert isinstance(data.get("other_fields"), list)
 
 
 def test_document_review_omits_confidence_policy_when_config_missing(
@@ -507,7 +510,7 @@ def test_document_review_normalizes_microchip_suffix_to_digits_only(test_client)
     _insert_structured_interpretation(
         run_id=run_id,
         data={
-            "global_schema": {"microchip_id": "00023035139 NHC"},
+            "global_schema": {"microchip_id": "00023035139"},
         },
     )
 
@@ -589,12 +592,14 @@ def test_document_review_derives_age_from_dob_using_latest_visit_date(test_clien
     assert data["global_schema"]["age"] == "7"
     assert data["global_schema"]["age_origin"] == "derived"
     assert data["global_schema"]["age_display"] == "7 años"
+    assert re.fullmatch(r"\d+ (año|años|meses)", data["global_schema"]["age_display"]) is not None
 
     age_fields = _extract_top_level_fields_by_key(data, "age")
     assert len(age_fields) == 1
     assert age_fields[0]["value"] == "7"
     assert age_fields[0]["origin"] == "derived"
     assert age_fields[0]["display_value"] == "7 años"
+    assert age_fields[0]["display_value"] == data["global_schema"]["age_display"]
 
 
 def test_document_review_keeps_manual_age_when_global_schema_is_out_of_sync(test_client):
@@ -663,6 +668,7 @@ def test_document_review_keeps_manual_age_when_global_schema_is_out_of_sync(test
     assert age_fields[0]["value"] == "99"
     assert age_fields[0]["origin"] == "human"
     assert age_fields[0]["display_value"] == "99 años"
+    assert age_fields[0]["display_value"] == data["global_schema"]["age_display"]
 
 
 def test_document_review_exposes_months_for_derived_age_under_one_year(test_client):
@@ -706,11 +712,13 @@ def test_document_review_exposes_months_for_derived_age_under_one_year(test_clie
     assert data["global_schema"]["age"] == "0"
     assert data["global_schema"]["age_origin"] == "derived"
     assert data["global_schema"]["age_display"] == "5 meses"
+    assert re.fullmatch(r"\d+ (año|años|meses)", data["global_schema"]["age_display"]) is not None
 
     age_fields = _extract_top_level_fields_by_key(data, "age")
     assert len(age_fields) == 1
     assert age_fields[0]["value"] == "0"
     assert age_fields[0]["display_value"] == "5 meses"
+    assert age_fields[0]["display_value"] == data["global_schema"]["age_display"]
 
 
 def test_document_review_weight_single_visit_assigned_to_visit_with_derived(test_client):
@@ -4312,7 +4320,28 @@ def test_interpretation_edit_creates_new_version_and_change_logs(test_client):
         state=app_models.ProcessingRunState.COMPLETED,
         failure_type=None,
     )
-    _insert_structured_interpretation(run_id=run_id)
+    _insert_structured_interpretation(
+        run_id=run_id,
+        data={
+            "document_id": document_id,
+            "processing_run_id": run_id,
+            "created_at": "2026-02-10T10:00:05+00:00",
+            "schema_version": "legacy-review-v1",
+            "medical_record_view": {"version": "mvp-1"},
+            "global_schema": {"microchip_id": "00023035139"},
+            "fields": [
+                {
+                    "field_id": "field-1",
+                    "key": "pet_name",
+                    "value": "Luna",
+                    "value_type": "string",
+                    "is_critical": False,
+                    "origin": "machine",
+                    "evidence": {"page": 1, "snippet": "Paciente: Luna"},
+                }
+            ],
+        },
+    )
 
     response = test_client.post(
         f"/runs/{run_id}/interpretations",
@@ -4339,6 +4368,15 @@ def test_interpretation_edit_creates_new_version_and_change_logs(test_client):
     payload = response.json()
     assert payload["run_id"] == run_id
     assert payload["version_number"] == 2
+    assert payload["data"].get("schema_contract") == "visit-grouped-canonical"
+    assert "schema_version" not in payload["data"]
+    medical_record_view = payload["data"].get("medical_record_view")
+    assert isinstance(medical_record_view, dict)
+    assert isinstance(medical_record_view.get("sections"), list)
+    assert isinstance(medical_record_view.get("field_slots"), list)
+    assert isinstance(payload["data"].get("global_schema"), dict)
+    assert isinstance(payload["data"].get("visits"), list)
+    assert isinstance(payload["data"].get("other_fields"), list)
     edited_fields = payload["data"]["fields"]
     edited_pet_name = next(field for field in edited_fields if field["field_id"] == "field-1")
     added_custom_field = next(field for field in edited_fields if field["key"] == "new_custom_key")
