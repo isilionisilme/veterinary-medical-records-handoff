@@ -15,8 +15,8 @@
 - `Story <ID>: <short imperative description>`
 
 **Technical work:**
-- `<type>: <short imperative description>`
-- Allowed types: `refactor`, `chore`, `ci`, `docs`, `test`, `build`, `fix`
+   - `<type>: <short imperative description>`
+   - Allowed types: `improvement`, `refactor`, `chore`, `ci`, `docs`, `test`, `build`, `fix`
 
 Commit messages must be clear, specific, and written in **imperative form**.
 Each commit should represent a **coherent logical step**.
