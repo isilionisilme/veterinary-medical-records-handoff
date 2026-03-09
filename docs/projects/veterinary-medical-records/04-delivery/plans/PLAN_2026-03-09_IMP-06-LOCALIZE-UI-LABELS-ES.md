@@ -95,12 +95,12 @@ Push permanece manual en todos los modos.
 
 ### Phase 0 — Validación de prerequisitos
 
-- [ ] P0-A 🔄 — Verificar que la rama base (`main`) está actualizada y los tests L1 pasan. Si no, STOP. — `no-commit`
-- [ ] P0-B 🚧 — Hard-gate: usuario confirma agente y modo de automatización. — `no-commit`
+- [x] P0-A 🔄 — Verificar que la rama base (`main`) está actualizada y los tests L1 pasan. Si no, STOP. — `no-commit`
+- [x] P0-B 🚧 — Hard-gate: usuario confirma agente y modo de automatización. — `no-commit`
 
 ### Phase 1 — Añadir labels al mapa `FIELD_LABELS`
 
-- [ ] P1-A 🔄 — Añadir las siguientes entradas al objeto `FIELD_LABELS` en `frontend/src/constants/appWorkspace.ts` (tras las entradas existentes, agrupadas al final de las claves de paciente):
+- [x] P1-A 🔄 — Añadir las siguientes entradas al objeto `FIELD_LABELS` en `frontend/src/constants/appWorkspace.ts` (tras las entradas existentes, agrupadas al final de las claves de paciente):
 
   ```typescript
   vet_name: "Veterinario",
@@ -116,18 +116,18 @@ Push permanece manual en todos los modos.
 
   No modificar ni eliminar entradas existentes. — `no-commit (pending commit point)`
 
-- [ ] P1-B 🔄 — Verificar que `ReviewSectionLayout.tsx` (~L223) consume `FIELD_LABELS` igual que `useDisplayFieldMapping.ts`; si usa un path distinto confirmar que los nuevos labels también se resuelven. Si no, añadir import o ajustar. — `no-commit (pending commit point)`
+- [x] P1-B 🔄 — Verificar que `ReviewSectionLayout.tsx` (~L223) consume `FIELD_LABELS` igual que `useDisplayFieldMapping.ts`; si usa un path distinto confirmar que los nuevos labels también se resuelven. Si no, añadir import o ajustar. — `no-commit (pending commit point)`
 
 > **Commit point →** `feat(labels): add explicit Spanish FIELD_LABELS for targeted patient fields`
 > Lanzar L2. Si falla, reparar. Cuando L2 verde → esperar instrucciones del usuario.
 
 ### Phase 2 — Tests
 
-- [ ] P2-A 🔄 — Actualizar `uiLabelOverrides` en `StructuredDataView.test.tsx` (~L37) para incluir las claves que ahora tienen label explícito en `FIELD_LABELS` y que previamente caían al schema label (para que el test siga siendo correcto cuando el label map tenga prioridad). Claves a añadir: `vet_name`, `breed`, `age`, `microchip_id`, `species`, `sex`, `weight`. Valor esperado = el nuevo label de `FIELD_LABELS`. — `no-commit (pending commit point)`
+- [x] P2-A 🔄 — Actualizar `uiLabelOverrides` en `StructuredDataView.test.tsx` (~L37) para incluir las claves que ahora tienen label explícito en `FIELD_LABELS` y que previamente caían al schema label (para que el test siga siendo correcto cuando el label map tenga prioridad). Claves a añadir: `vet_name`, `breed`, `age`, `microchip_id`, `species`, `sex`, `weight`. Valor esperado = el nuevo label de `FIELD_LABELS`. — `no-commit (pending commit point)`
 
-- [ ] P2-B 🔄 — Añadir test case en `useDisplayFieldMapping.test.tsx` que verifique: dado un field con `key: "reproductive_status"` (no presente en `GLOBAL_SCHEMA`), el `label` del `ReviewDisplayField` resultante es `"Estado reproductivo"` y no el fallback en inglés `"Reproductive status"`. — `no-commit (pending commit point)`
+- [x] P2-B 🔄 — Añadir test case en `useDisplayFieldMapping.test.tsx` que verifique: dado un field con `key: "reproductive_status"` (no presente en `GLOBAL_SCHEMA`), el `label` del `ReviewDisplayField` resultante es `"Estado reproductivo"` y no el fallback en inglés `"Reproductive status"`. — `no-commit (pending commit point)`
 
-- [ ] P2-C 🔄 — Añadir test case que verifique: dado un field con `key: "age"`, el label resultante es `"Edad (ultima visita)"` y no `"Edad"` (el valor del schema). — `no-commit (pending commit point)`
+- [x] P2-C 🔄 — Añadir test case que verifique: dado un field con `key: "age"`, el label resultante es `"Edad (ultima visita)"` y no `"Edad"` (el valor del schema). — `no-commit (pending commit point)`
 
 > **Commit point →** `test(labels): update and add tests for Spanish label mapping`
 > Lanzar L2. Si falla, reparar. Cuando L2 verde → esperar instrucciones del usuario.

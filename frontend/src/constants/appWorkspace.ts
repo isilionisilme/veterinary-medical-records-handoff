@@ -160,6 +160,15 @@ export const FIELD_LABELS: Record<string, string> = {
   vaccinations: "Vacunaciones",
   lab_result: "Resultado de laboratorio",
   imaging: "Imagen",
+  vet_name: "Veterinario",
+  breed: "Raza",
+  age: "Edad (ultima visita)",
+  microchip_id: "Microchip",
+  reproductive_status: "Estado reproductivo",
+  repro_status: "Estado reproductivo",
+  species: "Especie",
+  sex: "Sexo",
+  weight: "Peso",
 };
 
 export const HIDDEN_REVIEW_FIELDS = new Set([

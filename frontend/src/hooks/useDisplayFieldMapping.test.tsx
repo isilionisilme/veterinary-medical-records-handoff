@@ -207,4 +207,87 @@ describe("useDisplayFieldMapping", () => {
     expect(ageField?.items[0]?.displayValue).toBe("5 meses");
     expect(ageField?.items[0]?.rawField?.value).toBe("0");
   });
+
+  it("uses explicit Spanish FIELD_LABELS for reproductive_status in non-canonical mode", () => {
+    const reproductiveStatus: ReviewField = {
+      field_id: "f-repro-status",
+      key: "reproductive_status",
+      value: "Castrado",
+      value_type: "string",
+      classification: "medical_record",
+      origin: "machine",
+      is_critical: false,
+    };
+    const validatedReviewFields: ReviewField[] = [reproductiveStatus];
+    const matchesByKey = new Map<string, ReviewField[]>([
+      ["reproductive_status", [reproductiveStatus]],
+    ]);
+
+    const { result } = renderHook(() =>
+      useDisplayFieldMapping({
+        isCanonicalContract: false,
+        hasMalformedCanonicalFieldSlots: false,
+        interpretationData: buildInterpretationData(),
+        validatedReviewFields,
+        matchesByKey,
+        buildSelectableField,
+        explicitOtherReviewFields: [],
+      }),
+    );
+
+    const reproField = result.current.coreDisplayFields.find(
+      (field) => field.key === "reproductive_status",
+    );
+    expect(reproField).toBeDefined();
+    expect(reproField?.label).toBe("Estado reproductivo");
+    expect(reproField?.label).not.toBe("Reproductive status");
+  });
+
+  it("uses FIELD_LABELS override for age over canonical schema label", () => {
+    const derivedAge: ReviewField = {
+      field_id: "derived-age-canonical",
+      key: "age",
+      value: "5 años",
+      value_type: "string",
+      scope: "document",
+      section: "patient",
+      classification: "medical_record",
+      origin: "derived",
+      field_mapping_confidence: 0.9,
+      is_critical: false,
+    };
+    const validatedReviewFields: ReviewField[] = [derivedAge];
+    const matchesByKey = new Map<string, ReviewField[]>([["age", [derivedAge]]]);
+    const interpretationData = buildInterpretationData({
+      medical_record_view: {
+        version: "mvp-1",
+        sections: ["patient"],
+        field_slots: [
+          {
+            canonical_key: "age",
+            scope: "document",
+            section: "patient",
+            aliases: [],
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useDisplayFieldMapping({
+        isCanonicalContract: true,
+        hasMalformedCanonicalFieldSlots: false,
+        interpretationData,
+        validatedReviewFields,
+        matchesByKey,
+        buildSelectableField,
+        explicitOtherReviewFields: [],
+      }),
+    );
+
+    const ageField = result.current.coreDisplayFields.find((field) => field.key === "age");
+    expect(ageField).toBeDefined();
+    expect(ageField?.label).toBe("Edad (ultima visita)");
+    expect(ageField?.label).not.toBe("Edad");
+  });
 });
