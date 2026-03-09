@@ -90,6 +90,59 @@ function Invoke-Step {
         [Parameter(Mandatory = $true)][scriptblock]$Action
     )
 
+    function Compare-ConfigWithReference {
+        $configMappings = @(
+            @{ Source = "backend/requirements.txt"; Reference = "requirements.txt" },
+            @{ Source = "package.json"; Reference = "package.json" },
+            @{ Source = "Dockerfile.backend"; Reference = "Dockerfile.backend" },
+            @{ Source = "Dockerfile.frontend"; Reference = "Dockerfile.frontend" },
+            @{ Source = ".env.example"; Reference = ".env.example" }
+        )
+        $referenceDir = Join-Path $repoRoot ".ci-config-reference"
+        if (-not (Test-Path $referenceDir)) {
+            Write-Host "No reference config directory found: $referenceDir. Skipping config sync check."
+            return
+        }
+
+        $missingFiles = @()
+        $differences = @()
+        foreach ($mapping in $configMappings) {
+            $sourcePath = Join-Path $repoRoot $mapping.Source
+            $referencePath = Join-Path $referenceDir $mapping.Reference
+            $hasSource = Test-Path $sourcePath
+            $hasReference = Test-Path $referencePath
+
+            if (-not $hasSource -or -not $hasReference) {
+                if (-not $hasSource) {
+                    $missingFiles += "source:$($mapping.Source)"
+                }
+                if (-not $hasReference) {
+                    $missingFiles += "reference:$($mapping.Reference)"
+                }
+                continue
+            }
+
+            $sourceHash = Get-FileHash $sourcePath | Select-Object -ExpandProperty Hash
+            $referenceHash = Get-FileHash $referencePath | Select-Object -ExpandProperty Hash
+            if ($sourceHash -ne $referenceHash) {
+                $differences += "$($mapping.Source) -> $($mapping.Reference)"
+            }
+        }
+
+        if ($missingFiles.Count -gt 0) {
+            $message = "Config sync guard failed: Missing required config files: $($missingFiles -join ', ')"
+            Write-Error $message
+            throw $message
+        }
+
+        if ($differences.Count -gt 0) {
+            $message = "Config sync guard failed: Config files differ from CI reference: $($differences -join ', ')"
+            Write-Error $message
+            throw $message
+        } else {
+            Write-Host "Config sync guard passed: Local config matches CI reference."
+        }
+    }
     Write-Host "`n==> $Name" -ForegroundColor Cyan
     $global:LASTEXITCODE = 0
     & $Action
