@@ -346,6 +346,40 @@ def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
     assert "Maximum automatic remediation loop: 2 attempts" in pr_router_text
 
 
+def test_commit_automation_and_pre_pr_history_policy_propagates_to_owner_modules() -> None:
+    execution_source = _read_text(
+        REPO_ROOT
+        / "docs"
+        / "projects"
+        / "veterinary-medical-records"
+        / "03-ops"
+        / "plan-execution-protocol.md"
+    )
+    execution_owner = _read_text(
+        REPO_ROOT
+        / "docs"
+        / "agent_router"
+        / "03_SHARED"
+        / "EXECUTION_PROTOCOL"
+        / "50_rollback-governance.md"
+    )
+    wow_source = _read_text(WAY_OF_WORKING)
+    wow_owner = _read_text(
+        REPO_ROOT / "docs" / "agent_router" / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md"
+    )
+
+    assert "### Automation Mode Selection (Mandatory Plan-Start Choice)" in execution_source
+    assert "### Pre-PR Requirements" in execution_source
+    assert "commit automation mode" in execution_source
+
+    assert "Automation Mode Selection (Mandatory Plan-Start Choice)" in execution_owner
+    assert "Pre-PR Requirements" in execution_owner
+
+    assert "### Pre-PR Commit History Review (Hard Rule)" in wow_source
+    assert "review the commit history on the feature branch" in wow_source
+    assert "Pre-PR Commit History Review (Hard Rule)" in wow_owner
+
+
 def test_post_merge_cleanup_requires_remote_branch_deletion() -> None:
     source_text = _read_text(WAY_OF_WORKING)
     shared_pr_router = _read_text(
@@ -383,12 +417,13 @@ def test_commit_confirmation_policy_is_documented_across_general_and_plan_modes(
     )
 
     assert "Agent commit confirmation (hard rule)" in source_text
-    assert "Outside of an active plan with an explicit commit-task (`CT-*`)" in source_text
+    assert "Auto-commit without user confirmation is only permitted" in source_text
+    assert "automation mode is `Semiautomatico` or `Automatico`" in source_text
     assert "wait for explicit confirmation before running `git commit`" in source_text
 
-    assert "explicit commit task (`CT-*`)" in plan_protocol
-    assert "only case where auto-commit without user confirmation is permitted" in plan_protocol
-    assert "may auto-commit only when the active step explicitly defines" in plan_protocol
+    assert "Commit behavior is governed by the plan's automation mode" in plan_protocol
+    assert "`Supervisado` requires explicit user confirmation before each commit" in plan_protocol
+    assert "`Semiautomatico` and `Automatico` permit automatic commits" in plan_protocol
 
 
 def test_owner_entries_track_iteration_4_doc_propagation() -> None:

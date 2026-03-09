@@ -2,7 +2,7 @@
 
 **Status:** Planned
 
-**Plan:** [PLAN_2026-03-07_PROCESSING-HISTORY-UI.md](../plans/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md)
+**Plan:** [PLAN_2026-03-07_PROCESSING-HISTORY-UI.md](../plans/completed/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md)
 
 **User Story**
 As an evaluator, I want to see a clear, informative processing history with state badges, durations, and per-run raw text access so that I can verify the system preserves all processing runs and artifacts end-to-end.
@@ -33,7 +33,7 @@ As an evaluator, I want to see a clear, informative processing history with stat
 
 - Tech: Processing history endpoint contract: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../../02-tech/technical-design.md) Appendix B3.1.
 - Tech: Run artifacts endpoint: [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../../02-tech/technical-design.md) Appendix B3.2.
-- Execution plan: [`docs/projects/veterinary-medical-records/04-delivery/plans/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md`](../plans/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md).
+- Execution plan: [`docs/projects/veterinary-medical-records/04-delivery/plans/completed/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md`](../plans/completed/PLAN_2026-03-07_PROCESSING-HISTORY-UI.md).
 
 **Test Expectations**
 
