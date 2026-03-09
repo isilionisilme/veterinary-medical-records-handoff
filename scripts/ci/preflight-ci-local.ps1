@@ -165,7 +165,7 @@ function Get-ChangedFiles {
 
 function Filter-ChangedFiles {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Files,
+        [Parameter()][AllowEmptyCollection()][string[]]$Files = @(),
         [Parameter(Mandatory = $true)][string[]]$Patterns
     )
 
@@ -182,7 +182,7 @@ function Filter-ChangedFiles {
 
 function Filter-ChangedExtensions {
     param(
-        [Parameter(Mandatory = $true)][string[]]$Files,
+        [Parameter()][AllowEmptyCollection()][string[]]$Files = @(),
         [Parameter(Mandatory = $true)][string[]]$Extensions
     )
 
@@ -260,6 +260,61 @@ function Resolve-NpmCommand {
     }
 
     return "npm"
+}
+
+function Get-ListeningProcessIds {
+    param([Parameter(Mandatory = $true)][int]$Port)
+
+    $listeners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+    if (-not $listeners) {
+        return @()
+    }
+
+    return @($listeners | Select-Object -ExpandProperty OwningProcess -Unique)
+}
+
+function Stop-ManagedPortProcesses {
+    param([Parameter(Mandatory = $true)][int[]]$Ports)
+
+    foreach ($port in $Ports) {
+        foreach ($processId in (Get-ListeningProcessIds -Port $port)) {
+            try {
+                $process = Get-Process -Id $processId -ErrorAction Stop
+            }
+            catch {
+                continue
+            }
+
+            if ($process.ProcessName -in @("python", "node")) {
+                Stop-Process -Id $processId -Force -ErrorAction Stop
+                Write-Host "Stopped lingering $($process.ProcessName) PID $processId on port $port"
+            }
+        }
+    }
+}
+
+function Test-PortAvailable {
+    param([Parameter(Mandatory = $true)][int]$Port)
+
+    return (Get-ListeningProcessIds -Port $Port).Count -eq 0
+}
+
+function Select-LocalE2EPortPair {
+    $candidates = @(
+        @{ Backend = 18000; Frontend = 15173 },
+        @{ Backend = 28000; Frontend = 25173 },
+        @{ Backend = 38000; Frontend = 35173 }
+    )
+
+    foreach ($candidate in $candidates) {
+        if ((Test-PortAvailable -Port $candidate.Backend) -and (Test-PortAvailable -Port $candidate.Frontend)) {
+            return $candidate
+        }
+
+        Write-Host "Skipping occupied local E2E port pair $($candidate.Backend)/$($candidate.Frontend)."
+    }
+
+    throw "Unable to find a clean local E2E port pair. Checked: 18000/15173, 28000/25173, 38000/35173."
 }
 
 $python = Resolve-PythonCommand
@@ -582,8 +637,45 @@ if ($runFrontendFull) {
 
 if ($runE2E) {
     Invoke-Step "Frontend E2E (Playwright)" {
-        Invoke-FrontendCommand {
-            & $npm run test:e2e
+        $selectedPorts = Select-LocalE2EPortPair
+        $runtimeRoot = Join-Path $env:TEMP ("vmr-playwright-e2e-{0}-{1}" -f $PID, $selectedPorts.Backend)
+        $storageRoot = Join-Path $runtimeRoot "storage"
+        $dbPath = Join-Path $runtimeRoot "documents.db"
+
+        New-Item -ItemType Directory -Force -Path $storageRoot | Out-Null
+
+        $previousBackendPort = $env:PLAYWRIGHT_BACKEND_PORT
+        $previousFrontendPort = $env:PLAYWRIGHT_FRONTEND_PORT
+        $previousBackendBaseUrl = $env:PLAYWRIGHT_BACKEND_BASE_URL
+        $previousBaseUrl = $env:PLAYWRIGHT_BASE_URL
+        $previousDbPath = $env:VET_RECORDS_DB_PATH
+        $previousStoragePath = $env:VET_RECORDS_STORAGE_PATH
+        $previousExternalServers = $env:PLAYWRIGHT_EXTERNAL_SERVERS
+
+        $env:PLAYWRIGHT_BACKEND_PORT = "$($selectedPorts.Backend)"
+        $env:PLAYWRIGHT_FRONTEND_PORT = "$($selectedPorts.Frontend)"
+        $env:PLAYWRIGHT_BACKEND_BASE_URL = "http://127.0.0.1:$($selectedPorts.Backend)"
+        $env:PLAYWRIGHT_BASE_URL = "http://127.0.0.1:$($selectedPorts.Frontend)"
+        $env:VET_RECORDS_DB_PATH = $dbPath
+        $env:VET_RECORDS_STORAGE_PATH = $storageRoot
+        $env:PLAYWRIGHT_EXTERNAL_SERVERS = "0"
+
+        Write-Host "Local E2E runtime selected backend port $($selectedPorts.Backend) and frontend port $($selectedPorts.Frontend)."
+
+        try {
+            Invoke-FrontendCommand {
+                & $npm run test:e2e
+            }
+        }
+        finally {
+            $env:PLAYWRIGHT_BACKEND_PORT = $previousBackendPort
+            $env:PLAYWRIGHT_FRONTEND_PORT = $previousFrontendPort
+            $env:PLAYWRIGHT_BACKEND_BASE_URL = $previousBackendBaseUrl
+            $env:PLAYWRIGHT_BASE_URL = $previousBaseUrl
+            $env:VET_RECORDS_DB_PATH = $previousDbPath
+            $env:VET_RECORDS_STORAGE_PATH = $previousStoragePath
+            $env:PLAYWRIGHT_EXTERNAL_SERVERS = $previousExternalServers
+            Stop-ManagedPortProcesses -Ports @($selectedPorts.Backend, $selectedPorts.Frontend)
         }
     }
 }

@@ -352,6 +352,7 @@ jobs:
         env:
           PLAYWRIGHT_EXTERNAL_SERVERS: "1"
           PLAYWRIGHT_BASE_URL: "http://127.0.0.1:5173"
+          PLAYWRIGHT_CI_WORKERS: "12"
         run: npm --prefix frontend run test:e2e
       - name: Upload Playwright report on failure
         if: failure()

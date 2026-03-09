@@ -313,12 +313,12 @@ def test_way_of_working_branch_naming_worktree_prefix_is_propagated() -> None:
     workflow_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "BRANCHING" / "00_entry.md")
 
     required_terms = (
-        "Canonical format:",
-        "codex/<worktree>/<category>/<slug>",
-        "Category-specific branch patterns:",
-        "Legacy format `<worktree>/<category>/<slug>` is temporarily allowed during migration.",
-        "Legacy format `<category>/<slug>` is temporarily allowed during migration.",
-        "Detached HEAD is exempt from this naming convention.",
+        "Branch names must follow category-specific patterns:",
+        "`feature/<ID>-<short-representative-slug>`",
+        "`improvement/<short-slug>`",
+        "This convention removes the `codex/<worktree>/` segment "
+        "and only requires the category pattern:",
+        "Detached HEAD is exempt from this convention.",
     )
 
     for term in required_terms:
@@ -333,17 +333,17 @@ def test_way_of_working_canonical_branch_creation_rules_are_propagated() -> None
     branching_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "BRANCHING" / "00_entry.md")
 
     start_work_terms = (
-        "build `<branch-name>` using the canonical format `codex/<worktree>/<category>/<slug>`",
-        "Derive `worktree` from the current repository top-level folder name",
+        "build `<branch-name>` using the canonical format `<category>/<slug>`",
+        "Category mapping is defined in Section 1.",
         "user story -> `feature`",
         "user-facing improvement -> `improvement`",
         "technical work -> `fix`, `docs`, `chore`, `refactor`, or `ci`",
     )
     branching_terms = (
-        "Creation-time rule:",
-        "During `Starting New Work`, the agent must derive and create branch names "
-        "in canonical format",
-        "category mapping defined in Section 1.",
+        "### Branch Naming Conventions",
+        "Branch names must follow category-specific patterns:",
+        "This convention removes the `codex/<worktree>/` segment "
+        "and only requires the category pattern:",
     )
 
     for term in start_work_terms:

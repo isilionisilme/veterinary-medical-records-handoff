@@ -1,28 +1,54 @@
 import { defineConfig } from "@playwright/test";
+import os from "node:os";
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:5173";
 const useExternalServers = process.env.PLAYWRIGHT_EXTERNAL_SERVERS === "1";
-const workers = process.env.PLAYWRIGHT_WORKERS
-  ? Number(process.env.PLAYWRIGHT_WORKERS)
-  : process.env.CI
-    ? 6
-    : 1;
+const defaultBackendPort = process.env.CI || useExternalServers ? 8000 : 18000;
+const defaultFrontendPort = process.env.CI || useExternalServers ? 5173 : 15173;
+const cpuCount = os.cpus().length;
+const maxWorkers = Math.max(1, cpuCount);
+
+function resolvePort(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function resolveWorkerCount(value: string | undefined): number | undefined {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+const backendPort = resolvePort(process.env.PLAYWRIGHT_BACKEND_PORT, defaultBackendPort);
+const frontendPort = resolvePort(process.env.PLAYWRIGHT_FRONTEND_PORT, defaultFrontendPort);
+const backendBaseURL = process.env.PLAYWRIGHT_BACKEND_BASE_URL || `http://127.0.0.1:${backendPort}`;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${frontendPort}`;
+// Keep local runs fast by default, but avoid oversaturating the machine.
+const localDefaultWorkers = Math.min(12, maxWorkers, Math.max(1, Math.floor(cpuCount * 0.75)));
+const ciDefaultWorkers = Math.min(maxWorkers, 6);
+const requestedWorkers = resolveWorkerCount(process.env.PLAYWRIGHT_WORKERS)
+  ?? (process.env.CI
+    ? resolveWorkerCount(process.env.PLAYWRIGHT_CI_WORKERS) ?? ciDefaultWorkers
+    : localDefaultWorkers);
+const workers = Math.min(maxWorkers, requestedWorkers);
 const webServer = useExternalServers
   ? undefined
   : [
       {
         command:
-          "python -m uvicorn backend.app.main:create_app --factory --host 127.0.0.1 --port 8000",
-        url: "http://127.0.0.1:8000/health",
+          `python -m uvicorn backend.app.main:create_app --factory --host 127.0.0.1 --port ${backendPort}`,
+        url: `${backendBaseURL}/openapi.json`,
         cwd: "..",
         // Backend may already be running (local or CI docker stack).
         reuseExistingServer: true,
         timeout: 120_000,
       },
       {
-        command: "npm run dev -- --host 127.0.0.1 --port 5173",
+        command: `node ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${frontendPort}`,
         url: baseURL,
         cwd: ".",
+        env: {
+          ...process.env,
+          VITE_API_BASE_URL: backendBaseURL,
+        },
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },

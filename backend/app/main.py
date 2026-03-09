@@ -207,14 +207,20 @@ def _get_cors_origins() -> list[str]:
 
     raw = get_settings().vet_records_cors_origins
     if raw is None:
-        return [
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
+        default_origins = [
             "http://localhost",
             "http://127.0.0.1",
             "http://localhost:80",
             "http://127.0.0.1:80",
         ]
+        for port in (5173, 15173, 25173, 35173):
+            default_origins.extend(
+                [
+                    f"http://localhost:{port}",
+                    f"http://127.0.0.1:{port}",
+                ]
+            )
+        return default_origins
     origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
     return origins
 

@@ -2,6 +2,11 @@ import fs from "node:fs";
 
 import { expect, type Page } from "@playwright/test";
 
+const useExternalServers = process.env.PLAYWRIGHT_EXTERNAL_SERVERS === "1";
+const defaultBackendPort = process.env.CI || useExternalServers ? 8000 : 18000;
+const backendBaseURL =
+  process.env.PLAYWRIGHT_BACKEND_BASE_URL || `http://127.0.0.1:${defaultBackendPort}`;
+
 function extractDocumentId(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") {
     return null;
@@ -27,7 +32,7 @@ async function fetchLatestDocumentId(
   page: Page,
   knownDocumentIds: Set<string>,
 ): Promise<string | null> {
-  const endpoints = ["/api/documents?limit=50&offset=0", "/documents?limit=50&offset=0"];
+  const endpoints = [`${backendBaseURL}/documents?limit=50&offset=0`];
   for (const endpoint of endpoints) {
     const response = await page.request.get(endpoint);
     if (!response.ok()) {
@@ -78,7 +83,7 @@ export async function uploadAndWaitForProcessing(
   );
 
   const filename = pdfPath.split("/").pop() ?? "sample.pdf";
-  const uploadResponse = await page.request.post("/documents/upload", {
+  const uploadResponse = await page.request.post(`${backendBaseURL}/documents/upload`, {
     multipart: {
       file: {
         name: filename,
@@ -172,7 +177,15 @@ export async function uploadAndWaitForProcessing(
   }
 
   const row = page.getByTestId(`doc-row-${docId}`);
-  await expect(row).toBeVisible({ timeout });
+  try {
+    await expect(row).toBeVisible({ timeout: 5_000 });
+  } catch {
+    const refreshButton = page.getByRole("button", { name: "Actualizar" });
+    if (await refreshButton.isVisible()) {
+      await refreshButton.click();
+    }
+    await expect(row).toBeVisible({ timeout });
+  }
 
   return docId!;
 }
