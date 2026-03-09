@@ -2,15 +2,15 @@
 
 > **ARCH origin:** `ARCH-01` — [arch-01-decompose-review-service.md](../../Backlog/arch-01-decompose-review-service.md)
 > **Related plans (series):**
-> - **Current:** `PLAN_2026-03-09_ARCH-01-PR1-PROJECTOR-AGE.md`
-> - [PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md](PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md)
-> - [PLAN_2026-03-09_ARCH-01-PR3-PARSER-CLASSIFIER.md](PLAN_2026-03-09_ARCH-01-PR3-PARSER-CLASSIFIER.md)
+> - **Archived as:** `COMPLETED_2026-03-09_ARCH-01-PR1-PROJECTOR-AGE.md`
+> - [PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md](../PLAN_2026-03-09_ARCH-01-DECOMPOSITION-PR-SERIES/PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md)
+> - [PLAN_2026-03-09_ARCH-01-PR3-PARSER-CLASSIFIER.md](../PLAN_2026-03-09_ARCH-01-DECOMPOSITION-PR-SERIES/PLAN_2026-03-09_ARCH-01-PR3-PARSER-CLASSIFIER.md)
 
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for execution protocol, hard-gates, and handoff behavior.
 
 **Backlog item:** [arch-01-decompose-review-service.md](../../Backlog/arch-01-decompose-review-service.md)
 **Branch:** `refactor/arch-01-pr1-projector-age`
-**PR:** Pending (PR created on explicit user request)
+**PR:** [#254](https://github.com/isilionisilme/veterinary-medical-records/pull/254) — `refactor: extract review projector and age normalizer`
 **User Story:** N/A (Architecture improvement ARCH-01, PR 1 of 3)
 **Prerequisite:** ARCH-03 completed, or explicit user approval to proceed with temporary local-only complexity checks
 **Worktree:** `C:/Users/ferna/.codex/worktrees/c691/veterinary-medical-records`
@@ -132,7 +132,7 @@ Decision record:
 
 - [x] S4-A 🔄 `[GPT-4.1]` — Complete mandatory documentation task: `no-doc-needed` (internal refactor, no new long-lived rules) or update architecture notes if needed.
 - [x] S4-B 🔄 `[GPT-4.1]` — Record completion evidence in this plan (LOC/CC checks, test outcomes).
-- [ ] S4-C 🚧 — Hard-gate: user validates results and authorizes PR creation.
+- [x] S4-C 🚧 — Hard-gate: user validated results and authorized PR creation; PR #254 opened.
 
 ---
 
@@ -348,7 +348,7 @@ Remind user: after PR-1 merge, PR-2 (VisitAssignmentEngine) is next.
 
 ## Active Prompt
 
-Pending user activation.
+Completed and archived on 2026-03-09.
 
 ---
 
@@ -368,6 +368,7 @@ _Section for recording step completion evidence per protocol §8 EVIDENCE BLOCK.
    - `S2-A` through `S2-C`
    - `S3-A` through `S3-D`
    - `S4-A` through `S4-B`
+   - `S4-C`
 - Local validation evidence:
    - Baseline reviewed from original `review_service.py` hotspot scope: projector + age functions isolated as PR-1 extraction targets; user go/no-go for implementation granted before Phase 2
    - Extracted modules present: `backend/app/application/documents/review_payload_projector.py` (174 LOC), `backend/app/application/documents/age_normalizer.py` (211 LOC)
@@ -380,6 +381,8 @@ _Section for recording step completion evidence per protocol §8 EVIDENCE BLOCK.
    - Public API unchanged at `review_service.py` boundary: `get_document_review`, `mark_document_reviewed`, `reopen_document_review`
    - `scripts/ci/test-L3.ps1 -BaseRef main` passed on the backend-only slice: `827 passed, 2 xfailed`, total coverage `91.23%`, `preflight-ci-local: PASS`
    - Docs/contract drift was split into a separate branch so PR-1 remains backend-focused
+   - User validated the PR-1 outcome and explicitly authorized PR creation on 2026-03-09
+   - PR opened: [#254](https://github.com/isilionisilme/veterinary-medical-records/pull/254) — `refactor: extract review projector and age normalizer`
 
 ---
 
