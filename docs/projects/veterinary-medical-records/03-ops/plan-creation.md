@@ -19,7 +19,8 @@ Create a plan when work requires coordinated multi-step delivery, multiple check
 
 - Plan folder naming convention: `PLAN_<YYYY-MM-DD>_<SLUG>`
 - Active plan location: `docs/projects/veterinary-medical-records/04-delivery/plans/<plan-folder>/`
-- Canonical root file inside the plan folder: `PLAN_MASTER.md`
+- Canonical root file inside the plan folder: `PLAN_<YYYY-MM-DD>_<SLUG>.md` (must match the folder name)
+- Legacy compatibility: plans that still use the legacy root-file naming remain readable during the transition period. New plans MUST use the folder-matching name.
 - Optional per-PR annex files: `PR-1.md`, `PR-2.md`, ...
 - Completed plans location: `docs/projects/veterinary-medical-records/04-delivery/plans/completed/<plan-folder>/`
 
@@ -28,7 +29,7 @@ Create a plan when work requires coordinated multi-step delivery, multiple check
 Every new plan MUST include:
 
 1. Create plan folder: `plans/<plan-folder>/`.
-2. Create root file: `plans/<plan-folder>/PLAN_MASTER.md`.
+2. Create root file: `plans/<plan-folder>/PLAN_<YYYY-MM-DD>_<SLUG>.md` (matching the folder name).
 3. Title: `# Plan: <name>`
 4. Operational rules pointer: `> **Operational rules:** See [plan-execution-protocol.md](...)`
 5. Metadata:
@@ -55,9 +56,9 @@ Optional sections:
 - `## Risks and limitations`
 
 When `## PR Roadmap` is present:
-- The section lives in `PLAN_MASTER.md`.
+- The section lives in the plan root file.
 - Each phase and each execution-status step must include a `**[PR-X]**` tag.
-- If a PR requires implementation detail that would bloat `PLAN_MASTER.md`, create/update `PR-X.md` annex files in the same folder and link them from the roadmap.
+- If a PR requires implementation detail that would bloat the plan root file, create/update `PR-X.md` annex files in the same folder and link them from the roadmap.
 
 ### Plan-start requirement
 

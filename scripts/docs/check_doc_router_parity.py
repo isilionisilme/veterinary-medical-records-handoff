@@ -6,6 +6,8 @@ Updated in PR-154 CI remediation to align doc/test sync required guard touches.
 Updated in PR-221 split follow-up to keep implementation-plan propagation changes in sync.
 Updated in PR-229 follow-up to keep implementation-plan completed-plan propagation in sync.
 Updated in PR-238 follow-up to satisfy implementation-plan doc/test sync guard coverage.
+Updated in IMP-05 follow-up to keep implementation-plan status
+propagation aligned with owner-router parity checks.
 """
 
 from __future__ import annotations

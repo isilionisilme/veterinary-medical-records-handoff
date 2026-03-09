@@ -44,7 +44,7 @@ Before executing the first step of a plan, the agent must ask the user where to 
   1. Use one of the listed existing worktrees.
   2. Create a new worktree (user chooses path and base branch, unless explicitly delegated).
 - Do not start step 1 until the user explicitly selects one option.
-- Record the selected execution worktree path in the active plan source file (`PLAN_MASTER.md` for new plans; `PLAN_*.md` for legacy plans).
+- Record the selected execution worktree path in the active plan source file (`PLAN_<date>_<slug>.md` for new plans; legacy root-file names remain accepted during transition).
 - All plan execution commands and file edits must stay within the selected worktree.
 
 ### CI Execution Mode (Mandatory Plan-Start Choice)
@@ -57,7 +57,7 @@ Before executing the first step of a plan, the agent must offer the user exactly
 
 **Mandatory behavior:**
 - Ask the user to choose one mode before step 1 starts.
-- Record the selected mode in the active plan source file (`PLAN_MASTER.md` for new plans; `PLAN_*.md` for legacy plans).
+- Record the selected mode in the active plan source file (`PLAN_<date>_<slug>.md` for new plans; legacy root-file names remain accepted during transition).
 - If the user does not choose, default to **Mode 2 (Pipeline depth-1 gate)**.
 - The selected mode applies to the full plan unless the user explicitly changes it.
 - Hard-gates (🚧), inter-agent handoffs, and merge readiness still require CI green.

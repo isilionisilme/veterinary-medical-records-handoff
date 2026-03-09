@@ -30,7 +30,7 @@
     },
     {
       "doc_glob": "docs/agent_router/**/*.md",
-      "description": "Router workflow changes must keep router/doc-updates contract tests aligned.",
+      "description": "Router workflow changes, including propagated plan-root naming rules, must keep router/doc-updates contract tests aligned.",
       "rule_change_only": true,
       "owner_any": [
         "docs/agent_router/**/*.md"
@@ -100,7 +100,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL changes (including user-triggered PR opening policy) require EXECUTION_PROTOCOL router parity propagation and doc-updates guard alignment.",
+      "description": "Project PLAN_EXECUTION_PROTOCOL changes, including folder-matching plan-root naming and legacy root-file compatibility, require EXECUTION_PROTOCOL router parity propagation and doc-updates guard alignment.",
       "required_any": [
         "scripts/docs/generate-router-files.py",
         "backend/tests/unit/test_doc_updates_contract.py",
@@ -124,7 +124,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
-      "description": "Project PLAN_MANAGEMENT changes require project owner routing parity and doc-updates guard alignment.",
+      "description": "Project PLAN_MANAGEMENT changes, including folder-matching plan-root naming, require project owner routing parity and doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",

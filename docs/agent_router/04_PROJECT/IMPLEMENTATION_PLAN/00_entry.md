@@ -92,4 +92,5 @@ Start with `AGENTS.md` (repo root) and `docs/agent_router/00_AUTHORITY.md` for i
 
 ### Operational governance improvements (2026-03-08)
 - Source implementation plan now includes non-user-facing IMP items (`IMP-01` through `IMP-05`) under Release 17.
+- `IMP-05` is now marked implemented in the source implementation plan and backlog item.
 - Story and improvement specifications now live in `docs/projects/veterinary-medical-records/04-delivery/Backlog/`, with `implementation-plan.md` reduced to release sequencing plus backlog links.

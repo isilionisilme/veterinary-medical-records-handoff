@@ -1,6 +1,6 @@
 # IMP-05 — Plan Root File Naming Alignment
 
-**Status:** Planned
+**Status:** Implemented
 
 **Type:** Technical Improvement (non-user-facing)
 

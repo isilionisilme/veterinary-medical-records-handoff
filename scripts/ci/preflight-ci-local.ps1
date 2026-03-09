@@ -66,7 +66,12 @@ function Get-ChangedFiles {
         }
     }
 
-    return @($set | Sort-Object)
+    $files = @($set | Sort-Object)
+    if ($null -eq $files) {
+        return @()
+    }
+
+    return $files
 }
 
 function Filter-ChangedFiles {
@@ -175,7 +180,7 @@ if ($All.IsPresent) {
     $Mode = "Full"
 }
 
-$changedFiles = Get-ChangedFiles -BaseRefValue $BaseRef
+$changedFiles = @(Get-ChangedFiles -BaseRefValue $BaseRef)
 
 Write-Host "preflight-ci-local: mode=$Mode base-ref=$BaseRef"
 if ($changedFiles.Count -eq 0) {

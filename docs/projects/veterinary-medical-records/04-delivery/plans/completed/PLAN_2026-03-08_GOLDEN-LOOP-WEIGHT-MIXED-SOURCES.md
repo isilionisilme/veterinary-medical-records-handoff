@@ -71,20 +71,20 @@ Estado actual observado en `main`:
 
 ### Phase 1 - Rule hardening (logic)
 
-- [ ] P1-A 🔄 - Implementar criterio de desempate determinista para pesos en misma `visit_date` (priorizar evidencia mas tardia/actualizada; fallback estable por orden de visita/campo).
-- [ ] P1-B 🔄 - Mantener precedencia de visita sobre peso global cuando ambas fuentes coexisten en el mismo payload.
+- [x] P1-A 🔄 - Implementar criterio de desempate determinista para pesos en misma `visit_date` (priorizar evidencia mas tardia/actualizada; fallback estable por orden de visita/campo). — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
+- [x] P1-B 🔄 - Mantener precedencia de visita sobre peso global cuando ambas fuentes coexisten en el mismo payload. — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
 
 ### Phase 2 - Test coverage expansion
 
-- [ ] P2-A 🔄 - Añadir test de integracion: `weight` mixto global+visita debe derivar valor de visita.
-- [ ] P2-B 🔄 - Añadir test de integracion: misma `visit_date` con varios pesos debe elegir ganador determinista (ultima evidencia).
-- [ ] P2-C 🔄 - Ejecutar subset focalizado de tests de review y confirmar no regresiones.
+- [x] P2-A 🔄 - Añadir test de integracion: `weight` mixto global+visita debe derivar valor de visita. — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
+- [x] P2-B 🔄 - Añadir test de integracion: misma `visit_date` con varios pesos debe elegir ganador determinista (ultima evidencia). — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
+- [x] P2-C 🔄 - Ejecutar subset focalizado de tests de review y confirmar no regresiones. — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
 
 ### Phase 3 - Validation & closure
 
-- [ ] P3-A 🚧 - Hard-gate: validacion de usuario sobre el criterio "mas actualizado" y resultados en payload final.
-- [ ] P3-B 🔄 - Preparar evidencia final para PR (casos cubiertos, before/after, comandos de test).
-- [ ] P3-C 🚧 - Documentacion wiki: actualizar documentacion tecnica o cerrar con `no-doc-needed` justificado.
+- [x] P3-A 🚧 - Hard-gate: validacion de usuario sobre el criterio "mas actualizado" y resultados en payload final. — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
+- [x] P3-B 🔄 - Preparar evidencia final para PR (casos cubiertos, before/after, comandos de test). — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
+- [x] P3-C 🚧 - Documentacion wiki: actualizar documentacion tecnica o cerrar con `no-doc-needed` justificado. — ✅ `no-commit (user-directed close-out reconciliation 2026-03-09)`
 
 ---
 

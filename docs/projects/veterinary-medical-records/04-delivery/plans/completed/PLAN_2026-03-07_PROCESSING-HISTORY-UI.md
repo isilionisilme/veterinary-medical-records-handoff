@@ -133,21 +133,21 @@ This feature showcases:
 
 | Step | Description | Status |
 |------|-------------|--------|
-| P0-A | Snapshot baseline E2E | [ ] |
-| P0-B | Extract ProcessingHistorySection | [ ] |
-| P0-C | Verify no visual regression | [ ] |
-| P1-A | State badges per run | [ ] |
-| P1-B | "Latest" label on newest run | [ ] |
-| P1-C | Run-level total duration | [ ] |
-| P1-D | Reverse run order (latest first) | [ ] |
-| P2-A | "Ver texto extraído" button | [ ] |
-| P2-B | Fetch + display per-run raw text | [ ] |
-| P2-C | Loading/error states | [ ] |
-| P3-A | Unit tests for ProcessingHistorySection | [ ] |
-| P3-B | E2E test: multi-run visibility | [ ] |
-| P3-C | Full E2E suite green | [ ] |
-| P3-D | 🚧 User review / demo | [ ] |
-| P3-E | 🚧 Documentación wiki / no-doc-needed | [ ] |
+| P0-A | Snapshot baseline E2E | [x] |
+| P0-B | Extract ProcessingHistorySection | [x] |
+| P0-C | Verify no visual regression | [x] |
+| P1-A | State badges per run | [x] |
+| P1-B | "Latest" label on newest run | [x] |
+| P1-C | Run-level total duration | [x] |
+| P1-D | Reverse run order (latest first) | [x] |
+| P2-A | "Ver texto extraído" button | [x] |
+| P2-B | Fetch + display per-run raw text | [x] |
+| P2-C | Loading/error states | [x] |
+| P3-A | Unit tests for ProcessingHistorySection | [x] |
+| P3-B | E2E test: multi-run visibility | [x] |
+| P3-C | Full E2E suite green | [x] |
+| P3-D | 🚧 User review / demo | [x] |
+| P3-E | 🚧 Documentación wiki / no-doc-needed | [x] |
 
 ---
 

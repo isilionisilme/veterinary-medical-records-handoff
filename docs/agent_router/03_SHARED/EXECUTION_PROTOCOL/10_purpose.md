@@ -24,13 +24,13 @@ docs/projects/veterinary-medical-records/03-ops/
 
 docs/projects/veterinary-medical-records/04-delivery/plans/
 ├── PLAN_<date>_<slug>/             ← Active plan folder
-│   ├── PLAN_MASTER.md              ← Active plan source of truth
+│   ├── PLAN_<date>_<slug>.md       ← Active plan source of truth (matches folder name)
 │   └── PR-*.md                     ← Optional per-PR annex
 └── completed/
     └── PLAN_<date>_<slug>/         ← Completed plan folder (same file names)
 ```
 
-**Active plan file:** For new plans, the agent attaches `plans/<plan-folder>/PLAN_MASTER.md` when executing a continuation-intent request (for example: "continue", "go", "let's go", "proceed", "resume").
+**Active plan file:** For new plans, the agent attaches `plans/<plan-folder>/PLAN_<date>_<slug>.md` (matching the folder name) when executing a continuation-intent request (for example: "continue", "go", "let's go", "proceed", "resume").
 For legacy plans, `PLAN_*.md` remains accepted during transition.
 The active plan source file contains: Execution Status (checkboxes), Prompt Queue, Active Prompt, and iteration-specific context.
 
