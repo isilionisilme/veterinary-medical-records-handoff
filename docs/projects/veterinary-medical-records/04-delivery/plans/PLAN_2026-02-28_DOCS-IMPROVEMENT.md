@@ -6,10 +6,18 @@
 **PR:** [#154](https://github.com/isilionisilme/veterinary-medical-records/pull/154)
 **User Story:** [US-67](../implementation-plan.md)
 **Prerequisite:** Iteration 12 merged to `main`.
-**Worktree:** `D:/Git/veterinary-medical-records` (default — single worktree)
+**Worktree:** `8420/veterinary-medical-records`
 **CI Mode:** Pipeline depth-1 gate (mode 2, default)
 **Agents:** Planning agent + Execution agent
 **Automation Mode:** Supervisado
+
+---
+
+## Agent Instructions
+
+1. **En cuanto termines una tarea, márcala como completada en el plan** (checkbox `[x]` inmediato, sin esperar lote).
+2. **Cuando llegues a una sugerencia de commit, lanza los tests L2** (`scripts/ci/test-L2.ps1`). Si no funcionan, repáralos. Cuando L2 esté verde, espera instrucciones del usuario.
+3. **No hagas commit ni push sin aprobación** explícita del usuario.
 
 ## Objective
 
@@ -138,7 +146,7 @@ The project's canonical documentation (`docs/projects/veterinary-medical-records
 
 ### Closure
 
-- [ ] D9-A 🚧 — Final smoke review and acceptance decision for merge readiness · skill: `microsoft-wiki-qa` (Planning agent)
+- [ ] D9-A 🚧 — Final smoke review and acceptance criteria verification · skill: `microsoft-wiki-qa` (Planning agent)
 - [ ] D9-B 🚧 — Documentacion wiki: publicar actualizaciones o cerrar con `no-doc-needed` justificado (Planning agent)
 
 ---

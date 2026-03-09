@@ -349,6 +349,12 @@ if ($runDocs) {
     }
 }
 
+if ($Mode -eq "Push" -or $Mode -eq "Full") {
+    Invoke-Step "Plan execution guard" {
+        & $python "scripts/ci/check_plan_execution_guard.py"
+    }
+}
+
 if ($runBackendQuick) {
     $backendPythonFiles = Filter-ChangedExtensions -Files $backendChangedFiles -Extensions @(".py")
     if ($backendPythonFiles.Count -gt 0) {

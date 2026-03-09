@@ -26,6 +26,10 @@ Start with `AGENTS.md` (repo root) and `docs/agent_router/00_AUTHORITY.md` for i
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/135_release-12-additional-formats-ocr.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/136_release-13-schema-evolution-isolated-reviewer-workflows.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/137_release-14-research-operational-readiness.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/138_release-15-extraction-field-expansion-golden-loops.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/139_release-16-multi-visit-detection-per-visit-extraction.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/140_release-17-engineering-quality-project-governance.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/141_release-18-frontend-observability-for-evaluators.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/150_us-01-upload-document.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/160_us-02-view-document-status.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/170_us-03-download-preview-original-document.md`
@@ -68,6 +72,24 @@ Start with `AGENTS.md` (repo root) and `docs/agent_router/00_AUTHORITY.md` for i
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/361_us-56-externalize-ui-texts-to-editable-files.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/362_us-57-research-field-standardization.md`
 - `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/363_us-58-define-production-db-reset-policy.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/364_us-61-extract-patient-date-of-birth-accurately.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/365_us-62-extract-patient-microchip-number-accurately.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/366_us-63-extract-owner-address-without-confusing-it-with-clinic-address.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/367_us-64-detect-all-visits-even-without-explicit-date-fields.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/368_us-65-view-clinical-data-assigned-to-each-specific-visit.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/369_us-66-diagnose-visit-to-data-assignment-problems-conditional.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/370_us-67-auditable-navigable-consistent-project-documentation.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/371_us-68-identify-source-worktree-of-each-branch.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/372_us-69-extract-pet-name-accurately.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/373_us-70-extract-clinic-name-accurately.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/374_us-71-extract-clinic-address-accurately.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/375_us-72-complete-clinic-address-from-name-and-vice-versa.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/376_us-73-modular-architecture-and-maintainable-code.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/377_us-74-automated-test-and-e2e-coverage-in-ci.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/378_us-75-production-security-performance-and-resilience.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/379_us-76-functional-l1-l2-l3-local-validation-pipeline-on-windows.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/380_us-77-canonical-documentation-source-of-truth-with-automatic-derivation.md`
+- `docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/381_us-78-enhanced-processing-history-ui-for-evaluator-observability.md`
 
 ## Propagated updates
 - Story status propagation requires `**Status**: Implemented (YYYY-MM-DD)` updates in the implementation plan when explicitly requested.

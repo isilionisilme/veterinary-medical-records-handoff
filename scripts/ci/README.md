@@ -17,6 +17,49 @@ Scripts de preflight local y hooks de Git.
 | `install-pre-commit-hook.ps1` | Instala `.githooks/pre-commit` en `.git/hooks/pre-commit` (usa L1). |
 | `install-pre-push-hook.ps1` | Instala `.githooks/pre-push` en `.git/hooks/pre-push` (usa L2). |
 | `validate-branch-name.ps1` | Valida formato de rama (`codex/<worktree>/<category>/<slug>`; permite legacy con warning). |
+| `check_plan_execution_guard.py` | Valida invariantes del plan activo por rama (resolucion de plan activo, `Execution Status`, estados activos y lock semantics). |
+| `plan-close-step.ps1` | Cierra un step `IN PROGRESS` de un plan de forma determinista y exige evidencia antes del cierre. |
+
+## Guard de ejecucion de plan
+
+Script: `scripts/ci/check_plan_execution_guard.py`
+
+Que valida:
+- Resolucion determinista de plan activo por branch (`PLAN_*.md` fuera de `completed/`).
+- `## Execution Status` presente en plan activo.
+- Maximo un step activo (`IN PROGRESS` o `STEP LOCKED`).
+- No coexistencia de `STEP LOCKED` con `IN PROGRESS`.
+
+Ejecucion manual:
+
+```powershell
+python scripts/ci/check_plan_execution_guard.py
+python scripts/ci/check_plan_execution_guard.py --branch "codex/veterinary-medical-records/docs/imp-03-plan-execution-guard"
+python scripts/ci/check_plan_execution_guard.py --branch "my-branch" --plan-root "docs/projects/veterinary-medical-records/04-delivery/plans"
+```
+
+Exit codes:
+- `0`: PASS (incluye modo no-plan: sin plan activo para la branch).
+- `1`: FAIL (ambiguedad o invariante violado).
+
+Integracion:
+- Local: se ejecuta en `preflight-ci-local.ps1` en modos `Push` y `Full`.
+- CI: job `plan_execution_guard` en `.github/workflows/ci.yml` para eventos `pull_request`.
+
+## Helper de cierre de step
+
+Script: `scripts/ci/plan-close-step.ps1`
+
+Que hace:
+- Busca el step por `StepId` en estado `- [ ] ... IN PROGRESS`.
+- Valida evidencia en lineas siguientes (por ejemplo linea con `✅`) antes de cerrar.
+- Cierra step (`- [x]`) y elimina label `IN PROGRESS`.
+
+Uso:
+
+```powershell
+./scripts/ci/plan-close-step.ps1 -PlanPath "docs/projects/veterinary-medical-records/04-delivery/plans/PLAN_2026-03-09_IMP-03-PLAN-EXECUTION-GUARD.md" -StepId "P1-A"
+```
 
 ## Notas rápidas
 

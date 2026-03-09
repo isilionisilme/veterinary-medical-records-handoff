@@ -160,6 +160,22 @@ jobs:
         run: |
           python scripts/docs/generate-router-files.py --check
 
+  plan_execution_guard:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run plan execution guard
+        run: |
+          python scripts/ci/check_plan_execution_guard.py --branch "${{ github.head_ref }}"
+
   brand_guard:
     needs: changes
     if: github.event_name == 'pull_request' && needs.changes.outputs.frontend == 'true'

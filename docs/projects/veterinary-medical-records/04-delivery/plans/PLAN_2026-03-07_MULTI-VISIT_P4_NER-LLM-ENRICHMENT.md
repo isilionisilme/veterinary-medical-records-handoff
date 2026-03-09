@@ -5,11 +5,20 @@
 **Branch:** pendiente
 **PR:** pendiente
 **Prerequisite:** `main` con Plan 2 (observations/actions) y Plan 3 (metricas de cobertura) mergeados.
+**Backlog item:** N/A (conditional spike; tracked via multi-visit macro-plan)
 **Worktree:** `d:/Git/veterinary-medical-records-golden-loop`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)
 **Agents:** pendiente de seleccion explicita del usuario antes de Step 1
 **Automation Mode:** `Supervisado` (default hasta seleccion explicita del usuario)
 **Iteration:** 26 (propuesta)
+
+---
+
+## Agent Instructions
+
+1. **En cuanto termines una tarea, márcala como completada en el plan** (checkbox `[x]` inmediato, sin esperar lote).
+2. **Cuando llegues a una sugerencia de commit, lanza los tests L2** (`scripts/ci/test-L2.ps1`). Si no funcionan, repáralos. Cuando L2 esté verde, espera instrucciones del usuario.
+3. **No hagas commit ni push sin aprobación** explícita del usuario.
 
 ---
 

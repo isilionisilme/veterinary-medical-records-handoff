@@ -361,7 +361,7 @@ def test_pull_request_procedure_ai_automation_clauses_are_propagated() -> None:
     workflow_doc = _read_text(ROUTER_ROOT / "01_WORKFLOW" / "PULL_REQUESTS" / "00_entry.md")
 
     required_terms = (
-        "When an AI coding assistant or automation tool creates or updates a Pull Request",
+        "When the user explicitly requests Pull Request creation or update",
         "After a Pull Request is merged into `main`, "
         "the AI assistant must run this cleanup automatically",
     )

@@ -25,6 +25,7 @@ These rules are enforced at plan creation time. The execution agent validates ov
   - `Semiautomatico`: may be executed automatically.
   - `Automatico`: may be executed automatically.
 - `push`: always manual/user-triggered in all modes.
+- Pull Request creation/update: always manual/user-triggered.
 - Merge: always explicit user approval.
 
 ### Pull Request progress tracking (conditional)
@@ -33,6 +34,10 @@ If a PR already exists and the user requested update in this step, reflect compl
 ### PR traceability in plan metadata (mandatory)
 
 When a PR is created for the plan branch, the execution agent MUST update the `**PR:**` field in the plan file with the actual PR link (e.g., `[#220](https://github.com/…/pull/220)`) in the same commit or the immediately following plan-update commit. A plan with a merged or open PR whose `**PR:**` field still shows the placeholder text is a compliance failure.
+
+### Pre-PR Requirements
+
+Before opening or updating a PR, the pre-PR commit history review hard rule defined in [way-of-working.md §5](../../shared/03-ops/way-of-working.md#5-pull-request-workflow) must be satisfied.
 
 ### Execution Worktree Selection (Mandatory Plan-Start Choice)
 
@@ -63,5 +68,23 @@ Before executing the first step of a plan, the agent must offer the user exactly
 - Hard-gates (🚧), inter-agent handoffs, and merge readiness still require CI green.
 - Local tests are necessary but NOT sufficient. If a required CI gate is red, the agent must diagnose, attempt focused fixes, and rerun CI (max 2 attempts) before asking the user for guidance.
 - Mode 2 operational flow and edge cases are defined in **Section 8 — CI Mode 2 — Pipeline Execution (Depth-1)**.
+
+### Automation Mode Selection (Mandatory Plan-Start Choice)
+
+Before executing the first step of a plan, the agent must ask the user to select the commit automation mode.
+
+**Options:**
+1. **Supervisado** — Explicit user confirmation required before each commit.
+2. **Semiautomatico** — Automatic commits permitted, scoped to the active step.
+3. **Automatico** — Automatic commits permitted across the full plan scope.
+
+**Mandatory behavior:**
+- Ask the user to choose one mode before step 1 starts.
+- If the interaction environment does not support option selectors, present the options as numbered text and accept the user's text reply.
+- Record the selected mode in the active plan source file (`PLAN_<date>_<slug>.md`).
+- Record format: `**Automation Mode:** <selected-mode>`
+- If the user does not choose, default to **Supervisado**.
+- The selected mode applies to the full plan unless the user explicitly changes it.
+- Mode behavior: see "Git policy by automation mode" above in this section.
 
 ---
