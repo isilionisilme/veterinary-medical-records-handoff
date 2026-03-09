@@ -321,7 +321,7 @@ def apply_interpretation_edits(
             created_at=now_iso,
         )
 
-    from backend.app.application.documents.review_service import (
+    from backend.app.application.documents.review_payload_projector import (
         _normalize_review_interpretation_data,
     )
 

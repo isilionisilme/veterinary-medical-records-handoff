@@ -20,6 +20,9 @@ from backend.app.application.documents.query_service import (
     get_processing_history,
     list_documents,
 )
+from backend.app.application.documents.review_payload_projector import (
+    _project_review_payload_to_canonical,
+)
 from backend.app.application.documents.review_service import (
     ActiveInterpretationReview,
     DocumentReview,
@@ -27,7 +30,6 @@ from backend.app.application.documents.review_service import (
     LatestCompletedRunReview,
     RawTextArtifactAvailability,
     ReviewToggleResult,
-    _project_review_payload_to_canonical,
     get_document_review,
     mark_document_reviewed,
     reopen_document_review,
