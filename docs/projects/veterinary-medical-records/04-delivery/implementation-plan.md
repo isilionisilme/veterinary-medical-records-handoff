@@ -80,11 +80,11 @@ last-updated: 2026-03-08
     - [User Stories (in order)](#user-stories-in-order-13)
   - [Release 15 — Extraction field expansion (golden loops)](#release-15--extraction-field-expansion-golden-loops)
     - [Goal](#goal-14)
-    - [Scope](#scope-15a)
+    - [Scope](#scope-15)
     - [User Stories (in order)](#user-stories-in-order-14)
   - [Release 16 — Multi-visit detection & per-visit extraction](#release-16--multi-visit-detection--per-visit-extraction)
     - [Goal](#goal-15)
-    - [Scope](#scope-16a)
+    - [Scope](#scope-16)
     - [User Stories (in order)](#user-stories-in-order-15)
   - [Release 17 — Engineering quality & project governance](#release-17--engineering-quality--project-governance)
     - [Goal](#goal-16)
@@ -94,6 +94,18 @@ last-updated: 2026-03-08
     - [Goal](#goal-17)
     - [Scope](#scope-18)
     - [User Stories (in order)](#user-stories-in-order-17)
+  - [Release 19 — Critical architecture remediation](#release-19--critical-architecture-remediation)
+    - [Goal](#goal-18)
+    - [Scope](#scope-19)
+    - [Items (in order)](#items-in-order)
+  - [Release 20 — Architecture hardening](#release-20--architecture-hardening)
+    - [Goal](#goal-19)
+    - [Scope](#scope-20)
+    - [Items (in order)](#items-in-order-1)
+  - [Release 21 — Architecture polish & operational maturity](#release-21--architecture-polish--operational-maturity)
+    - [Goal](#goal-20)
+    - [Scope](#scope-21)
+    - [Items (in order)](#items-in-order-2)
 - [Backlog Index](Backlog/README.md)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -103,10 +115,10 @@ This document is intended to provide structured context to an AI Coding Assistan
 The version of this document written for evaluators and reviewers is available here:
 https://docs.google.com/document/d/1b1rvBJu9bGjv8Z42OdDz9qwjecbqDbpilkn0KkYuD-M
 
-Reading order, document authority, and precedence rules are defined in [`docs/README.md`](../README.md).
+Reading order, document authority, and precedence rules are defined in [`docs/README.md`](../../../README.md).
 If any conflict is detected, **STOP and ask before proceeding**.
 
-# Introduction 
+# Introduction
 
 ## Purpose
 
@@ -124,7 +136,7 @@ This document does **not** define:
 - cross-cutting implementation principles,
 - backend/frontend implementation details.
 
-Those are defined in their respective authoritative documents as described in [`docs/README.md`](../README.md).
+Those are defined in their respective authoritative documents as described in [`docs/README.md`](../../../README.md).
 
 Features or behaviors not explicitly listed here are not part of this plan.
 
@@ -133,7 +145,7 @@ Features or behaviors not explicitly listed here are not part of this plan.
 ## How to use this document
 
 The AI Coding Assistant must:
-- enter via [`AGENTS.md`](../../AGENTS.md) and load only the router module(s) relevant to the current task/story,
+- enter via [`AGENTS.md`](../../../../AGENTS.md) and load only the router module(s) relevant to the current task/story,
 - implement user stories **strictly in the order defined here**,
 - treat the acceptance criteria in the linked backlog item files as **exit conditions**, not suggestions.
 
@@ -156,7 +168,7 @@ This plan MUST NOT specify or restate cross-cutting technical contracts, even as
 - library/framework choices, module structure, or code patterns.
 
 If a story depends on any of the above, it MUST include an **Authoritative References** section naming the canonical doc and section (e.g. "TECHNICAL_DESIGN Appendix B3").
-At execution time, the agent MUST NOT open those canonical docs directly; instead, enter via [`AGENTS.md`](../../AGENTS.md) and load only the router module that covers the needed section.
+At execution time, the agent MUST NOT open those canonical docs directly; instead, enter via [`AGENTS.md`](../../../../AGENTS.md) and load only the router module that covers the needed section.
 
 ---
 
@@ -213,7 +225,7 @@ Automatically process uploaded **PDF** documents in a **non-blocking** way, with
 - Append-only processing history
 
 ### Format support note
-Supported upload types are defined by [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](technical-design.md) Appendix B3. DOCX and image format expansion are sequenced as the final stories (US-19 and US-20).
+Supported upload types are defined by [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](../02-tech/technical-design.md) Appendix B3. DOCX and image format expansion are sequenced as the final stories (US-19 and US-20).
 
 ### User Stories (in order)
 - [US-05 — Process document](Backlog/us-05-process-document.md)
@@ -514,6 +526,7 @@ Establish modular architecture, comprehensive test coverage, production hardenin
 - [US-77 — Canonical documentation as source of truth with automatic derivation](Backlog/us-77-canonical-documentation-as-source-of-truth-with-au.md) (Implemented)
 - [US-68 — Identify the source worktree of each branch at a glance](Backlog/us-68-identify-the-source-worktree-of-each-branch-at-a-g.md) (Implemented 2026-03-06)
 - [US-67 — Auditable, navigable, and consistent project documentation](Backlog/us-67-auditable-navigable-and-consistent-project-documen.md)
+- [US-79 — Architecture health evaluation with quantified metrics and remediation path](Backlog/us-79-architecture-health-evaluation-with-quantified-metr.md) (In Progress)
 - [IMP-01 — Canonical Operational Execution Policy Alignment](Backlog/imp-01-canonical-operational-execution-policy-alignment.md) (Planned)
 - [IMP-02 — Router and DOC_UPDATES Contract Synchronization](Backlog/imp-02-router-and-doc-updates-contract-synchronization.md) (Planned)
 - [IMP-03 — Plan Execution Guard Enforcement (Local + CI)](Backlog/imp-03-plan-execution-guard-enforcement-local-ci.md) (Planned)
@@ -532,6 +545,75 @@ Enhance the frontend to provide evaluators with clear, informative processing hi
 
 ### User Stories (in order)
 - [US-78 — Enhanced processing history UI for evaluator observability](Backlog/us-78-enhanced-processing-history-ui-for-evaluator-obser.md)
+
+---
+
+## Release 19 — Critical architecture remediation
+
+### Goal
+Address the highest-impact architecture findings: decompose God Modules, add CI complexity gates, and close critical documentation gaps (security architecture, production deployment).
+
+### Scope
+- Backend God Module decomposition (review_service.py, candidate_mining.py)
+- CI complexity and LOC gates
+- Security architecture and production deployment documentation
+
+### Items (in order)
+- [ARCH-03 — Add CI Complexity Gates](Backlog/arch-03-add-ci-complexity-gates.md) (Planned)
+- [ARCH-01 — Decompose `review_service.py`](Backlog/arch-01-decompose-review-service.md) (Planned)
+- [ARCH-02 — Decompose `candidate_mining.py`](Backlog/arch-02-decompose-candidate-mining.md) (Planned)
+- [ARCH-06 — Create Security Architecture Documentation](Backlog/arch-06-create-security-architecture-documentation.md) (Planned)
+- [ARCH-07 — Create Production Deployment Documentation](Backlog/arch-07-create-production-deployment-documentation.md) (Planned)
+
+---
+
+## Release 20 — Architecture hardening
+
+### Goal
+Fix remaining hexagonal violations, improve code hygiene, add missing ADRs, close documentation gaps, and implement production security improvements.
+
+### Scope
+- Hexagonal architecture violation fixes
+- Structured logging for critical paths
+- Missing ADRs and documentation (ER diagram, monitoring, ADRs)
+- Production authentication, dependency hygiene, and security patterns
+
+### Items (in order)
+- [ARCH-04 — Fix infra→application Dependency Violation](Backlog/arch-04-fix-infra-application-hex-violation.md) (Planned)
+- [ARCH-08 — Expose `_shared` Functions Publicly](Backlog/arch-08-expose-shared-functions-publicly.md) (Planned)
+- [ARCH-15 — Explicitly Declare pydantic in requirements.txt](Backlog/arch-15-declare-pydantic-in-requirements.md) (Planned)
+- [ARCH-22 — Parameterize PRAGMA table_info Call](Backlog/arch-22-parameterize-pragma-table-info.md) (Planned)
+- [ARCH-24 — Replace Wildcard Re-export with Explicit Imports](Backlog/arch-24-replace-wildcard-re-export.md) (Planned)
+- [ARCH-05 — Add Structured Logging to Critical Paths](Backlog/arch-05-add-structured-logging-critical-paths.md) (Planned)
+- [ARCH-09 — Add ER Diagram to technical-design.md](Backlog/arch-09-add-er-diagram-to-technical-design.md) (Planned)
+- [ARCH-10 — Write Missing ADRs](Backlog/arch-10-write-missing-adrs.md) (Planned)
+- [ARCH-16 — Create Re-accretion Prevention ADR](Backlog/arch-16-create-re-accretion-prevention-adr.md) (Planned)
+- [ARCH-11 — Add Monitoring/Alerting Strategy Documentation](Backlog/arch-11-add-monitoring-alerting-strategy-docs.md) (Planned)
+- [ARCH-13 — Implement Production Authentication](Backlog/arch-13-implement-production-authentication.md) (Planned)
+
+---
+
+## Release 21 — Architecture polish & operational maturity
+
+### Goal
+Complete remaining architecture improvements: capacity planning, content validation, frontend state management, runtime observability, operational runbooks, and configuration documentation.
+
+### Scope
+- Capacity planning and configuration reference documentation
+- PDF upload content validation
+- Frontend state management refactor
+- Runtime metrics collection and rate limiting
+- Operational runbooks
+
+### Items (in order)
+- [ARCH-12 — Add Capacity Planning Documentation](Backlog/arch-12-add-capacity-planning-documentation.md) (Planned)
+- [ARCH-23 — Add Configuration Reference Documentation](Backlog/arch-23-add-configuration-reference-docs.md) (Planned)
+- [ARCH-14 — Add Content Validation for PDF Uploads](Backlog/arch-14-add-content-validation-pdf-uploads.md) (Planned)
+- [ARCH-17 — Simplify extraction_observability/ Subsystem](Backlog/arch-17-simplify-extraction-observability.md) (Planned)
+- [ARCH-19 — Create Operational Runbooks](Backlog/arch-19-create-operational-runbooks.md) (Planned)
+- [ARCH-18 — Extract Frontend State Management Layer](Backlog/arch-18-extract-frontend-state-management.md) (Planned)
+- [ARCH-20 — Add Metrics Collection Infrastructure](Backlog/arch-20-add-metrics-collection-infrastructure.md) (Planned)
+- [ARCH-21 — Add Rate Limiting to Write Endpoints](Backlog/arch-21-add-rate-limiting-write-endpoints.md) (Planned)
 
 ---
 

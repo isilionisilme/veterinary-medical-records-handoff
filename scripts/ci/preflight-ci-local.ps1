@@ -16,6 +16,42 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Get-RepoRoot -ScriptRoot $PSScriptRoot
 Set-Location $repoRoot
 
+function Assert-RemoteBaseUpToDate {
+    param(
+        [Parameter(Mandatory = $true)][string]$BaseRefValue
+    )
+
+    $currentBranch = (& git rev-parse --abbrev-ref HEAD).Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $currentBranch) {
+        throw "Unable to resolve current branch while checking remote base sync."
+    }
+
+    # Skip sync check on main; this guard is intended for feature branches before push.
+    if ($currentBranch -eq "main") {
+        Write-Host "Remote base sync guard skipped on 'main'."
+        return
+    }
+
+    & git fetch --quiet origin $BaseRefValue
+    if ($LASTEXITCODE -ne 0) {
+        throw "Remote base sync guard failed: could not fetch origin/$BaseRefValue."
+    }
+
+    & git show-ref --verify --quiet ("refs/remotes/origin/{0}" -f $BaseRefValue)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Remote base sync guard failed: origin/$BaseRefValue does not exist locally after fetch."
+    }
+
+    & git merge-base --is-ancestor ("origin/{0}" -f $BaseRefValue) HEAD
+    if ($LASTEXITCODE -ne 0) {
+        throw (
+            "Remote base sync guard failed: branch '$currentBranch' is behind origin/$BaseRefValue. " +
+            "Rebase or merge origin/$BaseRefValue before pushing."
+        )
+    }
+
+    Write-Host "Remote base sync guard passed: HEAD contains origin/$BaseRefValue."
+}
 function Invoke-Step {
     function Compare-ConfigWithReference {
         $configFiles = @(
@@ -378,6 +414,12 @@ if ($runDocs) {
 
     Invoke-Step "Doc/router parity guard" {
         & $python "scripts/docs/check_doc_router_parity.py" "--base-ref" $BaseRef
+    }
+}
+
+if ($Mode -eq "Push") {
+    Invoke-Step "Remote base sync guard" {
+        Assert-RemoteBaseUpToDate -BaseRefValue $BaseRef
     }
 }
 

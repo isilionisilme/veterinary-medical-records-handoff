@@ -16,7 +16,7 @@ Scripts de preflight local y hooks de Git.
 | `test-L3.bat` | Wrapper CMD de `test-L3.ps1`. |
 | `install-pre-commit-hook.ps1` | Instala `.githooks/pre-commit` en `.git/hooks/pre-commit` (usa L1). |
 | `install-pre-push-hook.ps1` | Instala `.githooks/pre-push` en `.git/hooks/pre-push` (usa L2). |
-| `validate-branch-name.ps1` | Valida formato de rama (`codex/<worktree>/<category>/<slug>`; permite legacy con warning). |
+| `validate-branch-name.ps1` | Valida formato de rama (`<category>/<slug>`; categorias: feature, improvement, refactor, chore, ci, docs, fix). |
 | `check_plan_execution_guard.py` | Valida invariantes del plan activo por rama (resolucion de plan activo, `Execution Status`, estados activos y lock semantics). |
 | `plan-close-step.ps1` | Cierra un step `IN PROGRESS` de un plan de forma determinista y exige evidencia antes del cierre. |
 
@@ -34,7 +34,7 @@ Ejecucion manual:
 
 ```powershell
 python scripts/ci/check_plan_execution_guard.py
-python scripts/ci/check_plan_execution_guard.py --branch "codex/veterinary-medical-records/docs/imp-03-plan-execution-guard"
+python scripts/ci/check_plan_execution_guard.py --branch "feature/us-3-plan-execution-guard"
 python scripts/ci/check_plan_execution_guard.py --branch "my-branch" --plan-root "docs/projects/veterinary-medical-records/04-delivery/plans"
 ```
 
@@ -65,3 +65,4 @@ Uso:
 
 - Los hooks de Git (`.githooks/*`) invocan scripts PowerShell.
 - Los `.bat` existen como comodidad para terminal CMD.
+- In `Mode Push`, `preflight-ci-local.ps1` runs a remote-base sync guard that executes `git fetch origin <base>` and fails if `HEAD` does not contain `origin/<base>`.

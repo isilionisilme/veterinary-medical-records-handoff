@@ -79,8 +79,33 @@ This directory contains the consolidated backlog for veterinary-medical-records.
 | US-76 | Functional L1/L2/L3 local validation pipeline on Windows | Release 17 | [us-76-functional-l1-l2-l3-local-validation-pipeline-on-w.md](us-76-functional-l1-l2-l3-local-validation-pipeline-on-w.md) |
 | US-77 | Canonical documentation as source of truth with automatic derivation | Release 17 | [us-77-canonical-documentation-as-source-of-truth-with-au.md](us-77-canonical-documentation-as-source-of-truth-with-au.md) |
 | US-78 | Enhanced processing history UI for evaluator observability | Release 18 | [us-78-enhanced-processing-history-ui-for-evaluator-obser.md](us-78-enhanced-processing-history-ui-for-evaluator-obser.md) |
+| US-79 | Architecture health evaluation with quantified metrics and remediation path | Release 17 | [us-79-architecture-health-evaluation-with-quantified-metr.md](us-79-architecture-health-evaluation-with-quantified-metr.md) |
 | IMP-01 | Canonical Operational Execution Policy Alignment | Release 17 | [imp-01-canonical-operational-execution-policy-alignment.md](imp-01-canonical-operational-execution-policy-alignment.md) |
 | IMP-02 | Router and DOC_UPDATES Contract Synchronization | Release 17 | [imp-02-router-and-doc-updates-contract-synchronization.md](imp-02-router-and-doc-updates-contract-synchronization.md) |
 | IMP-03 | Plan Execution Guard Enforcement (Local + CI) | Release 17 | [imp-03-plan-execution-guard-enforcement-local-ci.md](imp-03-plan-execution-guard-enforcement-local-ci.md) |
 | IMP-04 | Active Plan Migration and Global Index Cleanup | Release 17 | [imp-04-active-plan-migration-and-global-index-cleanup.md](imp-04-active-plan-migration-and-global-index-cleanup.md) |
 | IMP-05 | Plan Root File Naming Alignment | Release 17 | [imp-05-plan-root-file-naming-alignment.md](imp-05-plan-root-file-naming-alignment.md) |
+| ARCH-01 | Decompose `review_service.py` | Release 19 | [arch-01-decompose-review-service.md](arch-01-decompose-review-service.md) |
+| ARCH-02 | Decompose `candidate_mining.py` | Release 19 | [arch-02-decompose-candidate-mining.md](arch-02-decompose-candidate-mining.md) |
+| ARCH-03 | Add CI Complexity Gates | Release 19 | [arch-03-add-ci-complexity-gates.md](arch-03-add-ci-complexity-gates.md) |
+| ARCH-04 | Fix infra→application Dependency Violation | Release 20 | [arch-04-fix-infra-application-hex-violation.md](arch-04-fix-infra-application-hex-violation.md) |
+| ARCH-05 | Add Structured Logging to Critical Paths | Release 20 | [arch-05-add-structured-logging-critical-paths.md](arch-05-add-structured-logging-critical-paths.md) |
+| ARCH-06 | Create Security Architecture Documentation | Release 19 | [arch-06-create-security-architecture-documentation.md](arch-06-create-security-architecture-documentation.md) |
+| ARCH-07 | Create Production Deployment Documentation | Release 19 | [arch-07-create-production-deployment-documentation.md](arch-07-create-production-deployment-documentation.md) |
+| ARCH-08 | Expose `_shared` Functions Publicly | Release 20 | [arch-08-expose-shared-functions-publicly.md](arch-08-expose-shared-functions-publicly.md) |
+| ARCH-09 | Add ER Diagram to technical-design.md | Release 20 | [arch-09-add-er-diagram-to-technical-design.md](arch-09-add-er-diagram-to-technical-design.md) |
+| ARCH-10 | Write Missing ADRs | Release 20 | [arch-10-write-missing-adrs.md](arch-10-write-missing-adrs.md) |
+| ARCH-11 | Add Monitoring/Alerting Strategy Documentation | Release 20 | [arch-11-add-monitoring-alerting-strategy-docs.md](arch-11-add-monitoring-alerting-strategy-docs.md) |
+| ARCH-12 | Add Capacity Planning Documentation | Release 21 | [arch-12-add-capacity-planning-documentation.md](arch-12-add-capacity-planning-documentation.md) |
+| ARCH-13 | Implement Production Authentication | Release 20 | [arch-13-implement-production-authentication.md](arch-13-implement-production-authentication.md) |
+| ARCH-14 | Add Content Validation for PDF Uploads | Release 21 | [arch-14-add-content-validation-pdf-uploads.md](arch-14-add-content-validation-pdf-uploads.md) |
+| ARCH-15 | Explicitly Declare pydantic in requirements.txt | Release 20 | [arch-15-declare-pydantic-in-requirements.md](arch-15-declare-pydantic-in-requirements.md) |
+| ARCH-16 | Create Re-accretion Prevention ADR | Release 20 | [arch-16-create-re-accretion-prevention-adr.md](arch-16-create-re-accretion-prevention-adr.md) |
+| ARCH-17 | Simplify extraction_observability/ Subsystem | Release 21 | [arch-17-simplify-extraction-observability.md](arch-17-simplify-extraction-observability.md) |
+| ARCH-18 | Extract Frontend State Management Layer | Release 21 | [arch-18-extract-frontend-state-management.md](arch-18-extract-frontend-state-management.md) |
+| ARCH-19 | Create Operational Runbooks | Release 21 | [arch-19-create-operational-runbooks.md](arch-19-create-operational-runbooks.md) |
+| ARCH-20 | Add Metrics Collection Infrastructure | Release 21 | [arch-20-add-metrics-collection-infrastructure.md](arch-20-add-metrics-collection-infrastructure.md) |
+| ARCH-21 | Add Rate Limiting to Write Endpoints | Release 21 | [arch-21-add-rate-limiting-write-endpoints.md](arch-21-add-rate-limiting-write-endpoints.md) |
+| ARCH-22 | Parameterize PRAGMA table_info Call | Release 20 | [arch-22-parameterize-pragma-table-info.md](arch-22-parameterize-pragma-table-info.md) |
+| ARCH-23 | Add Configuration Reference Documentation | Release 21 | [arch-23-add-configuration-reference-docs.md](arch-23-add-configuration-reference-docs.md) |
+| ARCH-24 | Replace Wildcard Re-export with Explicit Imports | Release 20 | [arch-24-replace-wildcard-re-export.md](arch-24-replace-wildcard-re-export.md) |

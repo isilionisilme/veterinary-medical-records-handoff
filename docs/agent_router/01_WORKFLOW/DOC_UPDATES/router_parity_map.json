@@ -334,6 +334,42 @@
       ]
     },
     {
+      "source_doc": "docs/projects/veterinary-medical-records/02-tech/audits/architecture-review-*.md",
+      "description": "Project architecture review audit docs must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/02-tech/audits/improvement-backlog-*.md",
+      "description": "Project architecture improvement backlog docs must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/03-ops/architecture-audit-process.md",
+      "description": "Project architecture audit process docs must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
+    },
+    {
       "source_doc": "docs/projects/veterinary-medical-records/01-product/product-design.md",
       "description": "Project PRODUCT_DESIGN must map to project owner entry module.",
       "router_modules": [

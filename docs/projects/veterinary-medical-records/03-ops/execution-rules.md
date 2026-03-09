@@ -40,3 +40,12 @@ Use canonical commit convention:
 ## Token efficiency
 
 Use `iterative-retrieval` before each step and `strategic-compact` at step close.
+
+## Architecture audit methodology reference
+
+For reusable architecture-audit execution procedures (complete, partial, quick),
+see [`architecture-audit-process.md`](architecture-audit-process.md).
+
+For methodology details used in the 2026-03-09 audit cycle, see the Methodology
+section in
+[`architecture-review-2026-03-09.md`](../02-tech/audits/architecture-review-2026-03-09.md#methodology).

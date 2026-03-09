@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import markdownLinkCheck from 'markdown-link-check';
 
@@ -9,9 +10,46 @@ const repoRoot = path.resolve(__dirname, '../..');
 
 const roots = [
   path.join(repoRoot, 'docs', 'README.md'),
-  path.join(repoRoot, 'docs', 'project'),
+  path.join(repoRoot, 'docs', 'projects'),
   path.join(repoRoot, 'docs', 'shared'),
 ];
+
+function parseArgs(argv) {
+  const args = { baseRef: null };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--base-ref') {
+      args.baseRef = argv[i + 1] ?? null;
+      i += 1;
+    }
+  }
+  return args;
+}
+
+function changedMarkdownFiles(baseRef) {
+  const run = (gitArgs) => {
+    const out = execFileSync('git', gitArgs, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return out
+      .split(/\r?\n/)
+      .map((line) => line.trim().replaceAll('\\', '/'))
+      .filter(Boolean);
+  };
+
+  const changed = new Set([
+    ...run(['diff', '--name-only', '--diff-filter=ACMR', `${baseRef}...HEAD`]),
+    ...run(['diff', '--name-only', '--diff-filter=ACMR']),
+    ...run(['diff', '--cached', '--name-only', '--diff-filter=ACMR']),
+  ]);
+
+  return [...changed]
+    .filter((relPath) => relPath.endsWith('.md'))
+    .filter((relPath) => relPath === 'docs/README.md' || relPath.startsWith('docs/projects/') || relPath.startsWith('docs/shared/'))
+    .map((relPath) => path.join(repoRoot, relPath));
+}
 
 async function collectMarkdownFiles(targetPath) {
   const stats = await fs.stat(targetPath);
@@ -55,8 +93,15 @@ function runLinkCheck(filePath, markdownContent) {
 }
 
 async function main() {
-  const filesNested = await Promise.all(roots.map((targetPath) => collectMarkdownFiles(targetPath)));
-  const files = filesNested.flat().sort((left, right) => left.localeCompare(right));
+  const { baseRef } = parseArgs(process.argv.slice(2));
+  let files = [];
+
+  if (baseRef) {
+    files = changedMarkdownFiles(baseRef).sort((left, right) => left.localeCompare(right));
+  } else {
+    const filesNested = await Promise.all(roots.map((targetPath) => collectMarkdownFiles(targetPath)));
+    files = filesNested.flat().sort((left, right) => left.localeCompare(right));
+  }
 
   if (files.length === 0) {
     console.log('No markdown files found under canonical docs scope.');

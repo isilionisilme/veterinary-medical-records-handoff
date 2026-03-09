@@ -1,11 +1,17 @@
 {
   "files": {
-    "docs/agent_router/01_WORKFLOW/PULL_REQUESTS/00_entry.md": "Rule",
-    "docs/agent_router/03_SHARED/CODING_STANDARDS/140_naming-conventions.md": "Clarification",
-    "docs/agent_router/03_SHARED/WAY_OF_WORKING/50_pull-requests.md": "Rule",
-    "docs/projects/veterinary-medical-records/04-delivery/plans/completed/COMPLETED_2026-03-04_CANONICAL-DOC-RESTRUCTURE.md": "Rule",
-    "docs/shared/02-tech/coding-standards.md": "Clarification",
-    "docs/shared/03-ops/way-of-working.md": "Rule"
+    "docs/projects/veterinary-medical-records/02-tech/audits/architecture-review-2026-03-09.md": "Rule",
+    "docs/projects/veterinary-medical-records/02-tech/audits/improvement-backlog-2026-03-09.md": "Rule",
+    "docs/projects/veterinary-medical-records/03-ops/execution-rules.md": "Clarification",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/README.md": "Clarification",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/us-79-architecture-health-evaluation-with-quantified-metr.md": "Clarification",
+    "docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md": "Navigation",
+    "docs/projects/veterinary-medical-records/04-delivery/plans/PLAN_2026-03-09_ARCHITECTURE-AUDIT/PLAN_2026-03-09_ARCHITECTURE-AUDIT.md": "Rule"
   },
-  "overall": "Rule"
+  "overall": "Rule",
+  "meta": {
+    "base_ref": "main",
+    "head_sha": "319f4087b6dcabd1db69c406e39399c86d0f1df4",
+    "merge_base": "1598b25ab4e8f8fb5e45598bce028e18fb1f0984"
+  }
 }

@@ -231,6 +231,18 @@ def test_doc_test_sync_map_has_minimum_rules() -> None:
     assert (
         '"doc_glob": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md"' in text
     )
+    assert (
+        '"doc_glob": "docs/projects/veterinary-medical-records/03-ops/'
+        'architecture-audit-process.md"' in text
+    )
+    assert (
+        '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/audits/'
+        'architecture-review-*.md"' in text
+    )
+    assert (
+        '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/audits/'
+        'improvement-backlog-*.md"' in text
+    )
     assert '"doc_glob": "docs/projects/veterinary-medical-records/02-tech/adr/**/*.md"' in text
     assert '"owner_any"' in text
     assert '"docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md"' in text
@@ -261,6 +273,18 @@ def test_router_parity_map_has_product_design_rule() -> None:
     assert '"source_doc": "docs/shared/03-ops/way-of-working.md"' in text
     assert (
         '"source_doc": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md"' in text
+    )
+    assert (
+        '"source_doc": "docs/projects/veterinary-medical-records/03-ops/'
+        'architecture-audit-process.md"' in text
+    )
+    assert (
+        '"source_doc": "docs/projects/veterinary-medical-records/02-tech/audits/'
+        'architecture-review-*.md"' in text
+    )
+    assert (
+        '"source_doc": "docs/projects/veterinary-medical-records/02-tech/audits/'
+        'improvement-backlog-*.md"' in text
     )
     assert (
         '"path": "docs/agent_router/04_PROJECT/PRODUCT_DESIGN/'
