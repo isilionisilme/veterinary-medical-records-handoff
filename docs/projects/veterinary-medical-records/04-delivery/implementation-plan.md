@@ -532,6 +532,7 @@ Establish modular architecture, comprehensive test coverage, production hardenin
 - [IMP-03 — Plan Execution Guard Enforcement (Local + CI)](Backlog/imp-03-plan-execution-guard-enforcement-local-ci.md) (Planned)
 - [IMP-04 — Active Plan Migration and Global Index Cleanup](Backlog/imp-04-active-plan-migration-and-global-index-cleanup.md) (Planned)
 - [IMP-05 — Plan Root File Naming Alignment](Backlog/imp-05-plan-root-file-naming-alignment.md) (Implemented)
+- [IMP-06 — Preflight Wrapper Integrity and L3 Entrypoint Hardening](Backlog/imp-06-preflight-wrapper-integrity-and-l3-entrypoint-hardening.md) (Planned)
 
 ---
 
