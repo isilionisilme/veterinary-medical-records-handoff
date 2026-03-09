@@ -42,6 +42,13 @@ describe("App upload and list flow", () => {
       owner_name: "Nombre",
       owner_address: "Dirección",
       nhc: "NHC",
+      vet_name: "Veterinario",
+      breed: "Raza",
+      age: "Edad (ultima visita)",
+      microchip_id: "Microchip",
+      species: "Especie",
+      sex: "Sexo",
+      weight: "Peso",
     };
 
     const normalizeLabel = (value: string) =>
