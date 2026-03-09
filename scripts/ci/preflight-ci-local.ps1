@@ -307,10 +307,11 @@ function Select-LocalE2EPortPair {
     )
 
     foreach ($candidate in $candidates) {
-        Stop-ManagedPortProcesses -Ports @($candidate.Backend, $candidate.Frontend)
         if ((Test-PortAvailable -Port $candidate.Backend) -and (Test-PortAvailable -Port $candidate.Frontend)) {
             return $candidate
         }
+
+        Write-Host "Skipping occupied local E2E port pair $($candidate.Backend)/$($candidate.Frontend)."
     }
 
     throw "Unable to find a clean local E2E port pair. Checked: 18000/15173, 28000/25173, 38000/35173."
