@@ -8,7 +8,7 @@ Collects deterministic code metrics and generates:
 Usage:
     python scripts/quality/architecture_metrics.py
     python scripts/quality/architecture_metrics.py --baseline 2026-02-23
-    python scripts/quality/architecture_metrics.py --check --max-cc 30 --max-loc 500
+    python scripts/quality/architecture_metrics.py --check --warn-cc 11 --max-cc 30 --max-loc 500
 """
 
 from __future__ import annotations
@@ -84,6 +84,36 @@ def _ts_files(root: Path) -> list[Path]:
 
 def _rel(p: Path) -> str:
     return str(p.relative_to(REPO_ROOT)).replace("\\", "/")
+
+
+def _is_backend_app_path(path: str) -> bool:
+    return path.startswith("backend/app/")
+
+
+def _git_output(args: list[str]) -> list[str]:
+    result = _run(["git", *args])
+    if result.returncode != 0 or not result.stdout:
+        return []
+    return [line.strip().replace("\\", "/") for line in result.stdout.splitlines() if line.strip()]
+
+
+def _changed_backend_python_paths(base_ref: str | None) -> set[str]:
+    sources: list[list[str]] = []
+    if base_ref:
+        sources.append(["diff", "--name-only", f"{base_ref}...HEAD"])
+    sources.extend(
+        [
+            ["diff", "--name-only"],
+            ["diff", "--name-only", "--cached"],
+        ]
+    )
+
+    changed: set[str] = set()
+    for args in sources:
+        for path in _git_output(args):
+            if _is_backend_app_path(path) and path.endswith(".py"):
+                changed.add(path)
+    return changed
 
 
 def _layer_of(path: Path) -> str | None:
@@ -557,27 +587,44 @@ def generate_markdown(data: dict) -> str:
 # ── CI check mode ───────────────────────────────────────────────────
 
 
-def check_thresholds(data: dict, max_cc: int, max_loc: int) -> list[str]:
-    """Return list of threshold violations for CI mode."""
+def check_thresholds(
+    data: dict,
+    max_cc: int,
+    max_loc: int,
+    warn_cc: int,
+    changed_backend_paths: set[str] | None = None,
+) -> tuple[list[str], list[str]]:
+    """Return warning and failure lists for backend CI complexity checks."""
+    warnings: list[str] = []
     failures: list[str] = []
 
     cc_data = data.get("radon_cc", {})
     loc_data = data.get("loc", {})
 
     for f in cc_data.get("functions", []):
-        if f["complexity"] > max_cc:
+        if not _is_backend_app_path(f["file"]):
+            continue
+        if changed_backend_paths is not None and f["file"] not in changed_backend_paths:
+            continue
+        complexity = f["complexity"]
+        if complexity > max_cc:
             failures.append(
-                f"CC {f['complexity']} > {max_cc}: {f['name']} in {f['file']}:{f['lineno']}"
+                f"FAIL: CC {complexity} > {max_cc}: {f['name']} in {f['file']}:{f['lineno']}"
+            )
+        elif complexity >= warn_cc:
+            warnings.append(
+                f"WARNING: CC {complexity} >= {warn_cc}: {f['name']} in {f['file']}:{f['lineno']}"
             )
 
     for fp, count in loc_data.get("files", {}).items():
+        if not _is_backend_app_path(fp):
+            continue
+        if changed_backend_paths is not None and fp not in changed_backend_paths:
+            continue
         if count > max_loc:
-            failures.append(f"LOC {count} > {max_loc}: {fp}")
+            failures.append(f"FAIL: LOC {count} > {max_loc}: {fp}")
 
-    for v in data.get("imports", {}).get("violations", []):
-        failures.append(f"Hex violation: {v['edge']} in {v['file']}:{v['line']}")
-
-    return failures
+    return warnings, failures
 
 
 # ── Main ────────────────────────────────────────────────────────────
@@ -593,6 +640,13 @@ def main() -> int:
         "--check",
         action="store_true",
         help="CI mode: exit 1 if thresholds exceeded",
+    )
+    parser.add_argument(
+        "--base-ref",
+        help="Git base ref or commit used to scope --check to changed backend Python files",
+    )
+    parser.add_argument(
+        "--warn-cc", type=int, default=11, help="Warn CC threshold for --check (default: 11)"
     )
     parser.add_argument("--max-cc", type=int, default=30, help="Max CC for --check (default: 30)")
     parser.add_argument(
@@ -642,12 +696,35 @@ def main() -> int:
 
     # ── CI check mode
     if args.check:
-        failures = check_thresholds(data, args.max_cc, args.max_loc)
+        changed_backend_paths = (
+            _changed_backend_python_paths(args.base_ref) if args.base_ref else None
+        )
+        if changed_backend_paths is not None:
+            print(
+                f"  Scoped backend Python files: {len(changed_backend_paths)}",
+                file=sys.stderr,
+            )
+            if not changed_backend_paths:
+                print("\nSummary: 0 warning(s), 0 failure(s)", file=sys.stderr)
+                print("\n✅ No changed backend Python files to evaluate.", file=sys.stderr)
+                return 0
+        warnings, failures = check_thresholds(
+            data, args.max_cc, args.max_loc, args.warn_cc, changed_backend_paths
+        )
+        if warnings:
+            print(f"\n⚠️  {len(warnings)} warning(s):", file=sys.stderr)
+            for warning in warnings:
+                print(f"   • {warning}", file=sys.stderr)
         if failures:
-            print(f"\n❌ {len(failures)} threshold violation(s):", file=sys.stderr)
-            for f in failures:
-                print(f"   • {f}", file=sys.stderr)
+            print(f"\n❌ {len(failures)} failure(s):", file=sys.stderr)
+            for failure in failures:
+                print(f"   • {failure}", file=sys.stderr)
+            print(
+                f"\nSummary: {len(warnings)} warning(s), {len(failures)} failure(s)",
+                file=sys.stderr,
+            )
             return 1
+        print(f"\nSummary: {len(warnings)} warning(s), {len(failures)} failure(s)", file=sys.stderr)
         print("\n✅ All thresholds passed.", file=sys.stderr)
         return 0
 

@@ -556,6 +556,10 @@ if ($runBackendFull) {
     Invoke-Step "Backend security audit (pip-audit)" {
         & pip-audit --requirement backend/requirements.txt --strict --ignore-vuln GHSA-2c2j-9gv5-cj73 --ignore-vuln GHSA-7f5h-v6xp-fcq8
     }
+
+    Invoke-Step "Backend complexity gate" {
+        & $python "scripts/quality/architecture_metrics.py" --check --base-ref $BaseRef --warn-cc 11 --max-cc 30 --max-loc 500
+    }
 }
 
 if ($runFrontendQuick) {
