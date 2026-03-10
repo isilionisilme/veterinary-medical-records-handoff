@@ -76,21 +76,36 @@ The repository already has architecture metrics tooling (`scripts/quality/archit
 
 ## PR Roadmap
 
-### Single PR — `ci(arch-03): implement ci complexity gates`
+### PR1 — `ci: add architecture complexity gates`
+
+**Branch:** `ci/arch-03-complexity-gates-ci`
+
+**Scope:**
+- `.github/workflows/ci.yml`
+- `scripts/ci/preflight-ci-local.ps1`
+- `scripts/quality/architecture_metrics.py`
+
+### PR2 — `docs: add ARCH-03 complexity gate ADR and plan updates`
+
+**Branch:** `docs/arch-03-complexity-gates-docs`
+
+**Scope:**
+- `docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json`
+- `docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0005-complexity-gate-thresholds.md`
+- `docs/projects/veterinary-medical-records/02-tech/adr/index.md`
+- `docs/projects/veterinary-medical-records/04-delivery/Backlog/arch-03-add-ci-complexity-gates.md`
+- `docs/projects/veterinary-medical-records/04-delivery/plans/PLAN_2026-03-10_ARCH-03-CI-COMPLEXITY-GATES/PLAN_2026-03-10_ARCH-03-CI-COMPLEXITY-GATES.md`
+- `scripts/quality/README.md`
 
 **PR partition gate evidence:**
 - Projected scope: ~8 files, ~250 changed lines.
 - Semantic axes: CI tooling + quality scripts + ADR. No frontend, API, or schema changes.
 - Size guardrail: within 400-line and 15-file thresholds.
-- **Decision: Option A** (single PR) — cohesive CI enforcement scope, no mixed risk axes.
+- **Decision: Option B** (split PRs) — CI/code implementation isolated from documentation/governance updates for clearer review boundaries.
 
-**Planned files in PR:**
-- `scripts/quality/architecture_metrics.py` — warning output + exit code semantics
-- `scripts/quality/README.md` — updated description
-- `.github/workflows/ci.yml` — new `complexity_gate` job
-- `scripts/ci/preflight-ci-local.ps1` — integrate gate in Push/Full
-- `docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0005-complexity-gate-thresholds.md` — new ADR
-- `docs/projects/veterinary-medical-records/02-tech/adr/index.md` — add row
+**Execution evidence:**
+- PR1: `https://github.com/isilionisilme/veterinary-medical-records/pull/256`
+- PR2: `https://github.com/isilionisilme/veterinary-medical-records/pull/257`
 
 ---
 
