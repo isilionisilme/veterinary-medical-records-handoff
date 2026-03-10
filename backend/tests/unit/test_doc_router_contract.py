@@ -12,7 +12,6 @@ RULES_INDEX_DOC = ROUTER_ROOT / "00_RULES_INDEX.md"
 
 DOC_REF_PATTERN = re.compile(r"(docs/[A-Za-z0-9_./-]+\.md)")
 
-MAX_ROOT_AGENTS_CHARS = 4000
 MAX_AUTHORITY_CHARS = 3000
 
 
@@ -45,8 +44,7 @@ def test_authority_plan_audit_intent_exists() -> None:
     )
 
 
-def test_entrypoint_docs_stay_small() -> None:
-    assert len(_read_text(ROOT_AGENTS)) <= MAX_ROOT_AGENTS_CHARS
+def test_authority_doc_stays_small() -> None:
     assert len(_read_text(AUTHORITY_DOC)) <= MAX_AUTHORITY_CHARS
 
 

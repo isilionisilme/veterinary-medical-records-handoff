@@ -16,7 +16,7 @@ During plan execution, the agent MUST project plan progress into chat todos.
 
 ### Synchronization rules
 
-- The active plan source file checkboxes are the source of truth (`PLAN_<date>_<slug>.md` for new plans; legacy root-file names remain accepted during transition).
+- The active plan source file checkboxes are the source of truth (`PLAN_<YYYY-MM-DD>_<SLUG>.md`).
 - Chat todos are an execution-time projection and MUST stay synchronized with the plan.
 - If plan and chat todos diverge, reconcile immediately from the plan before continuing.
 

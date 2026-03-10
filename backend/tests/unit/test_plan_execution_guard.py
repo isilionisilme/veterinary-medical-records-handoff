@@ -36,14 +36,6 @@ NO_EXEC_STATUS_PLAN = """# Plan
 - details
 """
 
-LOCKED_PLAN = """# Plan
-**Branch:** `feature/test`
-
-## Execution Status
-- [ ] P1-A task 🔒 STEP LOCKED (code committed, awaiting CI + plan update)
-- [ ] P1-B task ⏳ IN PROGRESS (Execution agent, 2026-03-09)
-"""
-
 CLEAN_PLAN = """# Plan
 **Branch:** `feature/test`
 
@@ -90,11 +82,21 @@ def test_validate_execution_status_missing() -> None:
     assert "missing '## Execution Status' section" in errors[0]
 
 
-def test_locked_plus_in_progress_fails() -> None:
+def test_multiple_in_progress_steps_fail() -> None:
     module = _load_guard_module()
-    errors = module.validate_no_start_while_locked(LOCKED_PLAN)
+    errors = module.validate_single_active_step(
+        """# Plan
+**Branch:** `feature/test`
+
+## Execution Status
+- [ ] P1-A task ⏳ IN PROGRESS (Execution agent, 2026-03-09)
+- [ ] P1-B task ⏳ IN PROGRESS (Execution agent, 2026-03-09)
+"""
+    )
     assert errors == [
-        "Cannot start step while STEP LOCKED is active. Resolve the locked step first."
+        "Multiple active steps found. At most one step may be IN PROGRESS.\n"
+        "- [ ] P1-A task ⏳ IN PROGRESS (Execution agent, 2026-03-09)\n"
+        "- [ ] P1-B task ⏳ IN PROGRESS (Execution agent, 2026-03-09)"
     ]
 
 

@@ -8,7 +8,7 @@ Start with `AGENTS.md` (repo root) and `docs/agent_router/00_AUTHORITY.md` for i
 ## Modules
 
 - `10_purpose.md` — Purpose
-- `20_execution-mode.md` — 1. Semi-Unattended Execution (Default Mode)
+- `20_execution-mode.md` — 1. Execution Mode Defaults
 - `30_iterations-state.md` — 2. Atomic Iterations
 - `40_step-eligibility.md` — 4. Step Eligibility Rule (Hard Rule)
 - `50_rollback-governance.md` — 6. Rollback Procedure

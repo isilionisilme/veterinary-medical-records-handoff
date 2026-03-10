@@ -186,7 +186,7 @@ outputs:
 
   - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/20_execution-mode.md
     source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["1. Semi-Unattended Execution (Default Mode)"]
+    sections: ["1. Execution Mode Defaults"]
 
   - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/30_iterations-state.md
     source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md

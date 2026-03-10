@@ -7,7 +7,7 @@
 - A commit must **never** span multiple user stories.
 - A change may be implemented through **multiple commits**.
 - Commit history must remain **readable** to support reasoning and review.
-- **Agent commit confirmation (hard rule):** AI agents must present the staged files and proposed commit message to the user and wait for explicit confirmation before running `git commit`. Auto-commit without user confirmation is only permitted during active plan execution when the plan's automation mode is `Semiautomatico` or `Automatico` (see plan-execution-protocol.md §7).
+- **Agent commit confirmation (hard rule):** AI agents must present the staged files and proposed commit message to the user and wait for explicit confirmation before running `git commit`. Auto-commit without user confirmation is only permitted during active plan execution when the plan's execution mode is `Autonomous` (see plan-execution-protocol.md §7).
 
 ### Commit Message Conventions
 

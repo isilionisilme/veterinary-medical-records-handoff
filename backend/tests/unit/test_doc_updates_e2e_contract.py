@@ -32,6 +32,7 @@ TECHNICAL_DESIGN_OWNER_LIMITATIONS = (
 DELIVERY_SUMMARY_OWNER_ENTRY = (
     REPO_ROOT / "docs" / "agent_router" / "04_PROJECT" / "DELIVERY_SUMMARY" / "00_entry.md"
 )
+WAY_OF_WORKING_SOURCE = REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md"
 
 
 def _read_text(path: Path) -> str:
@@ -113,13 +114,15 @@ def test_ambiguity_handling_and_known_mappings_are_present() -> None:
     assert "04_PROJECT/UX_DESIGN/00_entry.md" in rules_text
 
 
-def test_agents_trigger_and_post_change_hook_remain_short_and_routed() -> None:
+def test_agents_trigger_and_post_change_hook_remain_routed() -> None:
     text = _read_text(ROOT_AGENTS)
     lower = text.lower()
+    way_of_working = _read_text(WAY_OF_WORKING_SOURCE).lower()
     assert "docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md" in text
     assert "any language or paraphrase" in lower
     assert "run the doc_updates normalization pass once" in lower
-    assert len(text) < 4000
+    assert "entrypoint-size warning (non-blocking)" in way_of_working
+    assert "if the pr changes `agents.md`" in way_of_working
 
 
 def test_checklist_requires_outputs_and_anti_loop() -> None:

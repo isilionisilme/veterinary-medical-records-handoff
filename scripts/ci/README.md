@@ -17,7 +17,7 @@ Scripts de preflight local y hooks de Git.
 | `install-pre-commit-hook.ps1` | Instala `.githooks/pre-commit` en `.git/hooks/pre-commit` (usa L1). |
 | `install-pre-push-hook.ps1` | Instala `.githooks/pre-push` en `.git/hooks/pre-push` (usa L2). |
 | `validate-branch-name.ps1` | Valida formato de rama (`<category>/<slug>`; categorias: feature, improvement, refactor, chore, ci, docs, fix). |
-| `check_plan_execution_guard.py` | Valida invariantes del plan activo por rama (resolucion de plan activo, `Execution Status`, estados activos y lock semantics). |
+| `check_plan_execution_guard.py` | Valida invariantes del plan activo por rama (resolucion de plan activo, `Execution Status` y unicidad de `IN PROGRESS`). |
 | `plan-close-step.ps1` | Cierra un step `IN PROGRESS` de un plan de forma determinista y exige evidencia antes del cierre. |
 
 ## Guard de ejecucion de plan
@@ -27,8 +27,8 @@ Script: `scripts/ci/check_plan_execution_guard.py`
 Que valida:
 - Resolucion determinista de plan activo por branch (`PLAN_*.md` fuera de `completed/`).
 - `## Execution Status` presente en plan activo.
-- Maximo un step activo (`IN PROGRESS` o `STEP LOCKED`).
-- No coexistencia de `STEP LOCKED` con `IN PROGRESS`.
+- Maximo un step activo (`IN PROGRESS`).
+- Ningun step cerrado puede conservar el label `IN PROGRESS`.
 
 Ejecucion manual:
 

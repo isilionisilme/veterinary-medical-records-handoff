@@ -3,7 +3,7 @@
 
 ## Purpose
 
-This protocol governs how AI agents execute plan steps in a structured, auditable, and semi-unattended manner. It defines execution rules, completion integrity, CI verification, handoff conventions, and the full iteration lifecycle.
+This protocol governs how AI agents execute plan steps in a structured, auditable manner using the plan's configured execution mode. It defines execution rules, completion integrity, CI verification, handoff conventions, and the full iteration lifecycle.
 
 ### Role taxonomy (availability-safe)
 
@@ -23,15 +23,14 @@ docs/projects/veterinary-medical-records/03-ops/
 └── plan-execution-protocol.md      ← YOU ARE HERE
 
 docs/projects/veterinary-medical-records/04-delivery/plans/
-├── PLAN_<date>_<slug>/             ← Active plan folder
-│   ├── PLAN_<date>_<slug>.md       ← Active plan source of truth (matches folder name)
-│   └── PR-*.md                     ← Optional per-PR annex
+├── PLAN_<YYYY-MM-DD>_<SLUG>.md     ← Active plan (single flat file)
 └── completed/
-    └── PLAN_<date>_<slug>/         ← Completed plan folder (same file names)
+    └── PLAN_<YYYY-MM-DD>_<SLUG>.md ← Completed plan
 ```
 
-**Active plan file:** For new plans, the agent attaches `plans/<plan-folder>/PLAN_<date>_<slug>.md` (matching the folder name) when executing a continuation-intent request (for example: "continue", "go", "let's go", "proceed", "resume").
-For legacy plans, `PLAN_*.md` remains accepted during transition.
+**Active plan file:** For new plans, the agent attaches `plans/PLAN_<YYYY-MM-DD>_<SLUG>.md` when executing a continuation-intent request (for example: "continue", "go", "let's go", "proceed", "resume").
+New plans are single flat files — no plan folders, no annex files. Legacy folder-based active plans remain accepted during migration while any active branch still resolves to `plans/<plan-folder>/PLAN_<YYYY-MM-DD>_<SLUG>.md`. Active-plan resolution searches for a matching `PLAN_*.md` outside `completed/`, regardless of nesting.
+See [`plan-creation.md` §1](plan-creation.md#1-how-to-create-a-plan) for naming and location conventions.
 The active plan source file contains: Execution Status (checkboxes), Prompt Queue, Active Prompt, and iteration-specific context.
 
 ---

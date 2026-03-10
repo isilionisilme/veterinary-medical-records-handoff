@@ -3,7 +3,9 @@
 
 ## 12. Hard-Gates: Structured Decision Protocol
 
-In 🚧 steps, the planning agent presents options as a numbered list:
+> **Presentation rule:** All options in hard-gates MUST be presented following the Agent-user interaction rule (AGENTS.md → Global rules).
+
+In 🚧 steps, the planning agent presents options:
 ```
 Backlog items:
 1. ✅ Centralize config — Impact: High, Effort: S

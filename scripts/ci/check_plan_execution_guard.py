@@ -11,7 +11,6 @@ CHECKBOX_LINE_RE = re.compile(r"^\s*- \[(?P<state>[ xX])]\s*(?P<text>.*)$")
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
 
 IN_PROGRESS_LABEL_RE = re.compile(r"(?:^|\s)(?:⏳\s*)?IN PROGRESS(?:\s*\(|\s*$)")
-STEP_LOCKED_LABEL_RE = re.compile(r"(?:^|\s)(?:🔒\s*)?STEP LOCKED(?:\s*\(|\s*$)")
 
 
 class PlanResolutionError(RuntimeError):
@@ -79,9 +78,8 @@ def validate_execution_status(plan_content: str, plan_path: Path) -> list[str]:
     return []
 
 
-def collect_active_labels(plan_content: str) -> tuple[list[str], list[str], list[str], list[str]]:
+def collect_active_labels(plan_content: str) -> tuple[list[str], list[str], list[str]]:
     in_progress_open: list[str] = []
-    step_locked_open: list[str] = []
     active_open: list[str] = []
     active_closed: list[str] = []
 
@@ -95,49 +93,36 @@ def collect_active_labels(plan_content: str) -> tuple[list[str], list[str], list
         # Ignore mentions in inline code snippets and detect label-like tokens only.
         text_without_code = INLINE_CODE_RE.sub("", text)
         has_in_progress = bool(IN_PROGRESS_LABEL_RE.search(text_without_code))
-        has_step_locked = bool(STEP_LOCKED_LABEL_RE.search(text_without_code))
 
         if state == " ":
             if has_in_progress:
                 in_progress_open.append(raw_line.strip())
                 active_open.append(raw_line.strip())
-            if has_step_locked:
-                step_locked_open.append(raw_line.strip())
-                if raw_line.strip() not in active_open:
-                    active_open.append(raw_line.strip())
-        elif state == "x" and (has_in_progress or has_step_locked):
+        elif state == "x" and has_in_progress:
             active_closed.append(raw_line.strip())
 
-    return in_progress_open, step_locked_open, active_open, active_closed
+    return in_progress_open, active_open, active_closed
 
 
 def validate_single_active_step(plan_content: str) -> list[str]:
-    _, _, active_open, active_closed = collect_active_labels(plan_content)
+    _, active_open, active_closed = collect_active_labels(plan_content)
     errors: list[str] = []
 
     if len(active_open) > 1:
-        listed = "\n".join(f"- {line}" for line in active_open)
+        listed = "\n".join(active_open)
         errors.append(
-            "Multiple active steps found. At most one step may be IN PROGRESS "
-            f"or STEP LOCKED.\n{listed}"
+            f"Multiple active steps found. At most one step may be IN PROGRESS.\n{listed}"
         )
 
     if active_closed:
-        listed_closed = "\n".join(f"- {line}" for line in active_closed)
+        listed_closed = "\n".join(active_closed)
         errors.append(
-            "Closed steps cannot keep active labels (IN PROGRESS/STEP LOCKED). "
+            "Closed steps cannot keep active labels (IN PROGRESS). "
             "Remove active labels from closed checkboxes.\n"
             f"{listed_closed}"
         )
 
     return errors
-
-
-def validate_no_start_while_locked(plan_content: str) -> list[str]:
-    in_progress_open, step_locked_open, _, _ = collect_active_labels(plan_content)
-    if in_progress_open and step_locked_open:
-        return ["Cannot start step while STEP LOCKED is active. Resolve the locked step first."]
-    return []
 
 
 def run_guard(branch: str, plan_root: Path) -> int:
@@ -157,7 +142,6 @@ def run_guard(branch: str, plan_root: Path) -> int:
     errors: list[str] = []
     errors.extend(validate_execution_status(plan_content, plan_path))
     errors.extend(validate_single_active_step(plan_content))
-    errors.extend(validate_no_start_while_locked(plan_content))
 
     if errors:
         for error in errors:

@@ -230,7 +230,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL (including user-triggered PR opening policy and folder-matching plan-root naming) must map to execution protocol owner module.",
+      "description": "Project PLAN_EXECUTION_PROTOCOL (including user-triggered PR opening policy and flat plan-file naming) must map to execution protocol owner module.",
       "router_modules": [
         {
           "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md",
@@ -242,8 +242,8 @@
         {
           "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/10_purpose.md",
           "required_terms": [
-            "PLAN_<date>_<slug>.md",
-            "accepted during transition"
+            "PLAN_<YYYY-MM-DD>_<SLUG>.md",
+            "no plan folders, no annex files"
           ]
         }
       ]

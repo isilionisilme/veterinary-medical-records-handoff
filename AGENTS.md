@@ -27,6 +27,7 @@ Assistant entrypoint Keep reads minimal and route by intent.
 - **No direct commits to `main` (hard rule).** All changes go through a feature branch + PR. Exception: explicit per-instance user authorization. Without it, STOP and create a branch first.
 - **Branch naming convention (hard rule).** All new branches must follow the current canonical Branching module convention (currently `<category>/<slug>`). Before running `git branch`, `git switch -c`, or `git checkout -b`, load `docs/agent_router/01_WORKFLOW/START_WORK/00_entry.md` and `docs/agent_router/01_WORKFLOW/BRANCHING/00_entry.md`.
 - **Blocker escalation (hard rule).** If any required standard cannot be satisfied, STOP, explain the blocker, and ask for guidance.
+- **Agent-user interaction rule (hard rule).** Whenever the agent needs the user to choose between options — plan-start choices, hard-gate decisions, commit proposals, or any other selection — the agent MUST prefer interactive UI option selectors (e.g., clickable option lists) when the environment supports them. Fall back to numbered text options only when the environment does not support UI selectors. This rule is IDE-agnostic: it applies to any development environment that supports structured option presentation.
 - **Procedure auto-tracking.** When a canonical doc defines a **Procedure** heading with numbered steps, load them as todos and complete each after execution.
 - **Code reviews: manual trigger only.**
 - After modifying docs, run the DOC_UPDATES normalization pass once before finishing.

@@ -8,7 +8,11 @@
   ],
   "exclude_doc_globs": [
     "docs/projects/veterinary-medical-records/04-delivery/plans/*",
-    "docs/projects/veterinary-medical-records/04-delivery/plans/**/*"
+    "docs/projects/veterinary-medical-records/04-delivery/plans/**/*",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/*.md",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*.md",
+    "docs/projects/veterinary-medical-records/99-archive/*.md",
+    "docs/projects/veterinary-medical-records/99-archive/**/*.md"
   ],
   "rules": [
     {
@@ -102,7 +106,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL changes, including folder-matching plan-root naming and legacy root-file compatibility, require EXECUTION_PROTOCOL router parity propagation and doc-updates guard alignment.",
+      "description": "Project PLAN_EXECUTION_PROTOCOL changes, including flat plan-file naming and plan-start execution rules, require EXECUTION_PROTOCOL router parity propagation and doc-updates guard alignment.",
       "required_any": [
         "scripts/docs/generate-router-files.py",
         "backend/tests/unit/test_doc_updates_contract.py",

@@ -9,9 +9,9 @@ On continuation intent, select the first `[ ]` step and apply the decision table
 from the canonical protocol. This compatibility stub keeps the Step eligibility
 rule and decision table reference discoverable for legacy tooling.
 
-## Semi-unattended execution
+## Execution mode defaults
 
-See canonical protocol section: `Semi-Unattended Execution (Default Mode)`.
+See canonical protocol section: `Execution Mode Defaults`.
 
 ## CI GATE
 

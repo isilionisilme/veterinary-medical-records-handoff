@@ -95,7 +95,7 @@ Branches must be **short-lived** and focused on a single user story or a single 
 - A commit must **never** span multiple user stories.
 - A change may be implemented through **multiple commits**.
 - Commit history must remain **readable** to support reasoning and review.
-- **Agent commit confirmation (hard rule):** AI agents must present the staged files and proposed commit message to the user and wait for explicit confirmation before running `git commit`. Auto-commit without user confirmation is only permitted during active plan execution when the plan's automation mode is `Semiautomatico` or `Automatico` (see plan-execution-protocol.md §7).
+- **Agent commit confirmation (hard rule):** AI agents must present the staged files and proposed commit message to the user and wait for explicit confirmation before running `git commit`. Auto-commit without user confirmation is only permitted during active plan execution when the plan's execution mode is `Autonomous` (see plan-execution-protocol.md §7).
 
 ### Commit Message Conventions
 
@@ -229,18 +229,23 @@ Before creating or updating a Pull Request, the agent MUST run the partition gat
    - significant backend + frontend in one PR,
    - migration + feature behavior in one PR,
    - public contract changes + broad refactor in one PR.
-3. Apply thresholds:
-    - Size threshold exceeded if diff is greater than `400` changed lines or `15` changed files.
-    - Semantic threshold exceeded if any high-risk axis mix is present without explicit split rationale.
-4. Open user decision gate when thresholds are exceeded:
+3. Classify changed lines into buckets using the **Pull Request Classification** table:
+    - **Code lines**: files matching the `Code` type.
+    - **Doc lines**: files matching the `Docs-only` type.
+    - **Config lines**: files matching the `Non-code, non-doc` type.
+4. Apply thresholds using two independent signals:
+    - **Code risk signal (partition trigger):** exceeded when code lines > `400` or code files > `15`. Doc-only and config-only lines are excluded.
+    - **Review load signal (informational):** when total reviewable lines (code + docs + config) exceed `800`, note high review load in the PR description. Does NOT trigger the partition gate.
+    - **Semantic threshold:** exceeded if any high-risk axis mix is present without explicit split rationale.
+5. Open user decision gate when thresholds are exceeded:
    - Present `Option A`: keep single PR with explicit rationale.
    - Present `Option B`: split into additional PRs with proposed boundaries/dependencies.
    - Require explicit user selection before proceeding.
-5. Enforce selected outcome:
+6. Enforce selected outcome:
    - If user selects `Option A`, proceed with one PR and include rationale.
    - If user selects `Option B`, split and proceed with the agreed PR set.
    - Without explicit selection, STOP.
-6. Record evidence:
+7. Record evidence:
    - Include size metrics, semantic assessment, selected option, and rationale in plan `PR Roadmap` notes or PR description rationale.
 
 ### Plan-Level Pull Request Roadmap
@@ -317,6 +322,10 @@ Before reading the diff, complete a pre-review checklist:
 - Confirm scope and changed paths.
 - Confirm CI status and required checks.
 - Confirm risk profile and review depth.
+
+Entrypoint-size warning (non-blocking):
+- If the PR changes `AGENTS.md` and the root entrypoint has grown materially (for example, beyond roughly `4000` characters), report a `Should-fix` or `Nice-to-have` review note about token efficiency and routing discipline.
+- Treat this as a warning only. It is not a merge blocker by itself unless the added content creates routing ambiguity, duplicates canonical policy, or causes contract drift.
 
 1. **Layering and dependency direction** — `domain/` has no framework/db imports; `application/` depends only on `domain/` + `ports/`; `api/` is thin; `infra/` is persistence/IO only.
 2. **Maintainability** — clear naming, low duplication, cohesive modules, correct layer placement.
@@ -420,9 +429,10 @@ Issues that clearly predate the Pull Request:
 
 Compatibility note: this section is also referenced as **Large diff policy** in legacy router contracts.
 
-If the Pull Request diff exceeds ~400 lines of non-generated code:
-- Report a Should-fix noting reduced review confidence.
-- Suggest a split strategy when visible.
+Apply the **Pull Request Classification** to evaluate diff size:
+- **Docs-only PRs:** no size-based Should-fix. If total doc lines exceed `800`, note the review load but do not reduce confidence.
+- **Code or mixed PRs:** if *code lines* exceed ~`400`, report a Should-fix noting reduced review confidence. Doc lines do not count toward this threshold.
+- When a Should-fix is reported, suggest a split strategy when visible.
 - Continue the review with stated confidence limitations.
 
 ---

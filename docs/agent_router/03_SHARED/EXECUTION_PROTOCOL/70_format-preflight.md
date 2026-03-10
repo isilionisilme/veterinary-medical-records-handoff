@@ -19,6 +19,19 @@
 | Before PR creation/update | L3 | `scripts/ci/test-L3.ps1 -BaseRef main` |
 | Before merge to main | CI green | No local run needed |
 
+### Per-Task and Per-Checkpoint Test Gates (Hard Rule)
+
+During plan execution, agents MUST run tests at two granularities: per-task and per-checkpoint. The specific test level at each granularity is determined by the active Execution Mode (see §7).
+
+| Trigger | Command by level |
+|---|---|
+| After completing any plan task | L1: `scripts/ci/test-L1.ps1 -BaseRef HEAD` · L2: `scripts/ci/test-L2.ps1 -BaseRef main` |
+| At every commit checkpoint (📌) | L2: `scripts/ci/test-L2.ps1 -BaseRef main` · L3: `scripts/ci/test-L3.ps1 -BaseRef main` |
+
+**Retry limits** are defined per Execution Mode (see §7). On exceeding the retry limit: STOP and report to the user.
+
+These gates complement the SCOPE BOUNDARY preflight levels. The per-task gate ensures each individual task leaves the codebase in a passing state. The per-checkpoint gate validates the cumulative branch state at natural commit boundaries.
+
 ### User Validation Environment (Mandatory)
 
 When the agent asks the user to validate or test behavior manually, the agent MUST first start the project in **dev mode with hot reload enabled**.

@@ -6,7 +6,7 @@
 
 **Target release:** Release 19 — Critical architecture remediation
 
-**Origin:** [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (§6), Phase 2 (Q-2)
+**Origin:** [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (§6), Phase 2 (Q-2)
 
 **Severity:** HIGH  
 **Effort:** S (2-4h)
@@ -27,8 +27,8 @@ Re-accretion pattern — decomposed files grow back into hotspots without automa
 - Gate runs in < 30s
 
 **Authoritative References**
-- Tech: Architecture review findings and hotspot rationale: [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md)
-- Tech: Enforcement thresholds and changed-file CI scope: [ADR-ARCH-0005](../../02-tech/adr/ADR-ARCH-0005-complexity-gate-thresholds.md)
+- Tech: Architecture review findings and hotspot rationale: [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md)
+- Tech: Enforcement thresholds and changed-file CI scope: [ADR-ARCH-0005](../../../02-tech/adr/ADR-ARCH-0005-complexity-gate-thresholds.md)
 
 **Dependencies**
 - None. This should be implemented first to protect subsequent decomposition work.

@@ -47,6 +47,10 @@ Before reading the diff, complete a pre-review checklist:
 - Confirm CI status and required checks.
 - Confirm risk profile and review depth.
 
+Entrypoint-size warning (non-blocking):
+- If the PR changes `AGENTS.md` and the root entrypoint has grown materially (for example, beyond roughly `4000` characters), report a `Should-fix` or `Nice-to-have` review note about token efficiency and routing discipline.
+- Treat this as a warning only. It is not a merge blocker by itself unless the added content creates routing ambiguity, duplicates canonical policy, or causes contract drift.
+
 1. **Layering and dependency direction** — `domain/` has no framework/db imports; `application/` depends only on `domain/` + `ports/`; `api/` is thin; `infra/` is persistence/IO only.
 2. **Maintainability** — clear naming, low duplication, cohesive modules, correct layer placement.
 3. **Testability** — core logic testable without frameworks; unit + integration tests.
@@ -149,9 +153,10 @@ Issues that clearly predate the Pull Request:
 
 Compatibility note: this section is also referenced as **Large diff policy** in legacy router contracts.
 
-If the Pull Request diff exceeds ~400 lines of non-generated code:
-- Report a Should-fix noting reduced review confidence.
-- Suggest a split strategy when visible.
+Apply the **Pull Request Classification** to evaluate diff size:
+- **Docs-only PRs:** no size-based Should-fix. If total doc lines exceed `800`, note the review load but do not reduce confidence.
+- **Code or mixed PRs:** if *code lines* exceed ~`400`, report a Should-fix noting reduced review confidence. Doc lines do not count toward this threshold.
+- When a Should-fix is reported, suggest a split strategy when visible.
 - Continue the review with stated confidence limitations.
 
 ---

@@ -1,9 +1,9 @@
 <!-- AUTO-GENERATED from canonical source: plan-execution-protocol.md — DO NOT EDIT -->
 <!-- To update, edit the canonical source and run: python scripts/docs/generate-router-files.py -->
 
-## 1. Semi-Unattended Execution (Default Mode)
+## 1. Execution Mode Defaults
 
-The default execution mode is **semi-unattended**. After completing the current task according to the active mode and closure rules, the agent applies the **decision table in §10** to determine whether to chain or stop.
+Unless the active plan records a different selection in `**Execution Mode:**`, the default execution mode is **Semi-supervised**. After completing the current task according to the active mode and closure rules, the agent applies the **decision table in §10** to determine whether to chain or stop.
 
 ### Single-Chat Execution Rule (Hard Rule)
 
