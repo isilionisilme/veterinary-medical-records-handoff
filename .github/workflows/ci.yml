@@ -254,6 +254,33 @@ jobs:
           --ignore-vuln GHSA-2c2j-9gv5-cj73
           --ignore-vuln GHSA-7f5h-v6xp-fcq8
 
+  complexity_gate:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-dev.txt', 'backend/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run complexity gate
+        run: |
+          python scripts/quality/architecture_metrics.py --check --base-ref "${{ github.event.pull_request.base.sha }}" --warn-cc 11 --max-cc 30 --max-loc 500
+
   docker_packaging_guard:
     runs-on: ubuntu-latest
     steps:
