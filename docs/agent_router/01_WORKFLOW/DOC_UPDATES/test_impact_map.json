@@ -356,7 +356,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md",
-      "description": "Project IMPLEMENTATION_PLAN changes require propagation to its owner module.",
+      "description": "Project IMPLEMENTATION_PLAN changes require propagation to its owner module, including closeout link updates when backlog artifacts move to completed/.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
@@ -404,7 +404,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/Backlog/*.md",
-      "description": "Backlog root docs require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module.",
+      "description": "Backlog root docs require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module (including closeout moves to completed/).",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "backend/tests/unit/test_doc_updates_contract.py",
@@ -414,7 +414,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*.md",
-      "description": "Backlog item extraction/split docs require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module.",
+      "description": "Backlog item extraction/split docs require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module (including closeout moves to completed/).",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "backend/tests/unit/test_doc_updates_contract.py",
@@ -438,7 +438,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/implementation-history.md",
-      "description": "Project IMPLEMENTATION_HISTORY changes (including iteration close-out entries) require doc-updates guard alignment.",
+      "description": "Project IMPLEMENTATION_HISTORY changes (including iteration close-out entries and plan/backlog archive references) require doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",

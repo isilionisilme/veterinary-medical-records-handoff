@@ -1,4 +1,7 @@
-from backend.app.application.documents._shared import _normalize_visit_date_candidate
+from backend.app.application.documents._shared import (
+    _locate_visit_date_occurrences_from_raw_text,
+    _normalize_visit_date_candidate,
+)
 from backend.app.application.documents.edit_service import (
     InterpretationEditOutcome,
     InterpretationEditResult,
@@ -56,6 +59,7 @@ __all__ = [
     "ProcessingStepHistory",
     "RawTextArtifactAvailability",
     "ReviewToggleResult",
+    "_locate_visit_date_occurrences_from_raw_text",
     "_normalize_visit_date_candidate",
     "_project_review_payload_to_canonical",
     "_resolve_human_edit_candidate_confidence",

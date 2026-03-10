@@ -93,7 +93,7 @@ This directory contains the consolidated backlog for veterinary-medical-records.
 | ARCH-05 | Add Structured Logging to Critical Paths | Release 20 | [arch-05-add-structured-logging-critical-paths.md](arch-05-add-structured-logging-critical-paths.md) |
 | ARCH-06 | Create Security Architecture Documentation | Release 19 | [arch-06-create-security-architecture-documentation.md](arch-06-create-security-architecture-documentation.md) |
 | ARCH-07 | Create Production Deployment Documentation | Release 19 | [arch-07-create-production-deployment-documentation.md](arch-07-create-production-deployment-documentation.md) |
-| ARCH-08 | Expose `_shared` Functions Publicly | Release 20 | [arch-08-expose-shared-functions-publicly.md](arch-08-expose-shared-functions-publicly.md) |
+| ARCH-08 | Expose `_shared` Functions Publicly | Release 20 | [arch-08-expose-shared-functions-publicly.md](completed/arch-08-expose-shared-functions-publicly.md) |
 | ARCH-09 | Add ER Diagram to technical-design.md | Release 20 | [arch-09-add-er-diagram-to-technical-design.md](arch-09-add-er-diagram-to-technical-design.md) |
 | ARCH-10 | Write Missing ADRs | Release 20 | [arch-10-write-missing-adrs.md](arch-10-write-missing-adrs.md) |
 | ARCH-11 | Add Monitoring/Alerting Strategy Documentation | Release 20 | [arch-11-add-monitoring-alerting-strategy-docs.md](arch-11-add-monitoring-alerting-strategy-docs.md) |

@@ -1,12 +1,12 @@
 # ARCH-08 — Expose `_shared` Functions Publicly
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Architecture Improvement (code principles)
 
 **Target release:** Release 20 — Architecture hardening
 
-**Origin:** [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (encapsulation warning), Phase 2 (P-3)
+**Origin:** [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (encapsulation warning), Phase 2 (P-3)
 
 **Severity:** MEDIUM  
 **Effort:** XS (30min)

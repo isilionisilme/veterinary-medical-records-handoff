@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import html
-import re
 from typing import Annotated, cast
 
 from fastapi import APIRouter, Path, Request, status
@@ -27,229 +25,20 @@ from backend.app.application.document_service import (
     mark_document_reviewed,
     reopen_document_review,
 )
-from backend.app.application.documents._shared import _locate_visit_date_occurrences_from_raw_text
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .review_debug import (
+    build_visit_debug_sections,
+    build_visit_scoping_metrics,
+    render_visit_debug_html,
+)
 from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Review"])
 UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 DocumentIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
 RunIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
-_NEXT_VISIT_BOUNDARY_PATTERN = re.compile(
-    r"(?:\s*)?visita\s+(?:consulta\s+general|administrativa)\s+del\s+d[ií]a",
-    re.IGNORECASE,
-)
-_NON_ANCHORED_RAW_CONTEXT_SENTINELS = {
-    "Raw text no disponible para este run.",
-    "No se pudieron inferir offsets de contexto en raw text.",
-    "Sin ancla de fecha para recortar contexto.",
-    "Sin ventana de contexto disponible.",
-}
-
-
-def _render_visit_debug_html(*, document_id: str, visit_sections: list[dict[str, str]]) -> str:
-    cards: list[str] = []
-    for section in visit_sections:
-        title = html.escape(section["title"])
-        subtitle = html.escape(section["subtitle"])
-        raw_context = html.escape(section["raw_context"])
-        cards.append(
-            "<section style='border:1px solid #d8dee6;border-radius:10px;padding:12px;"
-            "margin:12px 0;background:#fff;'>"
-            f"<h3 style='margin:0 0 6px 0;font-size:16px;color:#1f2937;'>{title}</h3>"
-            f"<p style='margin:0 0 10px 0;color:#4b5563;font-size:13px;'>{subtitle}</p>"
-            "<pre style='white-space:pre-wrap;word-break:break-word;background:#f8fafc;"
-            "border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;"
-            "line-height:1.45;max-height:360px;overflow:auto;'>"
-            f"{raw_context}"
-            "</pre>"
-            "</section>"
-        )
-
-    cards_html = "".join(cards) if cards else "<p>No hay visitas disponibles.</p>"
-    escaped_document_id = html.escape(document_id)
-    return (
-        "<!doctype html><html lang='es'><head><meta charset='utf-8' />"
-        f"<title>Visit Debug - {escaped_document_id}</title>"
-        "</head><body style='font-family:Segoe UI,Arial,sans-serif;background:#f3f4f6;"
-        "margin:0;padding:20px;color:#111827;'>"
-        f"<h1 style='margin:0 0 12px 0;'>Debug de visitas - {escaped_document_id}</h1>"
-        "<p style='margin:0 0 18px 0;color:#374151;'>"
-        "Vista temporal de diagnóstico. Muestra el texto crudo asociado a cada visita."
-        "</p>"
-        f"{cards_html}"
-        "</body></html>"
-    )
-
-
-def _build_visit_debug_sections(*, visits: object, raw_text: str | None) -> list[dict[str, str]]:
-    if not isinstance(visits, list):
-        return []
-
-    assigned_visits = [
-        visit
-        for visit in visits
-        if isinstance(visit, dict) and visit.get("visit_id") != "unassigned"
-    ]
-    if not assigned_visits:
-        return []
-
-    if not isinstance(raw_text, str) or not raw_text.strip():
-        return [
-            {
-                "title": f"Visita {index + 1} ({visit.get('visit_date') or 'sin fecha'})",
-                "subtitle": f"visit_id={visit.get('visit_id') or 'n/a'}",
-                "raw_context": "Raw text no disponible para este run.",
-            }
-            for index, visit in enumerate(assigned_visits)
-        ]
-
-    offsets_by_date: dict[str, list[int]] = {}
-    for normalized_date, offset in _locate_visit_date_occurrences_from_raw_text(raw_text=raw_text):
-        offsets_by_date.setdefault(normalized_date, []).append(offset)
-
-    consumed_by_date: dict[str, int] = {}
-    sections_with_offsets: list[tuple[dict[str, str], int | None]] = []
-    for index, visit in enumerate(assigned_visits):
-        visit_id = str(visit.get("visit_id") or "n/a")
-        visit_date = visit.get("visit_date")
-        normalized_date = visit_date if isinstance(visit_date, str) else None
-        anchor_offset: int | None = None
-        if normalized_date is not None:
-            offsets = offsets_by_date.get(normalized_date, [])
-            consumed = consumed_by_date.get(normalized_date, 0)
-            if consumed < len(offsets):
-                anchor_offset = offsets[consumed]
-                consumed_by_date[normalized_date] = consumed + 1
-
-        sections_with_offsets.append(
-            (
-                {
-                    "title": f"Visita {index + 1} ({normalized_date or 'sin fecha'})",
-                    "subtitle": f"visit_id={visit_id}",
-                    "raw_context": "",
-                },
-                anchor_offset,
-            )
-        )
-
-    sorted_anchors = sorted(
-        [
-            (idx, offset)
-            for idx, (_, offset) in enumerate(sections_with_offsets)
-            if offset is not None
-        ],
-        key=lambda item: item[1],
-    )
-    if not sorted_anchors:
-        for section, _ in sections_with_offsets:
-            section["raw_context"] = "No se pudieron inferir offsets de contexto en raw text."
-        return [section for section, _ in sections_with_offsets]
-
-    offset_windows: dict[int, tuple[int, int]] = {}
-    for anchor_index, (section_index, start_offset) in enumerate(sorted_anchors):
-        next_start = (
-            sorted_anchors[anchor_index + 1][1]
-            if anchor_index + 1 < len(sorted_anchors)
-            else len(raw_text)
-        )
-        offset_windows[section_index] = (start_offset, next_start)
-
-    for section_index, (section, offset) in enumerate(sections_with_offsets):
-        if offset is None:
-            section["raw_context"] = "Sin ancla de fecha para recortar contexto."
-            continue
-        window = offset_windows.get(section_index)
-        if window is None:
-            section["raw_context"] = "Sin ventana de contexto disponible."
-            continue
-        start_offset, end_offset = window
-        window_text = raw_text[start_offset:end_offset]
-        boundary_match = _NEXT_VISIT_BOUNDARY_PATTERN.search(window_text)
-        if boundary_match is not None and boundary_match.start() > 0:
-            end_offset = start_offset + boundary_match.start()
-
-        section["raw_context"] = raw_text[start_offset:end_offset].strip() or "(vacío)"
-
-    return [section for section, _ in sections_with_offsets]
-
-
-def _build_visit_scoping_metrics(*, visits: object, raw_text: str | None) -> dict[str, object]:
-    if not isinstance(visits, list):
-        return {
-            "summary": {
-                "total_visits": 0,
-                "assigned_visits": 0,
-                "anchored_visits": 0,
-                "unassigned_field_count": 0,
-                "raw_text_available": bool(raw_text and raw_text.strip()),
-            },
-            "visits": [],
-        }
-
-    assigned_visits = [
-        visit
-        for visit in visits
-        if isinstance(visit, dict) and visit.get("visit_id") != "unassigned"
-    ]
-    raw_text_available = bool(isinstance(raw_text, str) and raw_text.strip())
-    debug_sections = _build_visit_debug_sections(visits=visits, raw_text=raw_text)
-    metrics_rows: list[dict[str, object]] = []
-
-    for index, visit in enumerate(assigned_visits):
-        fields = visit.get("fields")
-        field_count = (
-            len([field for field in fields if isinstance(field, dict)])
-            if isinstance(fields, list)
-            else 0
-        )
-        section = debug_sections[index] if index < len(debug_sections) else None
-        raw_context = section["raw_context"] if isinstance(section, dict) else ""
-        anchored = (
-            raw_text_available
-            and bool(raw_context)
-            and (raw_context not in _NON_ANCHORED_RAW_CONTEXT_SENTINELS)
-        )
-
-        metrics_rows.append(
-            {
-                "visit_index": index + 1,
-                "visit_id": visit.get("visit_id"),
-                "visit_date": visit.get("visit_date"),
-                "field_count": field_count,
-                "anchored_in_raw_text": anchored,
-                "raw_context_chars": len(raw_context) if anchored else 0,
-            }
-        )
-
-    unassigned_field_count = 0
-    for visit in visits:
-        if not isinstance(visit, dict) or visit.get("visit_id") != "unassigned":
-            continue
-        fields = visit.get("fields")
-        if isinstance(fields, list):
-            unassigned_field_count += len([field for field in fields if isinstance(field, dict)])
-
-    anchored_visits = len(
-        [
-            visit_metrics
-            for visit_metrics in metrics_rows
-            if visit_metrics["anchored_in_raw_text"] is True
-        ]
-    )
-
-    return {
-        "summary": {
-            "total_visits": len(visits),
-            "assigned_visits": len(assigned_visits),
-            "anchored_visits": anchored_visits,
-            "unassigned_field_count": unassigned_field_count,
-            "raw_text_available": raw_text_available,
-        },
-        "visits": metrics_rows,
-    }
 
 
 def _resolve_review_context(
@@ -400,8 +189,8 @@ def get_document_review_visit_debug_page(
         return resolved
     review_data, raw_text = resolved
     visits = review_data.active_interpretation.data.get("visits")
-    visit_sections = _build_visit_debug_sections(visits=visits, raw_text=raw_text)
-    html_body = _render_visit_debug_html(document_id=document_id, visit_sections=visit_sections)
+    visit_sections = build_visit_debug_sections(visits=visits, raw_text=raw_text)
+    html_body = render_visit_debug_html(document_id=document_id, visit_sections=visit_sections)
     return HTMLResponse(content=html_body, status_code=status.HTTP_200_OK)
 
 
@@ -435,7 +224,7 @@ def get_document_review_visit_scoping_observability(
         return resolved
     review_data, raw_text = resolved
     visits = review_data.active_interpretation.data.get("visits")
-    payload = _build_visit_scoping_metrics(visits=visits, raw_text=raw_text)
+    payload = build_visit_scoping_metrics(visits=visits, raw_text=raw_text)
     payload["document_id"] = document_id
     payload["run_id"] = review_data.latest_completed_run.run_id
     return JSONResponse(content=payload, status_code=status.HTTP_200_OK)

@@ -581,7 +581,7 @@ Fix remaining hexagonal violations, improve code hygiene, add missing ADRs, clos
 
 ### Items (in order)
 - [ARCH-04 — Fix infra→application Dependency Violation](Backlog/arch-04-fix-infra-application-hex-violation.md) (Planned)
-- [ARCH-08 — Expose `_shared` Functions Publicly](Backlog/arch-08-expose-shared-functions-publicly.md) (Planned)
+- [ARCH-08 — Expose `_shared` Functions Publicly](Backlog/completed/arch-08-expose-shared-functions-publicly.md) (Done)
 - [ARCH-15 — Explicitly Declare pydantic in requirements.txt](Backlog/arch-15-declare-pydantic-in-requirements.md) (Planned)
 - [ARCH-22 — Parameterize PRAGMA table_info Call](Backlog/arch-22-parameterize-pragma-table-info.md) (Planned)
 - [ARCH-24 — Replace Wildcard Re-export with Explicit Imports](Backlog/arch-24-replace-wildcard-re-export.md) (Planned)
