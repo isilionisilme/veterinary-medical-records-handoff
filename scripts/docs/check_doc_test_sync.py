@@ -12,6 +12,7 @@ Updated in DOCS-IMPROVEMENT D4 follow-up to track owner propagation after broad 
 Updated in DOCS-IMPROVEMENT PR3 follow-up to keep architecture source-of-truth
 router propagation changes covered by sync guard metadata updates.
 Updated in DOCS-IMPROVEMENT closeout follow-up to track Backlog/completed archival moves.
+Updated in ARCH-09 follow-up to cover TECHNICAL_DESIGN owner-router propagation.
 """
 
 from __future__ import annotations

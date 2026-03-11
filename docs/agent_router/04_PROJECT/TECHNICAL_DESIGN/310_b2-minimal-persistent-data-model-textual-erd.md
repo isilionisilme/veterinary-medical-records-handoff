@@ -3,6 +3,56 @@
 This section defines the **minimum required persistent entities** and invariants.
 It is **not** a SQL schema, but an authoritative structural contract.
 
+```mermaid
+erDiagram
+    Document ||--o{ ProcessingRun : "document_id (FK)"
+    ProcessingRun ||--o{ Artifacts : "run_id (FK)"
+    ProcessingRun ||--o{ InterpretationVersion : "run_id (FK)"
+    InterpretationVersion ||--o{ FieldChangeLog : "interpretation_id (FK)"
+
+    Document {
+        uuid document_id PK
+        string original_filename
+        string content_type
+        int file_size
+        string storage_path
+        enum review_status "IN_REVIEW | REVIEWED"
+        string language_override "nullable"
+    }
+    ProcessingRun {
+        uuid run_id PK
+        uuid document_id FK
+        enum state "QUEUED | RUNNING | COMPLETED | FAILED | TIMED_OUT"
+        string failure_type "nullable"
+        string language_used
+        int schema_contract_used
+    }
+    Artifacts {
+        uuid artifact_id PK
+        uuid run_id FK
+        enum artifact_type "RAW_TEXT | STEP_STATUS"
+        json payload
+    }
+    InterpretationVersion {
+        uuid interpretation_id PK
+        uuid run_id FK
+        int version_number
+        json data
+        bool is_active
+    }
+    FieldChangeLog {
+        uuid change_id PK
+        uuid interpretation_id FK
+        string field_path
+        string old_value
+        string new_value
+        string change_type
+    }
+```
+
+Core-model scope note:
+This ERD is intentionally limited to the 5 operational core entities required by ARCH-09. Additional governance/schema entities are specified normatively in B2.7-B2.9.
+
 ---
 
 ## B2.1 Document

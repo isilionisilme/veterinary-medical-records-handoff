@@ -12,6 +12,7 @@ Updated in DOCS-IMPROVEMENT D1 follow-up to keep 2026-03-09 source/router parity
 Updated in DOCS-IMPROVEMENT D4 follow-up to keep parity checks aligned after broad TOC regeneration.
 Updated in DOCS-IMPROVEMENT PR3 follow-up to keep architecture source-of-truth
 owner-routing updates aligned with parity guard expectations.
+Updated in ARCH-09 follow-up to keep TECHNICAL_DESIGN ERD source/owner propagation aligned.
 """
 
 from __future__ import annotations

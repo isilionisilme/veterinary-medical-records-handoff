@@ -79,3 +79,4 @@ Canonical project references routed here include:
 - Canonical EXTRACTION_QUALITY wording now uses neutral extraction-tracking artifact references (no direct `docs/agent_router/*` path literals).
 - Canonical TECHNICAL_DESIGN sync on 2026-03-09: E2E limitation wording aligned to `65 tests / 21 specs` and related architecture-link corrections propagated.
 - Canonical EXTRACTION_QUALITY sync on 2026-03-09: governance wording and navigation refresh propagated under TECHNICAL_DESIGN ownership.
+- Canonical TECHNICAL_DESIGN sync on 2026-03-11 (ARCH-09): B2 now includes a Mermaid ER diagram for the five core entities (`Document`, `ProcessingRun`, `Artifacts`, `InterpretationVersion`, `FieldChangeLog`) with FK/cardinality annotations.

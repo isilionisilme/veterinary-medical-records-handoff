@@ -1143,12 +1143,10 @@ authoritative structural contract.
 
 ```mermaid
 erDiagram
-    Document ||--o{ ProcessingRun : "has many"
-    ProcessingRun ||--o{ Artifact : "produces"
-    ProcessingRun ||--o{ InterpretationVersion : "has versions"
-    InterpretationVersion ||--o{ FieldChangeLog : "tracks edits"
-    SchemaVersion ||--o{ ProcessingRun : "used by"
-    StructuralChangeCandidate ||--o{ GovernanceDecision : "decided by"
+    Document ||--o{ ProcessingRun : "document_id (FK)"
+    ProcessingRun ||--o{ Artifacts : "run_id (FK)"
+    ProcessingRun ||--o{ InterpretationVersion : "run_id (FK)"
+    InterpretationVersion ||--o{ FieldChangeLog : "interpretation_id (FK)"
 
     Document {
         uuid document_id PK
@@ -1167,7 +1165,7 @@ erDiagram
         string language_used
         int schema_contract_used
     }
-    Artifact {
+    Artifacts {
         uuid artifact_id PK
         uuid run_id FK
         enum artifact_type "RAW_TEXT | STEP_STATUS"
@@ -1188,25 +1186,10 @@ erDiagram
         string new_value
         string change_type
     }
-    SchemaVersion {
-        int schema_contract_id PK
-        int version_number
-        json schema_definition
-        string created_by
-    }
-    StructuralChangeCandidate {
-        uuid candidate_id PK
-        enum change_type "NEW_KEY | KEY_RENAME | KEY_DEPRECATION | KEY_MAPPING"
-        enum status "PENDING | APPROVED | REJECTED | DEFERRED"
-        int occurrence_count
-    }
-    GovernanceDecision {
-        uuid decision_id PK
-        uuid candidate_id FK
-        enum decision_type "APPROVE | REJECT | DEFER | FLAG_CRITICAL"
-        string reviewer_id
-    }
 ```
+
+Core-model scope note:
+This ERD is intentionally limited to the 5 operational core entities required by ARCH-09. Additional governance/schema entities are specified normatively in B2.7-B2.9.
 
 ---
 
