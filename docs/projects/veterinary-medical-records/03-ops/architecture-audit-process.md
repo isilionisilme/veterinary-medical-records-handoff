@@ -1,10 +1,48 @@
+---
+title: "Architecture Audit Process"
+type: how-to
+status: active
+audience: contributor
+last-updated: 2026-03-09
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
+
+- [Architecture Audit Process](#architecture-audit-process)
+  - [Purpose](#purpose)
+  - [Audit Triggers](#audit-triggers)
+  - [Audit Types](#audit-types)
+    - [Complete audit](#complete-audit)
+    - [Partial audit](#partial-audit)
+    - [Quick check audit](#quick-check-audit)
+  - [Procedure: Complete audit](#procedure-complete-audit)
+  - [Procedure: Partial audit](#procedure-partial-audit)
+  - [Procedure: Quick check audit](#procedure-quick-check-audit)
+  - [Post-implementation Re-audit Guide](#post-implementation-re-audit-guide)
+  - [File Locations and Ownership](#file-locations-and-ownership)
+  - [Metrics Script Maintenance Notes](#metrics-script-maintenance-notes)
+  - [Related References](#related-references)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
+
+title: "Architecture Audit Process" type: how-to status: active audience: all last-updated: 2026-03-09
+
+---
+
 # Architecture Audit Process
 
-This document defines when to run architecture audits, which audit depth to choose, and how to execute each audit type consistently.
+This document defines when to run architecture audits, which audit depth to choose, and how to execute each audit type
+consistently.
 
 ## Purpose
 
 Use this process to:
+
 - Detect architecture regressions early.
 - Keep technical debt visible and measurable over time.
 - Convert findings into tracked delivery backlog items.
@@ -13,6 +51,7 @@ Use this process to:
 ## Audit Triggers
 
 Run an architecture audit when one or more of these triggers occur:
+
 - New release planning starts.
 - A major module is refactored or introduced.
 - A new architectural pattern, toolchain, or dependency policy is adopted.
@@ -27,6 +66,7 @@ Run an architecture audit when one or more of these triggers occur:
 Use when broad confidence is required (new baseline, milestone, or large architectural change).
 
 Scope:
+
 - Documentation architecture audit.
 - Full codebase architecture audit.
 - Coupling and hotspot analysis.
@@ -40,6 +80,7 @@ Expected duration: 1-3 working days depending on churn and artifact quality.
 Use after implementation waves that changed architecture-relevant code.
 
 Scope:
+
 - Codebase architecture audit.
 - Coupling and hotspot analysis.
 - Delta synthesis against previous baseline.
@@ -51,6 +92,7 @@ Expected duration: 0.5-1 day.
 Use for routine control between larger audit cycles.
 
 Scope:
+
 - Automated metrics collection and thresholds only.
 - Spot-check top hotspots and violations.
 
@@ -71,6 +113,7 @@ Expected duration: 5-30 minutes.
 11. Archive evidence paths and command outputs in the report.
 
 Deliverables:
+
 - `docs/projects/veterinary-medical-records/02-tech/audits/architecture-review-<date>.md`
 - `docs/projects/veterinary-medical-records/02-tech/audits/improvement-backlog-<date>.md`
 - `docs/projects/veterinary-medical-records/04-delivery/Backlog/arch-*.md` (approved subset)
@@ -85,6 +128,7 @@ Deliverables:
 6. Update release planning if priorities changed.
 
 Deliverables:
+
 - Updated architecture review delta section or new dated review.
 - Updated improvement backlog priorities and mappings.
 
@@ -96,21 +140,25 @@ Deliverables:
 4. Open/update backlog entries only if a new regression appears.
 
 Commands:
+
 - `.venv/Scripts/python scripts/quality/architecture_metrics.py --baseline <yyyy-mm-dd>`
 - `.venv/Scripts/python scripts/quality/architecture_metrics.py --baseline <yyyy-mm-dd> --check`
 
 Deliverables:
+
 - `tmp/audit/metrics.json`
 - `tmp/audit/metrics-report.md`
 
 ## Post-implementation Re-audit Guide
 
 Use these checkpoints after architecture backlog implementation:
+
 - After top 5 ARCH items: run quick check audit.
 - After about 15 ARCH items: run partial audit.
 - After all ARCH items in current wave: run complete audit and establish a new baseline.
 
 Record before/after comparison for:
+
 - Maximum cyclomatic complexity.
 - Number of hotspots.
 - Number of hexagonal dependency violations.
@@ -119,6 +167,7 @@ Record before/after comparison for:
 ## File Locations and Ownership
 
 Primary audit artifacts:
+
 - Reviews and backlogs: `docs/projects/veterinary-medical-records/02-tech/audits/`
 - Delivery backlog items: `docs/projects/veterinary-medical-records/04-delivery/Backlog/`
 - Release planning: `docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`
@@ -128,6 +177,7 @@ Primary audit artifacts:
 ## Metrics Script Maintenance Notes
 
 Keep `scripts/quality/architecture_metrics.py` aligned with project reality:
+
 - Revisit thresholds when the codebase size or architecture strategy changes.
 - Keep parser and detector rules deterministic and side-effect free.
 - Keep output schema stable (`metrics.json` and Markdown report) for CI and report consumers.

@@ -310,6 +310,9 @@ def test_doc_test_sync_map_has_minimum_rules() -> None:
     assert '"docs/agent_router/03_SHARED/WAY_OF_WORKING/*.md"' in text
     assert '"docs/agent_router/04_PROJECT/BACKEND_IMPLEMENTATION/*.md"' in text
     assert '"doc_glob": "docs/shared/01-product/brand-guidelines.md"' in text
+    assert '"doc_glob": "docs/shared/01-product/ux-guidelines.md"' in text
+    assert '"doc_glob": "docs/shared/02-tech/coding-standards.md"' in text
+    assert '"doc_glob": "docs/shared/02-tech/documentation-guidelines.md"' in text
     assert "test_doc_updates_contract.py" in text
     assert "check_brand_compliance.py" in text
 

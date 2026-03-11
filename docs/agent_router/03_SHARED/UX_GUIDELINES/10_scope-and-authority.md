@@ -5,6 +5,8 @@
 
 This document defines:
 
+- The mandatory shared baseline for UX principles used across projects
+
 - Shared UX principles
 - Global interaction heuristics
 - Accessibility and usability expectations

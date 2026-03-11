@@ -8,16 +8,14 @@ last-updated: 2026-03-02
 
 # UX Guidelines — Shared Principles
 
-> **Canonical source of truth.**
-> This file is a canonical document maintained by humans.
-> Router files under `docs/agent_router/` are derived outputs generated from this canonical source.
-> Flow is **canonical → router only**. Router files MUST NOT be edited directly.
+> **Canonical source of truth.** This file is a canonical document maintained by humans.
+> Derived router files are auto-generated from this canonical source. Flow is **canonical → router only**.
+> Router files MUST NOT be edited directly.
 
 **Breadcrumbs:** [Docs](../../README.md) / Shared / 01-product
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Scope and Authority](#scope-and-authority)
 - [Core UX Principles](#core-ux-principles)
@@ -31,20 +29,23 @@ last-updated: 2026-03-02
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-This document defines the **global UX principles and interaction guidelines**
-that apply to **all products and initiatives** developed at Barkibu.
+This document defines the **global UX principles and interaction guidelines** that apply to **all products and
+initiatives** developed at Barkibu. It is normative for shared interaction principles across projects.
 
-It is **project-agnostic** and must not contain product- or initiative-specific
-flows, behaviors, roles, or domain assumptions.
+It is **project-agnostic** and must not contain product- or initiative-specific flows, behaviors, roles, or domain
+assumptions.
 
-If any UX decision depends on product context, it must be defined in the
-corresponding **project-level UX document** (e.g. [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
+If any UX decision depends on product context, it must be defined in the corresponding **project-level UX document**
+(e.g.
+[`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
 
 ---
 
 ## Scope and Authority
 
 This document defines:
+
+- The mandatory shared baseline for UX principles used across projects
 
 - Shared UX principles
 - Global interaction heuristics
@@ -93,8 +94,8 @@ All Barkibu products follow a **human-in-the-loop philosophy**:
 - High-stakes decisions require **explicit human confirmation**.
 - Systems must remain **explainable and auditable**.
 
-How this philosophy is realized in concrete workflows (review, editing,
-confirmation, escalation) is **project-specific** and must not be defined here.
+How this philosophy is realized in concrete workflows (review, editing, confirmation, escalation) is
+**project-specific** and must not be defined here.
 
 ---
 
@@ -106,8 +107,7 @@ When confidence, uncertainty, or quality signals are exposed in a UI:
 - They **must not block** user actions.
 - They **must not imply correctness or authority**.
 
-The exact semantics, thresholds, visual encoding, or prioritization rules for
-confidence are **project-specific**.
+The exact semantics, thresholds, visual encoding, or prioritization rules for confidence are **project-specific**.
 
 ---
 
@@ -120,15 +120,13 @@ All products must:
 - Avoid relying on color alone to convey meaning.
 - Use consistent interaction patterns across similar contexts.
 
-Accessibility requirements beyond these shared expectations are defined
-per project.
+Accessibility requirements beyond these shared expectations are defined per project.
 
 ---
 
 ## Role-Specific Workflows
 
-Role definitions (e.g. veterinarian, reviewer, admin), responsibilities,
-and workflows:
+Role definitions (e.g. veterinarian, reviewer, admin), responsibilities, and workflows:
 
 - Must **not** be defined in shared UX guidelines.
 - Must live in **project-level UX design documents**.
@@ -158,10 +156,11 @@ For any UX decision that depends on:
 - Confidence interpretation
 - Review, learning, or governance workflows
 
-This document **must defer** to the corresponding project-level UX document
-(e.g. [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
+This document **must defer** to the corresponding project-level UX document (e.g.
+[`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
 
-If no such document exists, AI assistants must **NOT** invent or assume UX behavior — they must consult the team before implementing.
+If no such document exists, AI assistants must **NOT** invent or assume UX behavior — they must consult the team before
+implementing.
 
 ---
 
@@ -169,5 +168,4 @@ If no such document exists, AI assistants must **NOT** invent or assume UX behav
 
 This document defines **principles and boundaries**, not product behavior.
 
-If a concrete UX decision cannot be resolved using only the rules above,
-it does **not** belong here.
+If a concrete UX decision cannot be resolved using only the rules above, it does **not** belong here.

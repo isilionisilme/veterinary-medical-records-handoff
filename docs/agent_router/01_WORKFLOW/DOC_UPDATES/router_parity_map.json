@@ -13,7 +13,7 @@
   "rules": [
     {
       "source_doc": "docs/shared/02-tech/llm-benchmarks.md",
-      "description": "Shared LLM_BENCHMARKS must remain discoverable from shared docs entry.",
+      "description": "Shared LLM_BENCHMARKS must remain discoverable from shared docs entry after policy alignment updates.",
       "router_modules": [
         {
           "path": "docs/agent_router/03_SHARED/00_entry.md",
@@ -37,7 +37,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/manual-qa-regression-checklist.md",
-      "description": "Project MANUAL_QA_REGRESSION_CHECKLIST must map to project docs owner entry module.",
+      "description": "Project MANUAL_QA_REGRESSION_CHECKLIST must map to project docs owner entry module after policy updates.",
       "router_modules": [
         {
           "path": "docs/agent_router/04_PROJECT/00_entry.md",
@@ -158,7 +158,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-e2e-test-coverage.md",
-      "description": "Project testing plans must remain routed under project modules.",
+      "description": "Project testing plans must remain routed under project modules after policy updates.",
       "router_modules": [
         {
           "path": "docs/agent_router/04_PROJECT/00_entry.md",
@@ -263,7 +263,7 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
-      "description": "Project PLAN_MANAGEMENT must remain discoverable through project docs owner routing, including the folder-matching plan-root naming rule, mandatory Phase 0 plan-start preflight guidance, and placeholder metadata policy for branch/worktree plus explicit user selections.",
+      "description": "Project PLAN_MANAGEMENT must remain discoverable through project docs owner routing, including the single-file plan naming rule, mandatory Phase 0 plan-start preflight guidance, and placeholder metadata policy for branch/worktree plus explicit user selections.",
       "router_modules": [
         {
           "path": "docs/agent_router/04_PROJECT/00_entry.md",

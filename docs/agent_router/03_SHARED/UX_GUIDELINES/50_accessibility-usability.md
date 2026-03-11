@@ -10,7 +10,6 @@ All products must:
 - Avoid relying on color alone to convey meaning.
 - Use consistent interaction patterns across similar contexts.
 
-Accessibility requirements beyond these shared expectations are defined
-per project.
+Accessibility requirements beyond these shared expectations are defined per project.
 
 ---

@@ -1,11 +1,56 @@
+---
+title: "Coding Standards"
+type: reference
+status: active
+audience: all
+last-updated: 2026-03-09
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
+
+- [Coding Standards](#coding-standards)
+  - [Purpose](#purpose)
+  - [Change Discipline](#change-discipline)
+  - [Code Style & Consistency](#code-style--consistency)
+  - [Structure & Separation of Concerns](#structure--separation-of-concerns)
+  - [Explicit Contracts & Schemas](#explicit-contracts--schemas)
+  - [State Management & Workflow Safety](#state-management--workflow-safety)
+  - [Traceability & Human Control](#traceability--human-control)
+  - [Error Handling & Observability](#error-handling--observability)
+    - [Error classification](#error-classification)
+    - [Observability & metrics](#observability--metrics)
+  - [Testing Discipline](#testing-discipline)
+  - [Data Handling & Safety](#data-handling--safety)
+  - [Configuration & Environment Separation](#configuration--environment-separation)
+  - [Versioning & Evolution](#versioning--evolution)
+  - [Dependency Management](#dependency-management)
+  - [Naming Conventions](#naming-conventions)
+    - [API and endpoints](#api-and-endpoints)
+    - [Domain concepts and models](#domain-concepts-and-models)
+    - [Lifecycle states](#lifecycle-states)
+    - [Persistence artifacts](#persistence-artifacts)
+  - [Architectural Layering (Review Criteria)](#architectural-layering-review-criteria)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+---
+
+title: "Coding Standards" type: reference status: active audience: all last-updated: 2026-03-09
+
+---
+
 # Coding Standards
 
-> **Canonical source of truth.**
-> This document is the single authoritative reference for all technical coding standards in this project.
+> **Canonical source of truth.** This document is the single authoritative reference for all technical coding standards
+> in this project.
 >
 > **Governance:**
+>
 > - This file is a canonical document maintained by humans.
-> - Router files under `docs/agent_router/` are derived outputs generated from this canonical source.
+> - Derived router modules are generated from this canonical source.
 > - Flow is **canonical → router only**. Router files MUST NOT be edited directly.
 > - Any direct edit to a router file may be overwritten during the next regeneration cycle.
 
@@ -13,10 +58,12 @@
 
 ## Purpose
 
-These standards define the **mandatory technical rules** for all code in this project.
-They apply to every approved implementation and must be followed consistently by all contributors (human and AI).
+These standards define the **mandatory technical rules** for all code in this project. They apply to every approved
+implementation and must be followed consistently by all contributors (human and AI). These standards are normative for
+implementation and review decisions.
 
-AI assistants must not silently skip or partially comply with these standards. If a standard cannot be satisfied, they must stop and explain the blocker before proceeding.
+AI assistants must not silently skip or partially comply with these standards. If a standard cannot be satisfied, they
+must stop and explain the blocker before proceeding.
 
 ---
 
@@ -142,7 +189,8 @@ AI assistants must not silently skip or partially comply with these standards. I
 
 ## Naming Conventions
 
-> Git naming conventions (branches, commits, Pull Requests) are defined in [way-of-working.md §2–§5](../03-ops/way-of-working.md).
+> Git naming conventions (branches, commits, Pull Requests) are defined in
+> [way-of-working.md §2–§5](../03-ops/way-of-working.md).
 
 ### API and endpoints
 
@@ -186,22 +234,26 @@ AI assistants must not silently skip or partially comply with these standards. I
 
 When reviewing code, validate correct layering and dependency direction:
 
-1. **Domain layer** (`domain/`): No framework or database imports. Pure business logic, frozen dataclasses, domain services.
+1. **Domain layer** (`domain/`): No framework or database imports. Pure business logic, frozen dataclasses, domain
+   services.
 2. **Application layer** (`application/`): Depends only on `domain/` and `ports/`. Orchestration and use cases.
 3. **API layer** (`api/`): Thin HTTP adapter only — mapping and validation. No SQL or business logic.
 4. **Infrastructure layer** (`infra/`): Persistence, I/O, and external service adapters only.
 
 Maintainability priorities (in order):
+
 - Clear naming and responsibilities
 - Low duplication
 - Small, cohesive modules and functions
 - Logic located in the correct layer
 
 Testability requirements:
+
 - Core application logic must be testable without FastAPI or SQLite.
 - Unit tests for services; integration tests for HTTP + wiring.
 
 Simplicity principle:
+
 - Flag overengineering risks.
 - Prefer removing complexity over adding abstraction.
 - Prefer small, high-impact fixes over large refactors.

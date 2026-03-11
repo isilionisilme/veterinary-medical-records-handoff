@@ -37,14 +37,14 @@ Use the local preflight system with three levels before pushing changes.
 
 ### Preflight Auto-Fix Policy
 
-Auto-fix policy when preflight fails: apply focused fixes and rerun the same level.
-Maximum automatic remediation loop: 2 attempts.
+Auto-fix policy when preflight fails: apply focused fixes and rerun the same
+level. Maximum automatic remediation loop: 2 attempts.
 
 When a preflight level (L1/L2/L3) fails:
 
 - AI assistants must attempt focused fixes automatically before proceeding.
 - Auto-fixes must stay within the current change scope and avoid unrelated refactors.
-- Maximum automatic remediation loop: **2 attempts** (fix + rerun the failed level).
+- Maximum automatic remediation loop: 2 attempts (fix + rerun the failed level).
 - **Never bypass quality gates** (`--no-verify`, disabling tests/checks, weakening assertions) to force a pass.
 - If failures persist after the limit, STOP and report root cause, impacted files, and next-action options.
 
@@ -52,23 +52,29 @@ When a preflight level (L1/L2/L3) fails:
 
 ## 5. Pull Request Workflow
 
-- Every user story or technical change requires **at least one Pull Request**. A single story or change may be split across multiple Pull Requests when the scope justifies it.
-- Pull Requests are opened once the change (or the slice covered by that Pull Request) is **fully implemented** and **all automated tests are passing**.
-- Each Pull Request must be small enough to be reviewed comfortably in isolation and should focus on a **single user story or a single technical concern**.
+- Every user story or technical change requires **at least one Pull Request**. A single story or change may be split
+  across multiple Pull Requests when the scope justifies it.
+- Pull Requests are opened once the change (or the slice covered by that Pull Request) is **fully implemented** and
+  **all automated tests are passing**.
+- Each Pull Request must be small enough to be reviewed comfortably in isolation and should focus on a **single user
+  story or a single technical concern**.
 - Pull Request creation/update is always explicit user-triggered.
 
 ### Pull Request Title Conventions
 
 **User stories:**
+
 - `Story <ID> — <Full User Story Title>`
 
 **Technical work:**
+
 - `<type>: <short description>`
 
 ### Pull Request Body Requirements
 
 - Pull Request title, body, and review comments must be written in **English**.
-- When setting the Pull Request description/body from CLI, use real multiline content (heredoc or file input), not escaped `\n` sequences.
+- When setting the Pull Request description/body from CLI, use real multiline content (heredoc or file input), not
+  escaped `\n` sequences.
 - Preferred patterns:
   - `gh pr create --body-file <path-to-markdown-file>`
   - PowerShell here-string assigned to a variable and passed to `--body`
@@ -77,11 +83,11 @@ When a preflight level (L1/L2/L3) fails:
 
 Classify the Pull Request by file types:
 
-| Type | File patterns |
-|------|--------------|
-| **Docs-only** | `docs/**`, `*.md`, `*.txt`, `*.rst`, `*.adoc` only |
-| **Code** | Any `*.py`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.css`, `*.scss`, `*.html`, `*.sql` |
-| **Non-code, non-doc** | `*.json`, `*.yaml`, `*.yml`, `*.toml`, `*.ini`, `*.env` |
+| Type                  | File patterns                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| **Docs-only**         | `docs/**`, `*.md`, `*.txt`, `*.rst`, `*.adoc` only                                 |
+| **Code**              | Any `*.py`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.css`, `*.scss`, `*.html`, `*.sql` |
+| **Non-code, non-doc** | `*.json`, `*.yaml`, `*.yml`, `*.toml`, `*.ini`, `*.env`                            |
 
 ### Pre-PR Commit History Review (Hard Rule)
 
@@ -96,7 +102,8 @@ If issues are found, amend, reorder, or squash commits before opening the PR.
 
 ### Pull Request Procedure
 
-When the user explicitly requests Pull Request creation or update, an AI coding assistant or automation tool must follow this procedure automatically:
+When the user explicitly requests Pull Request creation or update, an AI coding assistant or automation tool must follow
+this procedure automatically:
 
 1. Confirm repository state (branch, base, working tree).
 2. Create/update the Pull Request targeting `main`.
@@ -106,7 +113,15 @@ When the user explicitly requests Pull Request creation or update, an AI coding 
    - Review canonical UX/brand sources before implementation/review.
    - Add a `UX/Brand compliance` section to the Pull Request description.
 6. Include end-user validation steps when applicable.
-7. Before requesting merge, if the Pull Request includes code changes and no code review has been performed, ask the user whether a review should be done. Include a recommended review depth (see Section 6 — Review Depth) with a brief justification.
+7. Before requesting merge, if the Pull Request includes code changes and no code review has been performed, ask the
+   user whether a review should be done. Include a recommended review depth (see Section 6 — Review Depth) with a brief
+   justification.
+
+Entrypoint-size warning (non-blocking):
+
+- If the PR changes `AGENTS.md` and the root entrypoint has grown materially
+  (for example, beyond roughly `4000` characters), report a `Should-fix` or
+  `Nice-to-have` review note about token efficiency and routing discipline.
 
 ### PR Partition Gate (hard rule)
 
@@ -119,30 +134,27 @@ Before creating or updating a Pull Request, the agent MUST run the partition gat
    - significant backend + frontend in one PR,
    - migration + feature behavior in one PR,
    - public contract changes + broad refactor in one PR.
-3. Classify changed lines into buckets using the **Pull Request Classification** table:
-    - **Code lines**: files matching the `Code` type.
-    - **Doc lines**: files matching the `Docs-only` type.
-    - **Config lines**: files matching the `Non-code, non-doc` type.
-4. Apply thresholds using two independent signals:
-    - **Code risk signal (partition trigger):** exceeded when code lines > `400` or code files > `15`. Doc-only and config-only lines are excluded.
-    - **Review load signal (informational):** when total reviewable lines (code + docs + config) exceed `800`, note high review load in the PR description. Does NOT trigger the partition gate.
-    - **Semantic threshold:** exceeded if any high-risk axis mix is present without explicit split rationale.
-5. Open user decision gate when thresholds are exceeded:
+3. Apply thresholds:
+   - Size threshold exceeded if diff is greater than `400` changed lines or `15` changed files.
+   - Semantic threshold exceeded if any high-risk axis mix is present without explicit split rationale.
+4. Open user decision gate when thresholds are exceeded:
    - Present `Option A`: keep single PR with explicit rationale.
    - Present `Option B`: split into additional PRs with proposed boundaries/dependencies.
    - Require explicit user selection before proceeding.
-6. Enforce selected outcome:
+5. Enforce selected outcome:
    - If user selects `Option A`, proceed with one PR and include rationale.
    - If user selects `Option B`, split and proceed with the agreed PR set.
    - Without explicit selection, STOP.
-7. Record evidence:
-   - Include size metrics, semantic assessment, selected option, and rationale in plan `PR Roadmap` notes or PR description rationale.
+6. Record evidence:
+   - Include size metrics, semantic assessment, selected option, and rationale in plan `PR Roadmap` notes or PR
+     description rationale.
 
 ### Plan-Level Pull Request Roadmap
 
 Compatibility note: this section is also referenced as **Plan-level PR Roadmap** in legacy router contracts.
 
 When a plan spans multiple Pull Requests, it must include a **Pull Request Roadmap** section:
+
 - Table with columns: **Pull Request**, **Branch**, **Phases**, **Scope**, **Depends on**.
 - The planning agent must estimate PR count during plan creation and record it in the roadmap before execution starts.
 - Each phase belongs to exactly one Pull Request.
@@ -152,17 +164,21 @@ When a plan spans multiple Pull Requests, it must include a **Pull Request Roadm
 - A Pull Request is merged only when all its assigned phases pass CI and user review.
 
 PR split threshold (mandatory, mixed model):
+
 - Semantic and size thresholds are mandatory risk signals.
-- Exceeding a threshold triggers the user decision gate above; it does not force automatic split without user confirmation.
+- Exceeding a threshold triggers the user decision gate above; it does not force automatic split without user
+  confirmation.
 - If uncertain, default to smaller PR slices and declare dependencies in the roadmap.
 
 ### Post-Merge Cleanup Procedure
 
 After a Pull Request is merged into `main`, the AI assistant must run this cleanup automatically:
+
 1. Ensure the working tree is clean.
 2. Check for stashes related to the merged branch; clean up where safe.
 3. Switch to `main` and pull latest changes.
 4. Delete the local branch (safe deletion first; force-delete only if verified no unique commits).
-5. Attempt to delete the remote branch (`git push origin --delete <branch-name>`). If it fails because the branch is missing, protected, or you lack permissions, report it and continue cleanup.
+5. Attempt to delete the remote branch (`git push origin --delete <branch-name>`).
+   If it fails because the branch is missing, protected, or you lack permissions, report it and continue cleanup.
 
 ---

@@ -9,7 +9,6 @@ When confidence, uncertainty, or quality signals are exposed in a UI:
 - They **must not block** user actions.
 - They **must not imply correctness or authority**.
 
-The exact semantics, thresholds, visual encoding, or prioritization rules for
-confidence are **project-specific**.
+The exact semantics, thresholds, visual encoding, or prioritization rules for confidence are **project-specific**.
 
 ---

@@ -11,6 +11,7 @@
 - Always prefer completing a **smaller, well-defined** user story over partially implementing a larger one.
 
 Each release must result in:
+
 - A runnable and testable system state
 - Clear, observable user-facing behavior
 - Explicitly persisted data and state transitions

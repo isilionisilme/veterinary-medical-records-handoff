@@ -192,7 +192,7 @@ When a plan includes commit checkpoint recommendations, use this blockquote form
 Rules:
 - Checkpoint blockquotes are guidance, not executable checklist items (consistent with the Plan Scope Principle).
 - Place checkpoints after the last step of a logical group or phase.
-- The suggested commit message must follow [way-of-working.md §3](../../shared/03-ops/way-of-working.md) conventions.
+- The suggested commit message must follow [way-of-working.md §3](../../../shared/03-ops/way-of-working.md) conventions.
 - The L2 reference is `scripts/ci/test-L2.ps1 -BaseRef main`.
 
 ---

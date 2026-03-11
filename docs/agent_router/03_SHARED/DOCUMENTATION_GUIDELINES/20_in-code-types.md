@@ -6,6 +6,7 @@
 ### When to add docstrings
 
 Add docstrings to:
+
 - Public modules
 - Domain and application services
 - Public functions and methods
@@ -15,6 +16,7 @@ Add docstrings to:
 ### Docstring content
 
 Docstrings must include when relevant:
+
 - Purpose and responsibility
 - Inputs and outputs
 - Requirements and invariants
@@ -31,6 +33,7 @@ Docstrings must include when relevant:
 ### When NOT to add docstrings
 
 Do NOT add docstrings for:
+
 - Trivial helpers
 - Self-explanatory one-liners
 - Simple pass-through logic

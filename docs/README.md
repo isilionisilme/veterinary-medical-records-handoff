@@ -1,6 +1,6 @@
 ---
 title: "Wiki — Documentation Index"
-type: index
+type: reference
 status: active
 audience: all
 last-updated: 2026-03-02
@@ -8,12 +8,10 @@ last-updated: 2026-03-02
 
 # Wiki — Documentation Index
 
-
 **Breadcrumbs:** Docs
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Folder structure](#folder-structure)
 - [Sitemap](#sitemap)
@@ -31,7 +29,8 @@ last-updated: 2026-03-02
 Human-oriented index for all canonical documentation in this repository.
 
 ## Folder structure
-```
+
+```text
 docs/
 ├── shared/           ← standards and guidelines shared across all projects
 ├── projects/         ← per-initiative documentation
@@ -63,6 +62,7 @@ docs/
   - `03-ops/plan-execution-protocol.md`
   - `03-ops/plan-e2e-test-coverage.md`
   - `04-delivery/copilot-usage.md`
+  - `04-delivery/changelog-2026-03-09.md`
   - `04-delivery/delivery-summary.md`
   - `04-delivery/future-improvements.md`
   - `04-delivery/implementation-history.md`
@@ -78,8 +78,10 @@ docs/
 
 Standards that apply across all initiatives:
 
-- [coding-standards.md](shared/02-tech/coding-standards.md) — code style, architecture, contracts, naming, and technical standards.
-- [documentation-guidelines.md](shared/02-tech/documentation-guidelines.md) — documentation rules, change classification, and verification.
+- [coding-standards.md](shared/02-tech/coding-standards.md) — code style, architecture, contracts, naming, and technical
+  standards.
+- [documentation-guidelines.md](shared/02-tech/documentation-guidelines.md) — documentation rules, change
+  classification, and verification.
 - [way-of-working.md](shared/03-ops/way-of-working.md) — branch→commit→PR→review→merge lifecycle and working agreements.
 - [ux-guidelines.md](shared/01-product/ux-guidelines.md) — global UX principles.
 - [brand-guidelines.md](shared/01-product/brand-guidelines.md) — global brand rules.
@@ -87,18 +89,27 @@ Standards that apply across all initiatives:
 
 ## Projects
 
-- [veterinary-medical-records](projects/veterinary-medical-records/) — AI-assisted veterinary clinical records processing.
+- [veterinary-medical-records](projects/veterinary-medical-records/) — AI-assisted veterinary clinical records
+  processing.
 
 See [projects/README.md](projects/README.md) for the full initiative listing.
 
 ## Evaluator first-pass (recommended, 10-15 min)
 
 1. [README.md](../README.md) — Docker-first quickstart, smoke path, and repository overview.
-2. [product-design.md](projects/veterinary-medical-records/01-product/product-design.md) — problem framing and intended outcomes.
-3. [technical-design.md](projects/veterinary-medical-records/02-tech/technical-design.md) — architecture, contracts, and invariants.
-4. [ADR index](projects/veterinary-medical-records/02-tech/adr/index.md) — architecture decision records and trade-off rationale.
-5. [ux-design.md](projects/veterinary-medical-records/01-product/ux-design.md) — review workflow and UX interaction guarantees.
-6. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation details.
+2. [product-design.md](projects/veterinary-medical-records/01-product/product-design.md) — problem framing and intended
+   outcomes.
+3. [technical-design.md](projects/veterinary-medical-records/02-tech/technical-design.md) — architecture, contracts, and
+   invariants.
+4. [ADR index](projects/veterinary-medical-records/02-tech/adr/index.md) — architecture decision records and trade-off
+   rationale.
+5. [ux-design.md](projects/veterinary-medical-records/01-product/ux-design.md) — review workflow and UX interaction
+   guarantees.
+6. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and
+   [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation
+   details.
+7. [delivery-summary.md](projects/veterinary-medical-records/04-delivery/delivery-summary.md) — current delivery scope,
+   release framing, and follow-up references.
 
 ## Tooling (optional)
 
@@ -110,17 +121,23 @@ If documents conflict, resolve in this order:
 
 1. [technical-design.md](projects/veterinary-medical-records/02-tech/technical-design.md) — contracts and invariants
 2. [ux-design.md](projects/veterinary-medical-records/01-product/ux-design.md) — interaction contract
-3. [product-design.md](projects/veterinary-medical-records/01-product/product-design.md) — system meaning and governance boundary
+3. [product-design.md](projects/veterinary-medical-records/01-product/product-design.md) — system meaning and governance
+   boundary
 4. [implementation-plan.md](projects/veterinary-medical-records/04-delivery/implementation-plan.md) — release sequencing
-5. [Backlog/README.md](projects/veterinary-medical-records/04-delivery/Backlog/README.md) and backlog item files — story scope and acceptance criteria
-6. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation notes
+5. [Backlog/README.md](projects/veterinary-medical-records/04-delivery/Backlog/README.md) and backlog item files — story
+   scope and acceptance criteria
+6. [backend-implementation.md](projects/veterinary-medical-records/02-tech/backend-implementation.md) and
+   [frontend-implementation.md](projects/veterinary-medical-records/02-tech/frontend-implementation.md) — implementation
+   notes
 
 Shared docs (`docs/shared/*`) apply globally within their scope.
 
 ## Contribution and quality gates
 
-For daily development and pull-request readiness checks, use the local quality-gate commands listed in [README.md](../README.md#local-quality-gates-before-pushing).
+For daily development and pull-request readiness checks, use the local quality-gate commands listed in
+[README.md](../README.md#local-quality-gates-before-pushing).
 
 ## Dependency justification (Technical Design Appendix E3)
 
-PDF text extraction uses **PyMuPDF** because it provides strong extraction quality for "digital text" PDFs with a small dependency footprint and straightforward integration.
+PDF text extraction uses **PyMuPDF** because it provides strong extraction quality for "digital text" PDFs with a small
+dependency footprint and straightforward integration.

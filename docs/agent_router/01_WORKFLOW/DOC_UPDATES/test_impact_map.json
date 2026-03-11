@@ -132,7 +132,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
-      "description": "Project PLAN_MANAGEMENT changes, including folder-matching plan-root naming, mandatory Phase 0 plan-start preflight, and placeholder metadata rules for branch/worktree plus explicit user selections, require project owner routing parity and doc-updates guard alignment.",
+      "description": "Project PLAN_MANAGEMENT changes, including single-file plan naming, mandatory Phase 0 plan-start preflight, and placeholder metadata rules for branch/worktree plus explicit user selections, require project owner routing parity and doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
@@ -156,7 +156,7 @@
     },
     {
       "doc_glob": "docs/shared/02-tech/llm-benchmarks.md",
-      "description": "Shared LLM_BENCHMARKS changes require doc-updates guard alignment.",
+      "description": "Shared LLM_BENCHMARKS changes require explicit doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
@@ -166,7 +166,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/manual-qa-regression-checklist.md",
-      "description": "Project MANUAL_QA_REGRESSION_CHECKLIST changes require doc-updates guard alignment.",
+      "description": "Project MANUAL_QA_REGRESSION_CHECKLIST changes require explicit doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
@@ -300,7 +300,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-e2e-test-coverage.md",
-      "description": "Project testing plans require doc-updates mapping/guard alignment.",
+      "description": "Project testing plans require explicit doc-updates mapping/guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",

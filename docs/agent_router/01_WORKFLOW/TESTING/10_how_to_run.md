@@ -37,14 +37,14 @@ Use the local preflight system with three levels before pushing changes.
 
 ### Preflight Auto-Fix Policy
 
-Auto-fix policy when preflight fails: apply focused fixes and rerun the same level.
-Maximum automatic remediation loop: 2 attempts.
+Auto-fix policy when preflight fails: apply focused fixes and rerun the same
+level. Maximum automatic remediation loop: 2 attempts.
 
 When a preflight level (L1/L2/L3) fails:
 
 - AI assistants must attempt focused fixes automatically before proceeding.
 - Auto-fixes must stay within the current change scope and avoid unrelated refactors.
-- Maximum automatic remediation loop: **2 attempts** (fix + rerun the failed level).
+- Maximum automatic remediation loop: 2 attempts (fix + rerun the failed level).
 - **Never bypass quality gates** (`--no-verify`, disabling tests/checks, weakening assertions) to force a pass.
 - If failures persist after the limit, STOP and report root cause, impacted files, and next-action options.
 

@@ -3,11 +3,15 @@
 
 ## Purpose
 
-Documentation is a **code quality requirement**. All contributors (human and AI) must treat documentation as part of the deliverable and keep it consistent with the implementation.
+Documentation is a **code quality requirement**. All contributors (human and AI) must treat documentation as part of the
+deliverable and keep it consistent with the implementation. These guidelines are normative for documentation quality and
+review decisions.
 
-All user-facing written communication must be in **English** (documentation, pull request titles/descriptions, review comments, ADRs, and release notes).
+All user-facing written communication must be in **English** (documentation, pull request titles/descriptions, review
+comments, ADRs, and release notes).
 
 Document:
+
 - Intent and responsibility
 - Contracts and schemas
 - Design decisions and tradeoffs

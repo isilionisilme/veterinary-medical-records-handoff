@@ -11,9 +11,10 @@ For any UX decision that depends on:
 - Confidence interpretation
 - Review, learning, or governance workflows
 
-This document **must defer** to the corresponding project-level UX document
-(e.g. [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
+This document **must defer** to the corresponding project-level UX document (e.g.
+[`docs/projects/veterinary-medical-records/01-product/ux-design.md`](../../projects/veterinary-medical-records/01-product/ux-design.md)).
 
-If no such document exists, AI assistants must **NOT** invent or assume UX behavior — they must consult the team before implementing.
+If no such document exists, AI assistants must **NOT** invent or assume UX behavior — they must consult the team before
+implementing.
 
 ---

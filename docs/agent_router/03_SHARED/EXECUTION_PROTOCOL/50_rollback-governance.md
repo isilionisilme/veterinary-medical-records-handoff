@@ -27,7 +27,7 @@ When a PR is created for the plan branch, the execution agent MUST update the `*
 
 ### Pre-PR Requirements
 
-Before opening or updating a PR, the pre-PR commit history review hard rule defined in [way-of-working.md §5](../../shared/03-ops/way-of-working.md#5-pull-request-workflow) must be satisfied.
+Before opening or updating a PR, the pre-PR commit history review hard rule defined in [way-of-working.md §5](../../../shared/03-ops/way-of-working.md#5-pull-request-workflow) must be satisfied.
 
 ### Agent-user interaction rule
 

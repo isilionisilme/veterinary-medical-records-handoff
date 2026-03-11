@@ -3,9 +3,12 @@
 
 ## 1. Starting New Work (Branch First)
 
-Before making any new changes (code, docs, config, etc.), create a new branch off the appropriate base (default: `main`) using the branch naming conventions defined below.
+Before making any new changes (code, docs, config, etc.), create a new branch off the appropriate base (default: `main`)
+using the branch naming conventions defined below.
 
-**STOP** and ask for confirmation only if the repository state is unsafe or ambiguous (examples: uncommitted changes, merge/rebase in progress, conflicts, or it is unclear whether the current branch already corresponds to the intended work item).
+**STOP** and ask for confirmation only if the repository state is unsafe or ambiguous (examples: uncommitted changes,
+merge/rebase in progress, conflicts, or it is unclear whether the current branch already corresponds to the intended
+work item).
 
 ### Procedure
 
@@ -18,7 +21,9 @@ Before making any new changes (code, docs, config, etc.), create a new branch of
    - Switch to base and update it (`git switch main` then `git pull origin main`).
 3. Create the branch before editing any files:
    - If already on a correctly named branch for the same work item, proceed.
-   - Otherwise, build `<branch-name>` using the canonical format `<category>/<slug>` and create it from the updated base (`git switch -c <branch-name>`).
+   - Otherwise, build `<branch-name>` using the canonical format `<category>/<slug>` and create it from the updated
+     base (`git switch -c <branch-name>`).
+   - Derive `worktree` from the current repository top-level folder name.
    - Category mapping is defined in Section 1.
    - user story -> `feature`
    - user-facing improvement -> `improvement`
