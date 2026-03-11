@@ -11,6 +11,8 @@
     "docs/projects/veterinary-medical-records/04-delivery/plans/**/*",
     "docs/projects/veterinary-medical-records/04-delivery/Backlog/*.md",
     "docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*.md",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/completed/*.md",
+    "docs/projects/veterinary-medical-records/04-delivery/Backlog/completed/**/*.md",
     "docs/projects/veterinary-medical-records/99-archive/*.md",
     "docs/projects/veterinary-medical-records/99-archive/**/*.md"
   ],

@@ -1,12 +1,12 @@
 # ARCH-04 — Fix infra→application Dependency Violation
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Architecture Improvement (hexagonal architecture)
 
 **Target release:** Release 20 — Architecture hardening
 
-**Origin:** [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (§1.3 Violation 3)
+**Origin:** [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 3 (§1.3 Violation 3)
 
 **Severity:** MEDIUM  
 **Effort:** S (1-2h)
