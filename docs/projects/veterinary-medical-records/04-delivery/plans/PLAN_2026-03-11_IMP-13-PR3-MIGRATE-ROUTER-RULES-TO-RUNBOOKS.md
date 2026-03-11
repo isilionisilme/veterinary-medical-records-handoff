@@ -79,16 +79,16 @@ Each runbook draws from specific router modules. This table is the authoritative
 - [x] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata. — ✅ `pending-snapshot`
 - [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ Autonomous
 - [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ Default — GPT-5.4
-- [ ] P0-E 🔄 — Record plan-start snapshot commit. ⏳ IN PROGRESS (GitHub Copilot, 2026-03-11)
+- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ `6f662c89`
 
 ### Phase 1 — Enrich existing runbooks
 
-- [ ] P1-A 🔄 — Enrich `plan-create.prompt.md` with agent taxonomy, branch-first, naming, partition gate, PR Roadmap format.
-- [ ] P1-B 🔄 — Enrich `plan-start.prompt.md` with full Execution Mode definitions, Model Assignment options, single-chat rule.
-- [ ] P1-C 🔄 — Enrich `plan-resume.prompt.md` with step eligibility, task chaining, evidence block, next-step table, token-efficiency.
-- [ ] P1-D 🔄 — Enrich `plan-closeout.prompt.md` with iteration lifecycle, post-merge cleanup, artifact archival.
-- [ ] P1-E 🔄 — Enrich `code-review.prompt.md` with full depth selection, lens procedure, 7 focus areas, severity rules, template, publication, follow-up.
-- [ ] P1-F 🔄 — Enrich `scope-boundary.prompt.md` with format-before-commit, L1/L2/L3 table, auto-fix policy, hard-gate protocol.
+- [x] P1-A 🔄 — Enrich `plan-create.prompt.md` with agent taxonomy, branch-first, naming, partition gate, PR Roadmap format. — ✅ `pending-checkpoint`
+- [x] P1-B 🔄 — Enrich `plan-start.prompt.md` with full Execution Mode definitions, Model Assignment options, single-chat rule. — ✅ `pending-checkpoint`
+- [x] P1-C 🔄 — Enrich `plan-resume.prompt.md` with step eligibility, task chaining, evidence block, next-step table, token-efficiency. — ✅ `pending-checkpoint`
+- [x] P1-D 🔄 — Enrich `plan-closeout.prompt.md` with iteration lifecycle, post-merge cleanup, artifact archival. — ✅ `pending-checkpoint`
+- [x] P1-E 🔄 — Enrich `code-review.prompt.md` with full depth selection, lens procedure, 7 focus areas, severity rules, template, publication, follow-up. — ✅ `pending-checkpoint`
+- [x] P1-F 🔄 — Enrich `scope-boundary.prompt.md` with format-before-commit, L1/L2/L3 table, auto-fix policy, hard-gate protocol. — ✅ `pending-checkpoint`
 
 > 📌 **Commit checkpoint — P1 complete.** Suggested message: `docs(ops): enrich existing runbooks with router operational rules (IMP-13)`. Run L1; if red, fix and re-run. Then wait for user.
 
@@ -134,7 +134,7 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ## Active Prompt
 
-Prompt 1 — Plan-start preflight (completing P0-E).
+Prompt 2 — Enrich existing runbooks (P1 complete; waiting at checkpoint proposal).
 
 ---
 
