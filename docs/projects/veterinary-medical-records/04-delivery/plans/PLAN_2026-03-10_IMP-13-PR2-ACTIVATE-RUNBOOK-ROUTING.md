@@ -38,14 +38,14 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 - [x] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata. — ✅ `pending-snapshot`
 - [x] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata. — ✅ `pending-snapshot`
-- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ Autonomous
-- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ Uniform — GPT-5.4
-- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ snapshot committed
+- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ `pending-snapshot`
+- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ `pending-snapshot`
+- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ `d662fa94`
 
 ### Phase 1 — Rewire AGENTS.md
 
-- [ ] P1-A 🔄 — Rewrite `AGENTS.md` (~20–30 lines): global rules (no commits to main, branch naming), intent → `.prompt.md` mapping table, reference pointers to remaining router modules, plan enforcement script instruction.
-- [ ] P1-B 🔄 — Update `docs/agent_router/00_AUTHORITY.md` if needed: add note that operational intents are now handled by `.prompt.md` files.
+- [x] P1-A 🔄 — Rewrite `AGENTS.md` (~20–30 lines): global rules (no commits to main, branch naming), intent → `.prompt.md` mapping table, reference pointers to remaining router modules, plan enforcement script instruction. — ✅ `pending-checkpoint`
+- [x] P1-B 🔄 — Update `docs/agent_router/00_AUTHORITY.md` if needed: add note that operational intents are now handled by `.prompt.md` files. — ✅ `no-commit (AGENTS.md now owns operational routing; 00_AUTHORITY.md remains fallback/reference-only)`
 
 > 📌 **Commit checkpoint — P1 complete.** Suggested message: `refactor(ops): rewire AGENTS.md to operational runbooks (IMP-13)`. Run L2 tests; if red, fix and re-run until green. Then wait for user.
 
@@ -79,7 +79,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ## Active Prompt
 
-Prompt 1 — Phase 0 plan-start preflight (completing P0-E).
+Prompt 3 — Update contract tests (P2).
 
 ---
 
