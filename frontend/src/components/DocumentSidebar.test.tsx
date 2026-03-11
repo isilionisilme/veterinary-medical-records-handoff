@@ -167,7 +167,7 @@ describe("App upload and list flow", () => {
       expect(statusDot?.className).toContain("ring-2");
 
       fireEvent.click(collapsedReadyItem);
-      expect(screen.getByTestId("pdf-viewer")).toHaveAttribute("data-focus-page", "");
+      expect(sidebar).toHaveAttribute("data-expanded", "false");
     });
   });
 
