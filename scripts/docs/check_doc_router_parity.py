@@ -8,6 +8,8 @@ Updated in PR-229 follow-up to keep implementation-plan completed-plan propagati
 Updated in PR-238 follow-up to satisfy implementation-plan doc/test sync guard coverage.
 Updated in IMP-05 follow-up to keep implementation-plan status
 propagation aligned with owner-router parity checks.
+Updated in DOCS-IMPROVEMENT D1 follow-up to keep 2026-03-09 source/router parity checks aligned.
+Updated in DOCS-IMPROVEMENT D4 follow-up to keep parity checks aligned after broad TOC regeneration.
 """
 
 from __future__ import annotations

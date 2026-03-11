@@ -35,7 +35,43 @@ jobs:
             docs:
               - 'docs/**'
               - '*.md'
-              - 'scripts/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.markdownlint.yml'
+              - '.markdown-link-check.json'
+              - '.ci-config-reference/package.json'
+              - 'scripts/docs/**'
+              - 'scripts/quality/validate-frontmatter.py'
+
+  docs_qa:
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+      - name: Install docs tooling dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run docs QA checks (changed canonical docs)
+        run: python scripts/docs/run_docs_qa.py --base-ref "${{ github.event.pull_request.base.sha }}"
+
   frontend_test_build:
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true'

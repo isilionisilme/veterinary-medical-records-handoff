@@ -3,12 +3,14 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "docs:lint": "markdownlint-cli2 \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
-    "docs:lint:fix": "markdownlint-cli2 --fix \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
+    "docs:lint": "markdownlint-cli2 \"docs/README.md\" \"docs/shared/**/*.md\" \"docs/projects/veterinary-medical-records/01-product/**/*.md\" \"docs/projects/veterinary-medical-records/02-tech/**/*.md\" \"docs/projects/veterinary-medical-records/03-ops/**/*.md\" \"docs/projects/veterinary-medical-records/04-delivery/*.md\" \"docs/projects/veterinary-medical-records/onboarding/**/*.md\"",
+    "docs:lint:fix": "markdownlint-cli2 --fix \"docs/README.md\" \"docs/shared/**/*.md\" \"docs/projects/veterinary-medical-records/01-product/**/*.md\" \"docs/projects/veterinary-medical-records/02-tech/**/*.md\" \"docs/projects/veterinary-medical-records/03-ops/**/*.md\" \"docs/projects/veterinary-medical-records/04-delivery/*.md\" \"docs/projects/veterinary-medical-records/onboarding/**/*.md\"",
     "docs:links": "node scripts/docs/check_docs_links.mjs",
     "docs:toc": "doctoc --github docs/README.md docs/projects/veterinary-medical-records docs/shared",
-    "docs:format": "prettier --write \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\"",
-    "docs:format:check": "prettier --check \"docs/README.md\" \"docs/projects/veterinary-medical-records/**/*.md\" \"docs/shared/**/*.md\""
+    "docs:format": "prettier --write \"docs/README.md\" \"docs/shared/**/*.md\" \"docs/projects/veterinary-medical-records/01-product/**/*.md\" \"docs/projects/veterinary-medical-records/02-tech/**/*.md\" \"docs/projects/veterinary-medical-records/03-ops/**/*.md\" \"docs/projects/veterinary-medical-records/04-delivery/*.md\" \"docs/projects/veterinary-medical-records/onboarding/**/*.md\"",
+    "docs:format:check": "prettier --check \"docs/README.md\" \"docs/shared/**/*.md\" \"docs/projects/veterinary-medical-records/01-product/**/*.md\" \"docs/projects/veterinary-medical-records/02-tech/**/*.md\" \"docs/projects/veterinary-medical-records/03-ops/**/*.md\" \"docs/projects/veterinary-medical-records/04-delivery/*.md\" \"docs/projects/veterinary-medical-records/onboarding/**/*.md\"",
+    "docs:frontmatter": "python scripts/quality/validate-frontmatter.py",
+    "docs:qa": "npm run docs:lint && npm run docs:format:check && npm run docs:links && npm run docs:frontmatter"
   },
   "devDependencies": {
     "doctoc": "^2.2.1",

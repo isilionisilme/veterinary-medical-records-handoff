@@ -451,6 +451,42 @@
           ]
         }
       ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/04-delivery/changelog-*.md",
+      "description": "Project changelog snapshots must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/onboarding/*.md",
+      "description": "Onboarding guides must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
+    },
+    {
+      "source_doc": "docs/projects/veterinary-medical-records/onboarding/**/*.md",
+      "description": "Nested onboarding docs must remain discoverable from project docs entry.",
+      "router_modules": [
+        {
+          "path": "docs/agent_router/04_PROJECT/00_entry.md",
+          "required_terms": [
+            "Project Docs (Modules)"
+          ]
+        }
+      ]
     }
   ]
 }

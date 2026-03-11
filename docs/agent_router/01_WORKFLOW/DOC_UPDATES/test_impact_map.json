@@ -509,6 +509,36 @@
         "backend/tests/unit/test_doc_updates_e2e_contract.py",
         "scripts/docs/check_doc_router_parity.py"
       ]
+    },
+    {
+      "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/changelog-*.md",
+      "description": "Project changelog snapshots require DOC_UPDATES mapping coverage and docs guard alignment.",
+      "required_any": [
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
+      ]
+    },
+    {
+      "doc_glob": "docs/projects/veterinary-medical-records/onboarding/*.md",
+      "description": "Onboarding guides require DOC_UPDATES mapping coverage and docs guard alignment.",
+      "required_any": [
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
+      ]
+    },
+    {
+      "doc_glob": "docs/projects/veterinary-medical-records/onboarding/**/*.md",
+      "description": "Nested onboarding docs require DOC_UPDATES mapping coverage and docs guard alignment.",
+      "required_any": [
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
+        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
+        "scripts/docs/check_doc_test_sync.py",
+        "scripts/docs/check_doc_router_parity.py"
+      ]
     }
   ]
 }

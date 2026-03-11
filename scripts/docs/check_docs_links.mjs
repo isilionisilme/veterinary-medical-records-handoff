@@ -10,9 +10,26 @@ const repoRoot = path.resolve(__dirname, '../..');
 
 const roots = [
   path.join(repoRoot, 'docs', 'README.md'),
-  path.join(repoRoot, 'docs', 'projects'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '01-product'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '02-tech'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '03-ops'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '04-delivery'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', 'onboarding'),
   path.join(repoRoot, 'docs', 'shared'),
 ];
+
+const excludedDirs = [
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '04-delivery', 'plans'),
+  path.join(repoRoot, 'docs', 'projects', 'veterinary-medical-records', '04-delivery', 'Backlog'),
+];
+
+function isExcludedPath(targetPath) {
+  return excludedDirs.some((excludedDir) => targetPath === excludedDir || targetPath.startsWith(`${excludedDir}${path.sep}`));
+}
+
+function isWithinCanonicalRoots(targetPath) {
+  return roots.some((rootPath) => targetPath === rootPath || targetPath.startsWith(`${rootPath}${path.sep}`));
+}
 
 function parseArgs(argv) {
   const args = { baseRef: null };
@@ -47,11 +64,16 @@ function changedMarkdownFiles(baseRef) {
 
   return [...changed]
     .filter((relPath) => relPath.endsWith('.md'))
-    .filter((relPath) => relPath === 'docs/README.md' || relPath.startsWith('docs/projects/') || relPath.startsWith('docs/shared/'))
-    .map((relPath) => path.join(repoRoot, relPath));
+    .map((relPath) => path.join(repoRoot, relPath))
+    .filter((absPath) => isWithinCanonicalRoots(absPath))
+    .filter((absPath) => !isExcludedPath(absPath));
 }
 
 async function collectMarkdownFiles(targetPath) {
+  if (isExcludedPath(targetPath)) {
+    return [];
+  }
+
   const stats = await fs.stat(targetPath);
   if (stats.isFile()) {
     return targetPath.endsWith('.md') ? [targetPath] : [];

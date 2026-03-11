@@ -491,6 +491,10 @@ if ($runDocs) {
     Invoke-Step "Doc/router parity guard" {
         & $python "scripts/docs/check_doc_router_parity.py" "--base-ref" $BaseRef
     }
+
+    Invoke-Step "Docs QA (lint/format/links/frontmatter)" {
+        & $python "scripts/docs/run_docs_qa.py" "--base-ref" $BaseRef
+    }
 }
 
 if ($Mode -eq "Push") {
