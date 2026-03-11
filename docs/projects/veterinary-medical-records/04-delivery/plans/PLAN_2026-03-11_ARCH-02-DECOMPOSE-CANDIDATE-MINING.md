@@ -2,14 +2,16 @@
 
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, scope boundary template, commit conventions, and handoff behavior.
 
-**Branch:** `refactor/arch-02-candidate-mining-decomposition`
+**Branch:** `refactor/arch-02-implement-candidate-mining`
 **PR:** Pending (PR created on explicit user request)
 **Backlog item:** [arch-02-decompose-candidate-mining.md](../../Backlog/arch-02-decompose-candidate-mining.md)
 **Prerequisite:** ARCH-03 completed (CI complexity gates)
-**Worktree:** `D:\Git\worktrees\cuarto`
+**Worktree:** `D:\Git\worktrees\arch02-impl`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)
 **Agents:** Planning agent (plan authoring) -> Execution agent (implementation)
-**Automation Mode:** `Supervisado` (default)
+**Execution Mode:** `Autonomous`
+**Model Assignment:** `Uniform`
+**Automation Mode:** `Autonomous`
 **Iteration:** pending
 
 ---
@@ -79,7 +81,7 @@ Move `_candidate_sort_key()` and `_map_candidates_to_global_schema()` into `cand
 
 ### Phase 1 - Baseline and extraction scaffolding
 
-- [ ] A1 🔄 — Confirm baseline callers/import graph for `_mine_interpretation_candidates()`, `_map_candidates_to_global_schema()`, and `_candidate_sort_key()`.
+- [ ] A1 ⏳ IN PROGRESS (agent, 2026-03-11) 🔄 — Confirm baseline callers/import graph for `_mine_interpretation_candidates()`, `_map_candidates_to_global_schema()`, and `_candidate_sort_key()`.
 - [ ] A2 🔄 — Create `backend/app/application/processing/field_patterns.py` and move module-level compiled regex patterns from `candidate_mining.py` into it without behavior change.
 - [ ] A3 🔄 — Create `backend/app/application/processing/extractors/` package scaffolding and shared extractor contracts/helpers.
 
