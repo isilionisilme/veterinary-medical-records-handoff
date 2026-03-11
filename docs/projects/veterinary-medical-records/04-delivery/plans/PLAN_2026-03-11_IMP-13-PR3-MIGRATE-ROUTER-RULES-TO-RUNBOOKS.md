@@ -111,16 +111,21 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ### Phase 4 — User validation
 
-- [ ] P4-A 🚧 — Hard-gate: user validates runbooks in cold-chat tests:
+- [x] P4-A 🚧 — Hard-gate: user validates runbooks in cold-chat tests. — ✅ `no-commit (user confirmed cold-chat validation in chat, 2026-03-11)`
   1. "Create a plan" → loads `plan-create.prompt.md` with full rules.
   2. "Continue the plan" → runs `plan-start-check.py`, loads `plan-start.prompt.md` with full rules.
   3. "Start work on X" → loads `start-work.prompt.md`.
   4. "I updated docs" → loads `doc-updates.prompt.md`.
   5. "Create a PR" → loads `pr-workflow.prompt.md`.
 
+> Evidence
+> - Step: P4-A
+> - Code commit SHA: `no-commit (validation gate)`
+> - Plan commit SHA: `pending`
+
 ### Documentation task
 
-- [ ] DOC-1 🔄 — `no-doc-needed` — The runbooks ARE the delivered documentation. No separate docs required.
+- [x] DOC-1 🔄 — `no-doc-needed` — The runbooks ARE the delivered documentation. No separate docs required. — ✅ `no-commit (plan artifact only)`
 
 ---
 
