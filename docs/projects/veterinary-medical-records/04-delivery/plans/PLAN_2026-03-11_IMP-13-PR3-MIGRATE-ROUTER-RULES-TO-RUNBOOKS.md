@@ -94,16 +94,18 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ### Phase 2 — Create new runbooks
 
-- [x] P2-A 🔄 — Create `start-work.prompt.md` with branch-first procedure, naming, category mapping. — ✅ `pending-checkpoint`
-- [x] P2-B 🔄 — Create `doc-updates.prompt.md` with full DOC_UPDATES procedure, normalization, enforcement maps, output format. — ✅ `pending-checkpoint`
-- [x] P2-C 🔄 — Create `pr-workflow.prompt.md` with PR lifecycle: classification, title, body, commit review, partition gate, post-merge cleanup. — ✅ `pending-checkpoint`
+- [x] P2-A 🔄 — Create `start-work.prompt.md` with branch-first procedure, naming, category mapping. — ✅ `44f0ad8b2`
+- [x] P2-B 🔄 — Create `doc-updates.prompt.md` with full DOC_UPDATES procedure, normalization, enforcement maps, output format. — ✅ `44f0ad8b2`
+- [x] P2-C 🔄 — Create `pr-workflow.prompt.md` with PR lifecycle: classification, title, body, commit review, partition gate, post-merge cleanup. — ✅ `44f0ad8b2`
 
 > 📌 **Commit checkpoint — P2 complete.** Suggested message: `docs(ops): create start-work, doc-updates, and pr-workflow runbooks (IMP-13)`. Run L1; if red, fix and re-run. Then wait for user.
 
 ### Phase 3 — Update AGENTS.md routing and validate
 
-- [ ] P3-A 🔄 — Update AGENTS.md routing table to add entries for `start-work`, `doc-updates`, `pr-workflow`.
+- [ ] P3-A 🔄 ⏳ IN PROGRESS (agent, 2026-03-11) — Update AGENTS.md routing table to add entries for `start-work`, `doc-updates`, `pr-workflow`.
 - [ ] P3-B 🔄 — Run L2 validation (`scripts/ci/test-L2.ps1 -BaseRef main`). Fix any contract test failures.
+
+> Blocker (2026-03-11): L2 stopped at the remote base sync guard because `refactor/imp-13-activate-runbook-routing` was behind `origin/main` by 1 commit (`9851cd8a1`). Sync the branch, then re-run P3-B.
 
 > 📌 **Commit checkpoint — P3 complete.** Suggested message: `refactor(ops): update AGENTS.md routing for new runbooks (IMP-13)`. Run L2; if red, fix and re-run. Then wait for user.
 
@@ -134,7 +136,7 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ## Active Prompt
 
-Prompt 3 — Create new runbooks (P2 complete; waiting at checkpoint proposal).
+Prompt 4 — Update routing and validate.
 
 ---
 
