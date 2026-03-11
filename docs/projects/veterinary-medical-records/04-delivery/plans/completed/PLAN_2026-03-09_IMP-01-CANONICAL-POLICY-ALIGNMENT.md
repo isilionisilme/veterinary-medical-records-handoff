@@ -4,13 +4,13 @@
 
 **Branch:** `codex/veterinary-medical-records/docs/imp-01-canonical-policy-alignment`
 **PR:** [#241](https://github.com/isilionisilme/veterinary-medical-records/pull/241)
-**Backlog item:** [imp-01-canonical-operational-execution-policy-alignment.md](../../Backlog/imp-01-canonical-operational-execution-policy-alignment.md)
+**Backlog item:** [imp-01-canonical-operational-execution-policy-alignment.md](../../../Backlog/imp-01-canonical-operational-execution-policy-alignment.md)
 **Prerequisite:** None
 **Worktree:** `D:/Git/veterinary-medical-records`
 **CI Mode:** `1) Strict step gate`
 **Agents:** Planning agent (plan authoring) → Execution agent (implementation)
 **Automation Mode:** `Supervisado`
-**Iteration:** pending
+**Iteration:** Done
 
 ---
 
@@ -215,7 +215,7 @@ These inconsistencies enable ambiguous execution behavior across different agent
    ```markdown
    ### Pre-PR Requirements
 
-   Before opening or updating a PR, the pre-PR commit history review hard rule defined in [way-of-working.md §5](../../shared/03-ops/way-of-working.md#5-pull-request-workflow) must be satisfied.
+   Before opening or updating a PR, the pre-PR commit history review hard rule defined in [way-of-working.md §5](../../../shared/03-ops/way-of-working.md#5-pull-request-workflow) must be satisfied.
    ```
 
 3. Verify: both files reference the pre-PR review rule and the canonical definition lives in way-of-working.md.
@@ -275,7 +275,7 @@ Pending plan approval.
 
 ## Acceptance Criteria
 
-From [IMP-01 backlog item](../../Backlog/imp-01-canonical-operational-execution-policy-alignment.md):
+From [IMP-01 backlog item](../../../Backlog/imp-01-canonical-operational-execution-policy-alignment.md):
 
 1. Canonical policy no longer requires `CT-*`/`commit-task` for automatic commits.
 2. Commit/push/PR behavior by mode is documented once and without contradictions.

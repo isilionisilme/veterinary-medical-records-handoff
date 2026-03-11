@@ -1,12 +1,12 @@
 # ARCH-02 — Decompose `candidate_mining.py`
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Architecture Improvement (code quality)
 
 **Target release:** Release 19 — Critical architecture remediation
 
-**Origin:** [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 2 (P-2), Phase 3 (§3.2)
+**Origin:** [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 2 (P-2), Phase 3 (§3.2)
 
 **Severity:** CRITICAL  
 **Effort:** L (8-16h)

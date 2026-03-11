@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import asyncio
 
-from backend.app.application.processing import processing_scheduler
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
+from backend.app.ports.scheduler_port import SchedulerPort
 
 
 class SchedulerLifecycle:
     """Manage scheduler task lifecycle independently from FastAPI wiring."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, scheduler_fn: SchedulerPort) -> None:
+        self._scheduler_fn = scheduler_fn
         self._task: asyncio.Task[None] | None = None
         self._stop_event: asyncio.Event | None = None
 
@@ -25,7 +26,7 @@ class SchedulerLifecycle:
             return
         self._stop_event = asyncio.Event()
         self._task = asyncio.create_task(
-            processing_scheduler(
+            self._scheduler_fn(
                 repository=repository,
                 storage=storage,
                 stop_event=self._stop_event,

@@ -562,7 +562,7 @@ Address the highest-impact architecture findings: decompose God Modules, add CI 
 ### Items (in order)
 - [ARCH-03 — Add CI Complexity Gates](Backlog/arch-03-add-ci-complexity-gates.md) (Planned)
 - [ARCH-01 — Decompose `review_service.py`](Backlog/completed/arch-01-decompose-review-service.md) (Implemented)
-- [ARCH-02 — Decompose `candidate_mining.py`](Backlog/arch-02-decompose-candidate-mining.md) (Planned)
+- [ARCH-02 — Decompose `candidate_mining.py`](Backlog/completed/arch-02-decompose-candidate-mining.md) (Done)
 - [ARCH-06 — Create Security Architecture Documentation](Backlog/arch-06-create-security-architecture-documentation.md) (Planned)
 - [ARCH-07 — Create Production Deployment Documentation](Backlog/arch-07-create-production-deployment-documentation.md) (Planned)
 

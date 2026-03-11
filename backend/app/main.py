@@ -25,6 +25,7 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from backend.app.api.routes import MAX_UPLOAD_SIZE as ROUTE_MAX_UPLOAD_SIZE
 from backend.app.api.routes import router as api_router
+from backend.app.application.processing import processing_scheduler
 from backend.app.config import (
     auth_token,
     confidence_policy_explicit_config_diagnostics,
@@ -125,7 +126,7 @@ def create_app() -> FastAPI:
         recovered = repository.recover_orphaned_runs(completed_at=_now_iso())
         if recovered:
             logger.info("Recovered %s orphaned runs", recovered)
-        app.state.scheduler = SchedulerLifecycle()
+        app.state.scheduler = SchedulerLifecycle(scheduler_fn=processing_scheduler)
         if processing_enabled():
             await app.state.scheduler.start(repository=repository, storage=storage)
         yield
