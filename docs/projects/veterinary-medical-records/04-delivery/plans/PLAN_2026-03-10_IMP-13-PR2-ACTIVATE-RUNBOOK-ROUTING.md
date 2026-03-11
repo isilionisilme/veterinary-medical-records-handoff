@@ -4,7 +4,7 @@
 
 **Backlog item:** [imp-13-operational-runbook-architecture.md](../Backlog/imp-13-operational-runbook-architecture.md)
 **Branch:** `refactor/imp-13-activate-runbook-routing`
-**PR:** Pending (PR created on explicit user request)
+**PR:** #270 — merged `2026-03-11`
 **User Story:** IMP-13 Fase B
 **Prerequisite:** PR-1 (Fase A) merged to `main`; `.prompt.md`, `.instructions.md`, and `plan-start-check.py` already exist and are validated.
 **Worktree:** `d:\Git\worktrees\cuarto`
@@ -58,7 +58,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ### Phase 3 — User validation
 
-- [ ] P3-A 🚧 — Hard-gate: user validates that the new AGENTS.md works in real usage (cold chat test) before proceeding to router retirement in PR-3.
+- [x] P3-A 🚧 — Hard-gate: user validates that the new AGENTS.md works in real usage (cold chat test) before proceeding to router retirement in PR-3. — ✅ `user-approved / PR #270 merged 2026-03-11`
 
 > 📌 **Commit checkpoint — PR-2 complete (Fase B).** Suggested message: `refactor(ops): complete Fase B — activate runbook routing (IMP-13)`. Run L2 tests; if red, fix and re-run until green. Then wait for user.
 
@@ -79,7 +79,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ## Active Prompt
 
-Prompt 4 — User validation gate (P3).
+✅ PLAN COMPLETE — PR #270 merged to `main` on 2026-03-11.
 
 ---
 
