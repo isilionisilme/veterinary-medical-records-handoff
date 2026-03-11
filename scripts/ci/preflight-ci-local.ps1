@@ -181,8 +181,8 @@ function Get-ChangedFiles {
         )
     }
 
-    foreach ($args in $sources) {
-        foreach ($line in (Get-GitOutput -Arguments $args)) {
+    foreach ($gitArgs in $sources) {
+        foreach ($line in (Get-GitOutput -Arguments $gitArgs)) {
             $normalized = $line.Replace("\", "/")
             [void]$set.Add($normalized)
         }
@@ -509,30 +509,9 @@ if ($runBranchNameValidation) {
 }
 
 if ($runDocs) {
-    $branchName = (& git rev-parse --abbrev-ref HEAD).Trim()
-    if (-not $branchName) {
-        throw "Unable to resolve current branch name for doc classification path."
-    }
-    $safeBranchName = ($branchName -replace '[^A-Za-z0-9_.-]', '_')
-    $classificationDir = Join-Path $env:TEMP "vmr-doc-classification"
-    $classificationFile = Join-Path $classificationDir ("{0}.json" -f $safeBranchName)
-
-    Invoke-Step "Classify doc changes" {
-        & $python "scripts/docs/classify_doc_change.py" "--base-ref" $BaseRef "--output" $classificationFile
-    }
-
-    Invoke-Step "Docs canonical guard" {
-        & $python "scripts/docs/check_no_canonical_router_refs.py"
-    }
-
-    Invoke-Step "Doc/test sync guard" {
-        & $python "scripts/docs/check_doc_test_sync.py" "--base-ref" $BaseRef "--classification-file" $classificationFile
-    }
-
-    Invoke-Step "Doc/router parity guard" {
-        & $python "scripts/docs/check_doc_router_parity.py" "--base-ref" $BaseRef
-    }
-
+    # Note: Doc governance checks (canonical router, test sync, parity, directionality, drift) have been
+    # moved to .github/workflows/doc-governance.yml. They run automatically on all PRs and can be triggered
+    # manually via workflow_dispatch. For local validation, run that workflow manually or review the PR checks.
     Invoke-Step "Docs QA (lint/format/links/frontmatter)" {
         & $python "scripts/docs/run_docs_qa.py" "--base-ref" $BaseRef
     }
@@ -548,9 +527,6 @@ if ($Mode -eq "Push" -or $Mode -eq "Full") {
         Invoke-Step "Config sync guard (local vs CI reference)" {
             Compare-ConfigWithReference
         }
-    Invoke-Step "Plan execution guard" {
-        & $python "scripts/ci/check_plan_execution_guard.py"
-    }
 }
 
 if ($runBackendQuick) {

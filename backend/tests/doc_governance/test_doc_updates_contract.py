@@ -8,6 +8,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ROOT_AGENTS = REPO_ROOT / "AGENTS.md"
 CI_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "ci.yml"
+DOC_GOVERNANCE_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "doc-governance.yml"
 RULES_INDEX = REPO_ROOT / "docs" / "agent_router" / "00_RULES_INDEX.md"
 DOC_UPDATES_ENTRY = (
     REPO_ROOT / "docs" / "agent_router" / "01_WORKFLOW" / "DOC_UPDATES" / "00_entry.md"
@@ -681,11 +682,16 @@ def test_backlog_tracks_operational_runbook_architecture() -> None:
     assert "plan-start-check.py" in imp13_text
 
 
-def test_ci_does_not_ignore_markdown_only_changes() -> None:
-    text = _read_text(CI_WORKFLOW)
-    assert "paths-ignore" not in text
-    assert "check_doc_test_sync.py" in text
-    assert "check_doc_router_parity.py" in text
+def test_governance_checks_moved_to_separate_workflow() -> None:
+    """Verify that doc governance checks have been moved from ci.yml to doc-governance.yml."""
+    ci_text = _read_text(CI_WORKFLOW)
+    governance_text = _read_text(DOC_GOVERNANCE_WORKFLOW)
+
+    assert "paths-ignore" not in ci_text
+    assert "check_doc_test_sync.py" not in ci_text
+    assert "check_doc_router_parity.py" not in ci_text
+    assert "check_doc_test_sync.py" in governance_text
+    assert "check_doc_router_parity.py" in governance_text
 
 
 def test_execution_rules_exist_and_contain_core_sections() -> None:

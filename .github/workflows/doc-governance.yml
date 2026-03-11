@@ -1,0 +1,98 @@
+name: Doc Governance (Optional)
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  doc_canonical_router_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run canonical docs guard
+        run: python scripts/docs/check_no_canonical_router_refs.py
+
+  doc_test_sync_guard:
+    runs-on: ubuntu-latest
+    env:
+      DOC_CLASSIFICATION_FILE: /tmp/vmr-doc-classification/doc_change_classification.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Classify doc changes
+        run: |
+          mkdir -p /tmp/vmr-doc-classification
+          python scripts/docs/classify_doc_change.py --base-ref "${{ github.event.pull_request.base.sha || 'origin/main' }}" --output "$DOC_CLASSIFICATION_FILE"
+      - name: Run doc/test sync guard
+        run: python scripts/docs/check_doc_test_sync.py --base-ref "${{ github.event.pull_request.base.sha || 'origin/main' }}" --classification-file "$DOC_CLASSIFICATION_FILE"
+
+  doc_router_parity_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run doc/router parity guard
+        run: python scripts/docs/check_doc_router_parity.py --base-ref "${{ github.event.pull_request.base.sha || 'origin/main' }}"
+
+  doc_router_directionality_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run router directionality guard
+        run: python scripts/docs/check_router_directionality.py --base-ref "${{ github.event.pull_request.base.sha || 'origin/main' }}"
+
+  doc_router_drift_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: pip install pyyaml>=6.0
+      - name: Run router drift guard
+        run: python scripts/docs/generate-router-files.py --check
+
+  plan_execution_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Run plan execution guard
+        run: python scripts/ci/check_plan_execution_guard.py --branch "${{ github.head_ref || github.ref_name }}"
+
+  doc_governance_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run doc governance tests
+        run: pytest backend/tests/doc_governance/ -x --tb=short --no-header -o addopts=
