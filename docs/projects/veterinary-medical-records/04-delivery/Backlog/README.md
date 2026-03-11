@@ -85,12 +85,13 @@ This directory contains the consolidated backlog for veterinary-medical-records.
 | IMP-03 | Plan Execution Guard Enforcement (Local + CI) | Release 17 | [imp-03-plan-execution-guard-enforcement-local-ci.md](completed/imp-03-plan-execution-guard-enforcement-local-ci.md) |
 | IMP-04 | Active Plan Migration and Global Index Cleanup | Release 17 | [imp-04-active-plan-migration-and-global-index-cleanup.md](imp-04-active-plan-migration-and-global-index-cleanup.md) |
 | IMP-05 | Plan Root File Naming Alignment | Release 17 | [imp-05-plan-root-file-naming-alignment.md](imp-05-plan-root-file-naming-alignment.md) |
+<<<<<<< HEAD
 | IMP-08 | Documentation Contract Enforcement for Docs-Only PRs | Release 17 | [imp-08-documentation-contract-enforcement-for-docs-only-prs.md](imp-08-documentation-contract-enforcement-for-docs-only-prs.md) |
 | IMP-09 | Rationalize Documentation Governance Tests | Release 22 | [imp-09-rationalize-documentation-governance-tests.md](imp-09-rationalize-documentation-governance-tests.md) |
 | IMP-13 | Operational Runbook Architecture | Release 22 | [imp-13-operational-runbook-architecture.md](imp-13-operational-runbook-architecture.md) |
 | ARCH-01 | Decompose `review_service.py` | Release 19 | [arch-01-decompose-review-service.md](completed/arch-01-decompose-review-service.md) |
 | ARCH-02 | Decompose `candidate_mining.py` | Release 19 | [arch-02-decompose-candidate-mining.md](completed/arch-02-decompose-candidate-mining.md) |
-| ARCH-03 | Add CI Complexity Gates | Release 19 | [completed/arch-03-add-ci-complexity-gates.md](completed/arch-03-add-ci-complexity-gates.md) |
+| ARCH-03 | Add CI Complexity Gates | Release 19 | [arch-03-add-ci-complexity-gates.md](completed/arch-03-add-ci-complexity-gates.md) |
 | ARCH-04 | Fix infra→application Dependency Violation | Release 20 | [arch-04-fix-infra-application-hex-violation.md](completed/arch-04-fix-infra-application-hex-violation.md) |
 | ARCH-05 | Add Structured Logging to Critical Paths | Release 20 | [arch-05-add-structured-logging-critical-paths.md](arch-05-add-structured-logging-critical-paths.md) |
 | ARCH-06 | Create Security Architecture Documentation | Release 19 | [arch-06-create-security-architecture-documentation.md](arch-06-create-security-architecture-documentation.md) |
