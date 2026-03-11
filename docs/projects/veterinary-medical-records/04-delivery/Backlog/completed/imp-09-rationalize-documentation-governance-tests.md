@@ -111,8 +111,8 @@ Update the corresponding documentation so contributors can tell the difference b
   - Mitigation: run only the focused documentation-governance test subset.
 
 **Dependencies**
-- Closely related to [IMP-02 — Router and DOC_UPDATES Contract Synchronization](completed/imp-02-router-and-doc-updates-contract-synchronization.md).
-- Closely related to [IMP-08 — Documentation Contract Enforcement for Docs-Only PRs](imp-08-documentation-contract-enforcement-for-docs-only-prs.md).
+- Closely related to [IMP-02 — Router and DOC_UPDATES Contract Synchronization](imp-02-router-and-doc-updates-contract-synchronization.md).
+- Closely related to [IMP-08 — Documentation Contract Enforcement for Docs-Only PRs](../imp-08-documentation-contract-enforcement-for-docs-only-prs.md).
 - Depends on keeping the plan execution protocol and DOC_UPDATES workflow as the current policy source of truth.
 
 ---

@@ -416,7 +416,7 @@
     },
     {
       "doc_glob": "docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*.md",
-      "description": "Backlog item extraction/split docs, including Backlog/completed archival moves, require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module.",
+      "description": "Backlog item extraction/split docs, including Backlog/completed archival moves and completed backlog link-hygiene fixes, require DOC_UPDATES mapping coverage even when they do not propagate to a router owner module.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "backend/tests/unit/test_doc_updates_contract.py",

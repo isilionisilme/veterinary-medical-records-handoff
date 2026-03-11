@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 
 from . import candidate_ranking
@@ -23,8 +24,11 @@ from .extractors import (
     extract_physical_candidates,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def _mine_interpretation_candidates(raw_text: str) -> dict[str, list[dict[str, object]]]:
+    logger.debug("_mine_interpretation_candidates start chars=%d", len(raw_text))
     context = MiningContext.from_raw_text(raw_text)
     collector = CandidateCollector(context)
     _collect_external_candidates(context, collector)
@@ -39,6 +43,7 @@ def _mine_interpretation_candidates(raw_text: str) -> dict[str, list[dict[str, o
 def _map_candidates_to_global_schema(
     candidate_bundle: Mapping[str, list[dict[str, object]]],
 ) -> tuple[dict[str, object], dict[str, list[dict[str, object]]]]:
+    logger.debug("_map_candidates_to_global_schema start")
     return candidate_ranking._map_candidates_to_global_schema(candidate_bundle)
 
 
@@ -47,6 +52,7 @@ def _candidate_sort_key(item: dict[str, object], key: str) -> tuple[float, float
 
 
 def _collect_external_candidates(context: MiningContext, collector: CandidateCollector) -> None:
+    logger.debug("_collect_external_candidates start lines=%d", len(context.lines))
     collector.add_payloads(extract_regex_labeled_candidates(context.raw_text))
     collector.add_payloads(
         extract_unlabeled_header_dob_candidates(

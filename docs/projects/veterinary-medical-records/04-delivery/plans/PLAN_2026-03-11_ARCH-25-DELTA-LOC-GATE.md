@@ -2,10 +2,10 @@
 
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
-**Branch:** ci/arch-25-delta-loc-gate
-**Worktree:** D:/Git/worktrees/codex-permanent-1
-**Execution Mode:** Autonomous
-**Model Assignment:** Uniform
+**Branch:** PENDING PLAN-START RESOLUTION
+**Worktree:** PENDING PLAN-START RESOLUTION
+**Execution Mode:** PENDING USER SELECTION
+**Model Assignment:** PENDING USER SELECTION
 **PR:** Pending (PR created on explicit user request)
 **Backlog item:** [arch-25-delta-loc-complexity-gate.md](../Backlog/arch-25-delta-loc-complexity-gate.md)
 **Prerequisite:** None
@@ -114,32 +114,32 @@ for fp, count in loc_data.get("files", {}).items():
 
 ### Phase 0 — Plan-start preflight
 
-- [x] P0-A 🔄 — Resolve branch and worktree metadata. Verify clean working tree on the dedicated branch.
+- [ ] P0-A 🔄 — Resolve branch and worktree metadata. Verify clean working tree on the dedicated branch.
 
 ### Phase 1 — Implement delta-aware LOC gate
 
-- [x] P1-A ✅ no-commit (paired with P1-B/P1-C/P1-D/P1-E implementation commit) 🔄 — Add `_base_ref_loc(base_ref: str, rel_path: str) -> int` helper that runs `git show {base_ref}:{rel_path}` and counts lines. Returns 0 on failure (new file).
-- [x] P1-B ✅ no-commit (paired with P1-C/P1-D/P1-E implementation commit) 🔄 — Add `--max-loc-growth` CLI argument (default: 50) to argparse.
-- [x] P1-C ✅ no-commit (paired with P1-D/P1-E implementation commit) 🔄 — Modify `check_thresholds` signature to accept `base_ref: str | None` and `max_loc_growth: int`.
-- [x] P1-D ✅ no-commit (paired with P1-E implementation commit) 🔄 — Replace absolute LOC check with delta-aware logic implementing the three-outcome table from DD-1.
-- [x] P1-E ✅ no-commit (paired with Phase 1 implementation commit) 🔄 — Update the script docstring to document the new `--max-loc-growth` flag.
-- [x] P1-F ✅ no-commit (user-approved checkpoint; L3 PASS on 2026-03-11) 🚧 — 📌 Checkpoint: present diff of `architecture_metrics.py` for user review.
+- [ ] P1-A 🔄 — Add `_base_ref_loc(base_ref: str, rel_path: str) -> int` helper that runs `git show {base_ref}:{rel_path}` and counts lines. Returns 0 on failure (new file).
+- [ ] P1-B 🔄 — Add `--max-loc-growth` CLI argument (default: 50) to argparse.
+- [ ] P1-C 🔄 — Modify `check_thresholds` signature to accept `base_ref: str | None` and `max_loc_growth: int`.
+- [ ] P1-D 🔄 — Replace absolute LOC check with delta-aware logic implementing the three-outcome table from DD-1.
+- [ ] P1-E 🔄 — Update the script docstring to document the new `--max-loc-growth` flag.
+- [ ] P1-F 🚧 — 📌 Checkpoint: present diff of `architecture_metrics.py` for user review.
 
 ### Phase 2 — Add unit tests
 
-- [x] P2-A ✅ no-commit (awaiting P2-B hard-gate review) 🔄 — Create `scripts/quality/tests/test_architecture_metrics.py` with tests for:
+- [ ] P2-A 🔄 — Create `scripts/quality/tests/test_architecture_metrics.py` with tests for:
   - Scenario 1: pre-existing violation + small delta → WARNING, no FAIL.
   - Scenario 2: file crosses threshold in this PR → FAIL.
   - Scenario 3: pre-existing violation + large delta (> growth cap) → FAIL.
   - Scenario 4: file at/below threshold, stays at/below → no WARNING, no FAIL.
   - Scenario 5: no `base_ref` provided (fallback to absolute check) → existing behavior.
-- [x] P2-B ✅ no-commit (user-approved checkpoint on 2026-03-11) 🚧 — 📌 Checkpoint: present test file for user review.
+- [ ] P2-B 🚧 — 📌 Checkpoint: present test file for user review.
 
 ### Phase 3 — Validation
 
-- [x] P3-A ✅ no-commit (default command hit global coverage gate; tests validated with `--no-cov`) 🔄 — Run `python -m pytest scripts/quality/tests/ -x -q` — all new tests pass.
-- [x] P3-B ✅ no-commit (command passes with zero scoped backend files; supplemental check_thresholds probe confirms review_service WARNING/no FAIL) 🔄 — Run `python scripts/quality/architecture_metrics.py --check --base-ref main --max-loc 500` on current branch to verify review_service.py produces WARNING instead of FAIL.
-- [x] P3-C ✅ no-commit (final summary presented; user requested completion on 2026-03-11) 🚧 — Hard-gate: present final summary and commit proposal to user.
+- [ ] P3-A 🔄 — Run `python -m pytest scripts/quality/tests/ -x -q` — all new tests pass.
+- [ ] P3-B 🔄 — Run `python scripts/quality/architecture_metrics.py --check --base-ref main --max-loc 500` on current branch to verify review_service.py produces WARNING instead of FAIL.
+- [ ] P3-C 🚧 — Hard-gate: present final summary and commit proposal to user.
 
 ---
 
@@ -263,13 +263,13 @@ _(empty — execution has not started)_
 
 ## Acceptance Criteria
 
-- [x] Files already above `--max-loc` at base-ref do not FAIL for small additive changes (delta <= growth cap).
-- [x] Files that cross the threshold in the current PR still FAIL.
-- [x] Large growth (delta > growth cap) in already-over files still FAIL.
-- [x] Pre-existing violations emit WARNING (never silenced).
-- [x] Existing CC gate logic unchanged.
-- [x] Unit tests cover all five scenarios and pass.
-- [x] `--max-loc-growth` flag documented in script docstring.
+- [ ] Files already above `--max-loc` at base-ref do not FAIL for small additive changes (delta <= growth cap).
+- [ ] Files that cross the threshold in the current PR still FAIL.
+- [ ] Large growth (delta > growth cap) in already-over files still FAIL.
+- [ ] Pre-existing violations emit WARNING (never silenced).
+- [ ] Existing CC gate logic unchanged.
+- [ ] Unit tests cover all five scenarios and pass.
+- [ ] `--max-loc-growth` flag documented in script docstring.
 
 ---
 

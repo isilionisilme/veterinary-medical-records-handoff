@@ -19,10 +19,30 @@ def _load_module():
     return module
 
 
-def _data_with_loc(loc: int) -> dict:
+def _data_with_loc(loc: int, *, cc_error: str | None = None) -> dict:
+    radon_cc: dict[str, object] = {"functions": []}
+    if cc_error is not None:
+        radon_cc["error"] = cc_error
     return {
         "loc": {"files": {TARGET_FILE: loc}},
-        "radon_cc": {"functions": []},
+        "radon_cc": radon_cc,
+    }
+
+
+def _data_with_cc_function(name: str, complexity: int, *, symbol: str | None = None) -> dict:
+    return {
+        "loc": {"files": {}},
+        "radon_cc": {
+            "functions": [
+                {
+                    "file": TARGET_FILE,
+                    "name": name,
+                    "symbol": symbol or name,
+                    "lineno": 100,
+                    "complexity": complexity,
+                }
+            ]
+        },
     }
 
 
@@ -121,3 +141,84 @@ def test_no_base_ref_preserves_absolute_fail_behavior() -> None:
     assert warnings == []
     assert len(failures) == 1
     assert "FAIL: LOC 600 > 500" in failures[0]
+
+
+def test_radon_error_fails_closed_when_backend_scope_exists() -> None:
+    module = _load_module()
+    data = _data_with_loc(200, cc_error="radon failed: No module named radon")
+
+    warnings, failures = module.check_thresholds(
+        data,
+        max_cc=30,
+        max_loc=500,
+        warn_cc=11,
+        changed_backend_paths={TARGET_FILE},
+        base_ref="main",
+        max_loc_growth=50,
+    )
+
+    assert warnings == []
+    assert len(failures) == 1
+    assert "unable to evaluate CC thresholds" in failures[0]
+    assert "radon failed" in failures[0]
+
+
+def test_preexisting_cc_above_threshold_warns_when_not_regressed() -> None:
+    module = _load_module()
+    data = _data_with_cc_function("_legacy_hotspot", 53)
+
+    with patch.object(module, "_base_ref_cc_by_function", return_value={"_legacy_hotspot": 53}):
+        warnings, failures = module.check_thresholds(
+            data,
+            max_cc=30,
+            max_loc=500,
+            warn_cc=11,
+            changed_backend_paths={TARGET_FILE},
+            base_ref="main",
+            max_loc_growth=50,
+        )
+
+    assert failures == []
+    assert len(warnings) == 1
+    assert "pre-existing" in warnings[0]
+    assert "delta +0" in warnings[0]
+
+
+def test_preexisting_cc_above_threshold_fails_when_regressed() -> None:
+    module = _load_module()
+    data = _data_with_cc_function("_legacy_hotspot", 55)
+
+    with patch.object(module, "_base_ref_cc_by_function", return_value={"_legacy_hotspot": 53}):
+        warnings, failures = module.check_thresholds(
+            data,
+            max_cc=30,
+            max_loc=500,
+            warn_cc=11,
+            changed_backend_paths={TARGET_FILE},
+            base_ref="main",
+            max_loc_growth=50,
+        )
+
+    assert warnings == []
+    assert len(failures) == 1
+    assert "pre-existing, delta +2" in failures[0]
+
+
+def test_cc_baseline_uses_symbol_identity_not_only_name() -> None:
+    module = _load_module()
+    data = _data_with_cc_function("run", 55, symbol="B.run")
+
+    with patch.object(module, "_base_ref_cc_by_function", return_value={"A.run": 53, "B.run": 29}):
+        warnings, failures = module.check_thresholds(
+            data,
+            max_cc=30,
+            max_loc=500,
+            warn_cc=11,
+            changed_backend_paths={TARGET_FILE},
+            base_ref="main",
+            max_loc_growth=50,
+        )
+
+    assert warnings == []
+    assert len(failures) == 1
+    assert "FAIL: CC 55 > 30: run in" in failures[0]

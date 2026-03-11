@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -29,6 +30,8 @@ from backend.app.application.processing.candidate_mining import _mine_interpreta
 from backend.app.domain.models import ReviewStatus
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
+
+logger = logging.getLogger(__name__)
 
 _VISIT_REASON_LABEL_PREFIX_RE = re.compile(
     r"^(?:visita|consulta|control|revisi[oó]n|seguimiento|ingreso|alta)\b",
@@ -268,6 +271,7 @@ def get_document_review(
     repository: DocumentRepository,
     storage: FileStorage,
 ) -> DocumentReviewLookupResult | None:
+    logger.info("get_document_review called document_id=%s", document_id)
     document = repository.get(document_id)
     if document is None:
         return None
@@ -306,6 +310,7 @@ def get_document_review(
         try:
             raw_text = raw_text_path.read_text(encoding="utf-8")
         except OSError:
+            logger.warning("Failed to read raw_text file path=%s", raw_text_path)
             raw_text = None
 
     structured_data = review_payload_projector._normalize_review_interpretation_data(
@@ -1316,6 +1321,7 @@ def mark_document_reviewed(
     now_provider: Callable[[], str] = _default_now_iso,
     reviewed_by: str | None = None,
 ) -> ReviewToggleResult | None:
+    logger.info("mark_document_reviewed called document_id=%s", document_id)
     document = repository.get(document_id)
     if document is None:
         return None
@@ -1363,6 +1369,7 @@ def reopen_document_review(
     repository: DocumentRepository,
     now_provider: Callable[[], str] = _default_now_iso,
 ) -> ReviewToggleResult | None:
+    logger.info("reopen_document_review called document_id=%s", document_id)
     document = repository.get(document_id)
     if document is None:
         return None
