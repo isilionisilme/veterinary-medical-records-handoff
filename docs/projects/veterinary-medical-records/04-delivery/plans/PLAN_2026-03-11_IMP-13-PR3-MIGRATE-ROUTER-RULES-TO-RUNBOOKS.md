@@ -83,20 +83,20 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ### Phase 1 — Enrich existing runbooks
 
-- [x] P1-A 🔄 — Enrich `plan-create.prompt.md` with agent taxonomy, branch-first, naming, partition gate, PR Roadmap format. — ✅ `pending-checkpoint`
-- [x] P1-B 🔄 — Enrich `plan-start.prompt.md` with full Execution Mode definitions, Model Assignment options, single-chat rule. — ✅ `pending-checkpoint`
-- [x] P1-C 🔄 — Enrich `plan-resume.prompt.md` with step eligibility, task chaining, evidence block, next-step table, token-efficiency. — ✅ `pending-checkpoint`
-- [x] P1-D 🔄 — Enrich `plan-closeout.prompt.md` with iteration lifecycle, post-merge cleanup, artifact archival. — ✅ `pending-checkpoint`
-- [x] P1-E 🔄 — Enrich `code-review.prompt.md` with full depth selection, lens procedure, 7 focus areas, severity rules, template, publication, follow-up. — ✅ `pending-checkpoint`
-- [x] P1-F 🔄 — Enrich `scope-boundary.prompt.md` with format-before-commit, L1/L2/L3 table, auto-fix policy, hard-gate protocol. — ✅ `pending-checkpoint`
+- [x] P1-A 🔄 — Enrich `plan-create.prompt.md` with agent taxonomy, branch-first, naming, partition gate, PR Roadmap format. — ✅ `4ca4435a`
+- [x] P1-B 🔄 — Enrich `plan-start.prompt.md` with full Execution Mode definitions, Model Assignment options, single-chat rule. — ✅ `4ca4435a`
+- [x] P1-C 🔄 — Enrich `plan-resume.prompt.md` with step eligibility, task chaining, evidence block, next-step table, token-efficiency. — ✅ `4ca4435a`
+- [x] P1-D 🔄 — Enrich `plan-closeout.prompt.md` with iteration lifecycle, post-merge cleanup, artifact archival. — ✅ `4ca4435a`
+- [x] P1-E 🔄 — Enrich `code-review.prompt.md` with full depth selection, lens procedure, 7 focus areas, severity rules, template, publication, follow-up. — ✅ `4ca4435a`
+- [x] P1-F 🔄 — Enrich `scope-boundary.prompt.md` with format-before-commit, L1/L2/L3 table, auto-fix policy, hard-gate protocol. — ✅ `4ca4435a`
 
 > 📌 **Commit checkpoint — P1 complete.** Suggested message: `docs(ops): enrich existing runbooks with router operational rules (IMP-13)`. Run L1; if red, fix and re-run. Then wait for user.
 
 ### Phase 2 — Create new runbooks
 
-- [ ] P2-A 🔄 — Create `start-work.prompt.md` with branch-first procedure, naming, category mapping.
-- [ ] P2-B 🔄 — Create `doc-updates.prompt.md` with full DOC_UPDATES procedure, normalization, enforcement maps, output format.
-- [ ] P2-C 🔄 — Create `pr-workflow.prompt.md` with PR lifecycle: classification, title, body, commit review, partition gate, post-merge cleanup.
+- [x] P2-A 🔄 — Create `start-work.prompt.md` with branch-first procedure, naming, category mapping. — ✅ `pending-checkpoint`
+- [x] P2-B 🔄 — Create `doc-updates.prompt.md` with full DOC_UPDATES procedure, normalization, enforcement maps, output format. — ✅ `pending-checkpoint`
+- [x] P2-C 🔄 — Create `pr-workflow.prompt.md` with PR lifecycle: classification, title, body, commit review, partition gate, post-merge cleanup. — ✅ `pending-checkpoint`
 
 > 📌 **Commit checkpoint — P2 complete.** Suggested message: `docs(ops): create start-work, doc-updates, and pr-workflow runbooks (IMP-13)`. Run L1; if red, fix and re-run. Then wait for user.
 
@@ -134,7 +134,7 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ## Active Prompt
 
-Prompt 2 — Enrich existing runbooks (P1 complete; waiting at checkpoint proposal).
+Prompt 3 — Create new runbooks (P2 complete; waiting at checkpoint proposal).
 
 ---
 
