@@ -1,8 +1,8 @@
 # Plan: IMP-06 — Localize Core Patient UI Field Labels to Spanish
 
-> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
-**Backlog item:** [imp-06-localize-core-patient-ui-field-labels-to-spanish.md](../Backlog/imp-06-localize-core-patient-ui-field-labels-to-spanish.md)
+**Backlog item:** [imp-06-localize-core-patient-ui-field-labels-to-spanish.md](../../Backlog/imp-06-localize-core-patient-ui-field-labels-to-spanish.md)
 **Branch:** `codex/veterinary-medical-records/docs/imp-06-ui-labels-es`
 **PR:** pendiente
 **Prerequisite:** `main` actualizado y tests verdes

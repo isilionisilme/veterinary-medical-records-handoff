@@ -1,6 +1,6 @@
 # IMP-03 — Plan Execution Guard Enforcement (Local + CI)
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Technical Improvement (non-user-facing)
 

@@ -1,8 +1,8 @@
 # Plan: IMP-03 — Plan Execution Guard Enforcement (Local + CI)
 
-> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
-**Backlog item:** [imp-03-plan-execution-guard-enforcement-local-ci.md](../Backlog/imp-03-plan-execution-guard-enforcement-local-ci.md)
+**Backlog item:** [imp-03-plan-execution-guard-enforcement-local-ci.md](../../Backlog/completed/imp-03-plan-execution-guard-enforcement-local-ci.md)
 **Branch:** `codex/veterinary-medical-records/ci/plan-execution-guard`
 **PR:** pendiente
 **Prerequisite:** `main` actualizado y tests verdes

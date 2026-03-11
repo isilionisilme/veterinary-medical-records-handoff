@@ -1,6 +1,6 @@
 # ARCH-01 — Decompose `review_service.py`
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Architecture Improvement (code quality)
 

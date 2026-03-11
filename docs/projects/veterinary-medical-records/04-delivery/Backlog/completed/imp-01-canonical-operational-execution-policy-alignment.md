@@ -1,6 +1,6 @@
 # IMP-01 — Canonical Operational Execution Policy Alignment
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Technical Improvement (non-user-facing)
 

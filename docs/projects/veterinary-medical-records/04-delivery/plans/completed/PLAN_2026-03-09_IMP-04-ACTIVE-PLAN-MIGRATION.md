@@ -144,7 +144,7 @@ Goal: Verify IMP-01 prerequisite before starting migration work.
 
 Steps:
 1. Read the IMP-01 backlog item at
-   docs/projects/veterinary-medical-records/04-delivery/Backlog/imp-01-canonical-operational-execution-policy-alignment.md.
+   docs/projects/veterinary-medical-records/04-delivery/Backlog/completed/imp-01-canonical-operational-execution-policy-alignment.md.
    Check its Status field.
 2. Search for any IMP-01 plan under docs/projects/veterinary-medical-records/04-delivery/plans/
    (e.g., PLAN_*IMP-01* or PLAN_*POLICY*). If found, read its Execution Status to determine

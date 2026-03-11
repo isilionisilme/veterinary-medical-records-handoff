@@ -1,6 +1,6 @@
 # IMP-02 — Router and DOC_UPDATES Contract Synchronization
 
-**Status:** Planned
+**Status:** Done
 
 **Type:** Technical Improvement (non-user-facing)
 

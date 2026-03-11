@@ -3,13 +3,13 @@
 > **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Backlog item:** [imp-13-operational-runbook-architecture.md](../Backlog/imp-13-operational-runbook-architecture.md)
-**Branch:** PENDING PLAN-START RESOLUTION
+**Branch:** `refactor/imp-13-activate-runbook-routing`
 **PR:** Pending (PR created on explicit user request)
 **User Story:** IMP-13 Fase B
 **Prerequisite:** PR-1 (Fase A) merged to `main`; `.prompt.md`, `.instructions.md`, and `plan-start-check.py` already exist and are validated.
-**Worktree:** PENDING PLAN-START RESOLUTION
-**Execution Mode:** PENDING USER SELECTION
-**Model Assignment:** PENDING USER SELECTION
+**Worktree:** `d:\Git\worktrees\cuarto`
+**Execution Mode:** Autonomous
+**Model Assignment:** Uniform
 
 ---
 
@@ -36,11 +36,11 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ### Phase 0 — Plan-start preflight
 
-- [ ] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata.
-- [ ] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata.
-- [ ] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata.
-- [ ] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata.
-- [ ] P0-E 🔄 — Record plan-start snapshot commit.
+- [x] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata. — ✅ `pending-snapshot`
+- [x] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata. — ✅ `pending-snapshot`
+- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ Autonomous
+- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ Uniform — GPT-5.4
+- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ snapshot committed
 
 ### Phase 1 — Rewire AGENTS.md
 
@@ -79,7 +79,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ## Active Prompt
 
-None — plan not yet started.
+Prompt 1 — Phase 0 plan-start preflight (completing P0-E).
 
 ---
 

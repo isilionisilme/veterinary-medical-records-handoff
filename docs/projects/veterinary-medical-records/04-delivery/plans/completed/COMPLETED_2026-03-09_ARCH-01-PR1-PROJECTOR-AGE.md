@@ -1,6 +1,6 @@
 # Plan: ARCH-01 PR-1 — Extract ReviewPayloadProjector + AgeNormalizer
 
-> **ARCH origin:** `ARCH-01` — [arch-01-decompose-review-service.md](../../Backlog/arch-01-decompose-review-service.md)
+> **ARCH origin:** `ARCH-01` — [arch-01-decompose-review-service.md](../../Backlog/completed/arch-01-decompose-review-service.md)
 > **Related plans (series):**
 > - **Archived as:** `COMPLETED_2026-03-09_ARCH-01-PR1-PROJECTOR-AGE.md`
 > - [PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md](../PLAN_2026-03-09_ARCH-01-DECOMPOSITION-PR-SERIES/PLAN_2026-03-09_ARCH-01-PR2-VISIT-ENGINE.md)
@@ -8,7 +8,7 @@
 
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for execution protocol, hard-gates, and handoff behavior.
 
-**Backlog item:** [arch-01-decompose-review-service.md](../../Backlog/arch-01-decompose-review-service.md)
+**Backlog item:** [arch-01-decompose-review-service.md](../../Backlog/completed/arch-01-decompose-review-service.md)
 **Branch:** `refactor/arch-01-pr1-projector-age`
 **PR:** [#254](https://github.com/isilionisilme/veterinary-medical-records/pull/254) — `refactor: extract review projector and age normalizer`
 **User Story:** N/A (Architecture improvement ARCH-01, PR 1 of 3)

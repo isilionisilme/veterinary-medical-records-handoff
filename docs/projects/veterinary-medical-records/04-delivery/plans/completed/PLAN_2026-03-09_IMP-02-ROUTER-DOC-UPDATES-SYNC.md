@@ -4,7 +4,7 @@
 
 **Branch:** Pending (created at execution start)
 **PR:** Pending (PR created on explicit user request)
-**User Story:** [IMP-02](../../Backlog/imp-02-router-and-doc-updates-contract-synchronization.md)
+**User Story:** [IMP-02](../../Backlog/completed/imp-02-router-and-doc-updates-contract-synchronization.md)
 **Prerequisite:** IMP-01 canonical policy alignment merged or finalized in branch scope
 **Worktree:** `8420/veterinary-medical-records`
 **CI Mode:** Pipeline depth-1 gate (mode 2, default)
@@ -121,7 +121,7 @@ Propagate canonical policy updates (from IMP-01) into router modules and DOC_UPD
 >
 > **Steps:**
 >
-> 1. Read the IMP-01 backlog item at `docs/projects/veterinary-medical-records/04-delivery/Backlog/imp-01-canonical-operational-execution-policy-alignment.md`. Check its `Status` field.
+> 1. Read the IMP-01 backlog item at `docs/projects/veterinary-medical-records/04-delivery/Backlog/completed/imp-01-canonical-operational-execution-policy-alignment.md`. Check its `Status` field.
 > 2. Search for any IMP-01 plan folder under `docs/projects/veterinary-medical-records/04-delivery/plans/` (e.g., `PLAN_*IMP-01*` or `PLAN_*POLICY*`). If found, read its Execution Status to determine completion.
 > 3. If IMP-01 is not merged or finalized: **STOP**. Report to user that IMP-02 is blocked. Record the blocker in this plan and yield.
 > 4. If IMP-01 is merged or finalized, build the **delta inventory** by running:
