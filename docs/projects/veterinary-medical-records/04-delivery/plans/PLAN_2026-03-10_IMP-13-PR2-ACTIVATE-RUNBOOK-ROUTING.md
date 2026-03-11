@@ -9,7 +9,7 @@
 **Prerequisite:** PR-1 (Fase A) merged to `main`; `.prompt.md`, `.instructions.md`, and `plan-start-check.py` already exist and are validated.
 **Worktree:** `d:\Git\worktrees\cuarto`
 **Execution Mode:** Autonomous
-**Model Assignment:** Uniform
+**Model Assignment:** `Uniform` (GPT-5.4)
 
 ---
 
