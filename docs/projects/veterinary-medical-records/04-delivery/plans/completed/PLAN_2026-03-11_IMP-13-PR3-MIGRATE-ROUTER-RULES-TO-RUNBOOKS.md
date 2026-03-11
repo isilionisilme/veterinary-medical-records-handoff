@@ -4,10 +4,10 @@
 
 **Backlog item:** [imp-13-operational-runbook-architecture.md](../Backlog/imp-13-operational-runbook-architecture.md)
 **Branch:** `refactor/imp-13-activate-runbook-routing`
-**PR:** Pending (PR created on explicit user request)
+**PR:** [#274](https://github.com/isilionisilme/veterinary-medical-records/pull/274)
 **User Story:** IMP-13
 **Prerequisite:** PR-2 (Fase B) merged to `main`; AGENTS.md rewired to `.prompt.md` routing.
-**Worktree:** `d:\Git\worktrees\cuarto`
+**Worktree:** `D:\Git\worktrees\imp13-resume`
 **Execution Mode:** Autonomous
 **Model Assignment:** Default
 

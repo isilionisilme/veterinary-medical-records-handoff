@@ -14,7 +14,7 @@
 |---|---|---|---|
 | PR-1 | [IMP-13-PR1-CREATE-RUNBOOK-LAYER](../plans/PLAN_2026-03-10_IMP-13-PR1-CREATE-RUNBOOK-LAYER.md) | Fase A — Create `.prompt.md`, `.instructions.md`, `plan-start-check.py` | `docs/imp-13-operational-runbook-architecture` |
 | PR-2 | [IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING](../plans/completed/PLAN_2026-03-10_IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING.md) | Fase B — Rewire AGENTS.md | `refactor/imp-13-activate-runbook-routing` |
-| PR-3 | [IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS](../plans/PLAN_2026-03-11_IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS.md) | Migrate all operational rules from router into self-contained runbooks | Pending |
+| PR-3 | [IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS](../plans/completed/PLAN_2026-03-11_IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS.md) | Migrate all operational rules from router into self-contained runbooks | `refactor/imp-13-activate-runbook-routing` |
 | PR-4 | [IMP-13-PR4-RETIRE-ROUTER-OPERATIONAL](../plans/PLAN_2026-03-10_IMP-13-PR3-RETIRE-ROUTER-OPERATIONAL.md) | Fases C+D — Retire router, cleanup | Pending |
 
 **Technical Outcome**
