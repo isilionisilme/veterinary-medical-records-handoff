@@ -6,15 +6,16 @@
 
 **Target release:** Release 22 — Operational governance redesign
 
-**PR strategy:** 3 sequential PRs, each with its own plan. Hard-gate between PRs.
+**PR strategy:** 4 sequential PRs, each with its own plan. Hard-gate between PRs.
 
 **Plans (execution order):**
 
 | # | Plan | Scope | Branch |
 |---|---|---|---|
 | PR-1 | [IMP-13-PR1-CREATE-RUNBOOK-LAYER](../plans/PLAN_2026-03-10_IMP-13-PR1-CREATE-RUNBOOK-LAYER.md) | Fase A — Create `.prompt.md`, `.instructions.md`, `plan-start-check.py` | `docs/imp-13-operational-runbook-architecture` |
-| PR-2 | [IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING](../plans/PLAN_2026-03-10_IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING.md) | Fase B — Rewire AGENTS.md | `docs/imp-13-activate-runbook-architecture` |
-| PR-3 | [IMP-13-PR3-RETIRE-ROUTER-OPERATIONAL](../plans/PLAN_2026-03-10_IMP-13-PR3-RETIRE-ROUTER-OPERATIONAL.md) | Fases C+D — Retire router, cleanup | `docs/imp-13-retire-router-operational-layer` |
+| PR-2 | [IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING](../plans/PLAN_2026-03-10_IMP-13-PR2-ACTIVATE-RUNBOOK-ROUTING.md) | Fase B — Rewire AGENTS.md | `refactor/imp-13-activate-runbook-routing` |
+| PR-3 | [IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS](../plans/PLAN_2026-03-11_IMP-13-PR3-MIGRATE-ROUTER-RULES-TO-RUNBOOKS.md) | Migrate all operational rules from router into self-contained runbooks | Pending |
+| PR-4 | [IMP-13-PR4-RETIRE-ROUTER-OPERATIONAL](../plans/PLAN_2026-03-10_IMP-13-PR3-RETIRE-ROUTER-OPERATIONAL.md) | Fases C+D — Retire router, cleanup | Pending |
 
 **Technical Outcome**
 Replace the multi-level agent router operational layer with self-contained `.prompt.md` runbooks, pattern-triggered `.instructions.md` context files, and executable enforcement scripts. Reduce the agent's operational burden from navigating ~1000 lines of fragmented protocol to loading a single 20–40 line runbook per intent.

@@ -9,7 +9,7 @@
 **Prerequisite:** PR-1 (Fase A) merged to `main`; `.prompt.md`, `.instructions.md`, and `plan-start-check.py` already exist and are validated.
 **Worktree:** `d:\Git\worktrees\cuarto`
 **Execution Mode:** Autonomous
-**Model Assignment:** Uniform
+**Model Assignment:** `Uniform` (GPT-5.4)
 
 ---
 
@@ -38,21 +38,21 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 - [x] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata. — ✅ `pending-snapshot`
 - [x] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata. — ✅ `pending-snapshot`
-- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ Autonomous
-- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ Uniform — GPT-5.4
-- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ snapshot committed
+- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ `pending-snapshot`
+- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ `pending-snapshot`
+- [x] P0-E 🔄 — Record plan-start snapshot commit. — ✅ `d662fa94`
 
 ### Phase 1 — Rewire AGENTS.md
 
-- [ ] P1-A 🔄 — Rewrite `AGENTS.md` (~20–30 lines): global rules (no commits to main, branch naming), intent → `.prompt.md` mapping table, reference pointers to remaining router modules, plan enforcement script instruction.
-- [ ] P1-B 🔄 — Update `docs/agent_router/00_AUTHORITY.md` if needed: add note that operational intents are now handled by `.prompt.md` files.
+- [x] P1-A 🔄 — Rewrite `AGENTS.md` (~20–30 lines): global rules (no commits to main, branch naming), intent → `.prompt.md` mapping table, reference pointers to remaining router modules, plan enforcement script instruction. — ✅ `bde5ee7d`
+- [x] P1-B 🔄 — Update `docs/agent_router/00_AUTHORITY.md` if needed: add note that operational intents are now handled by `.prompt.md` files. — ✅ `no-commit (AGENTS.md now owns operational routing; 00_AUTHORITY.md remains fallback/reference-only)`
 
 > 📌 **Commit checkpoint — P1 complete.** Suggested message: `refactor(ops): rewire AGENTS.md to operational runbooks (IMP-13)`. Run L2 tests; if red, fix and re-run until green. Then wait for user.
 
 ### Phase 2 — Update contract tests
 
-- [ ] P2-A 🔄 — Update `backend/tests/unit/test_doc_router_contract.py` to validate the new AGENTS.md structure (`.prompt.md` references, reduced line count) instead of old routing chain expectations.
-- [ ] P2-B 🔄 — Run full test suite. Fix any failures.
+- [x] P2-A 🔄 — Update `backend/tests/unit/test_doc_router_contract.py` to validate the new AGENTS.md structure (`.prompt.md` references, reduced line count) instead of old routing chain expectations. — ✅ `pending-checkpoint`
+- [x] P2-B 🔄 — Run full test suite. Fix any failures. — ✅ `pending-checkpoint`
 
 > 📌 **Commit checkpoint — P2 complete.** Suggested message: `test(ops): update contract tests for runbook-based AGENTS.md`. Run L2 tests; if red, fix and re-run until green. Then wait for user.
 
@@ -64,7 +64,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ### Documentation task
 
-- [ ] DOC-1 🔄 — `no-doc-needed` — AGENTS.md itself serves as the operational routing documentation.
+- [x] DOC-1 🔄 — `no-doc-needed` — AGENTS.md itself serves as the operational routing documentation. — ✅ `no-commit (AGENTS.md is the delivered operational doc)`
 
 ---
 
@@ -79,7 +79,7 @@ Rewire `AGENTS.md` to route operational intents through `.prompt.md` runbooks in
 
 ## Active Prompt
 
-Prompt 1 — Phase 0 plan-start preflight (completing P0-E).
+Prompt 4 — User validation gate (P3).
 
 ---
 

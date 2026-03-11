@@ -1,4 +1,4 @@
-# Plan: IMP-13 PR-3 — Retire Router Operational Layer (Fases C+D)
+# Plan: IMP-13 PR-4 — Retire Router Operational Layer (Fases C+D)
 
 > **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
@@ -6,7 +6,7 @@
 **Branch:** PENDING PLAN-START RESOLUTION
 **PR:** Pending (PR created on explicit user request)
 **User Story:** IMP-13 Fases C+D
-**Prerequisite:** PR-2 (Fase B) merged to `main`; AGENTS.md rewired to `.prompt.md` routing; user has validated the new operational layer works in real usage.
+**Prerequisite:** PR-3 (Migrate Router Rules to Runbooks) merged to `main`; all runbooks self-contained; user has validated the new operational layer works in real usage.
 **Worktree:** PENDING PLAN-START RESOLUTION
 **Execution Mode:** PENDING USER SELECTION
 **Model Assignment:** PENDING USER SELECTION

@@ -13,6 +13,7 @@ RULES_INDEX_DOC = ROUTER_ROOT / "00_RULES_INDEX.md"
 DOC_REF_PATTERN = re.compile(r"(docs/[A-Za-z0-9_./-]+\.md)")
 
 MAX_AUTHORITY_CHARS = 3000
+MAX_AGENTS_NON_EMPTY_LINES = 30
 
 
 def _read_text(path: Path) -> str:
@@ -30,8 +31,23 @@ def test_entrypoint_contract_paths_exist() -> None:
     assert RULES_INDEX_DOC.exists(), "Missing rules index document."
 
     agents_text = _read_text(ROOT_AGENTS)
+    assert ".github/prompts/plan-create.prompt.md" in agents_text
+    assert ".github/prompts/plan-start.prompt.md" in agents_text
+    assert ".github/prompts/plan-resume.prompt.md" in agents_text
+    assert ".github/prompts/plan-closeout.prompt.md" in agents_text
+    assert ".github/prompts/code-review.prompt.md" in agents_text
+    assert ".github/prompts/scope-boundary.prompt.md" in agents_text
+    assert "scripts/dev/plan-start-check.py" in agents_text
     assert "docs/agent_router/00_AUTHORITY.md" in agents_text
     assert "docs/agent_router/00_FALLBACK.md" in agents_text
+
+
+def test_agents_entrypoint_uses_runbooks_and_stays_small() -> None:
+    agents_text = _read_text(ROOT_AGENTS)
+    non_empty_lines = [line for line in agents_text.splitlines() if line.strip()]
+
+    assert "Start with the matching operational runbook" in agents_text
+    assert len(non_empty_lines) <= MAX_AGENTS_NON_EMPTY_LINES
 
 
 def test_authority_plan_audit_intent_exists() -> None:

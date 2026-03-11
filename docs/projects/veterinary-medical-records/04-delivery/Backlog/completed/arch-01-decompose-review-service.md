@@ -6,7 +6,7 @@
 
 **Target release:** Release 19 — Critical architecture remediation
 
-**Origin:** [Architecture Review 2026-03-09](../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 2 (P-1), Phase 3 (§3.1)
+**Origin:** [Architecture Review 2026-03-09](../../../02-tech/audits/architecture-review-2026-03-09.md) — Phase 2 (P-1), Phase 3 (§3.1)
 
 **Severity:** CRITICAL  
 **Effort:** L (8-16h)
