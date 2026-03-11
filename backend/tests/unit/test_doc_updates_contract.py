@@ -118,11 +118,14 @@ def test_doc_updates_core_files_exist() -> None:
 def test_github_operational_prompts_exist() -> None:
     expected_files = {
         "code-review.prompt.md",
+        "doc-updates.prompt.md",
         "plan-closeout.prompt.md",
         "plan-create.prompt.md",
         "plan-resume.prompt.md",
         "plan-start.prompt.md",
+        "pr-workflow.prompt.md",
         "scope-boundary.prompt.md",
+        "start-work.prompt.md",
     }
 
     actual_files = {path.name for path in GITHUB_PROMPTS_DIR.glob("*.prompt.md")}

@@ -1,8 +1,8 @@
 # Plan: IMP-13 PR-2 — Activate Runbook Routing (Fase B)
 
-> **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+> **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
-**Backlog item:** [imp-13-operational-runbook-architecture.md](../Backlog/imp-13-operational-runbook-architecture.md)
+**Backlog item:** [imp-13-operational-runbook-architecture.md](../../Backlog/imp-13-operational-runbook-architecture.md)
 **Branch:** `refactor/imp-13-activate-runbook-routing`
 **PR:** #270 — merged `2026-03-11`
 **User Story:** IMP-13 Fase B

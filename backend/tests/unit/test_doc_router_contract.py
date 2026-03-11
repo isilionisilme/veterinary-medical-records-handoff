@@ -35,7 +35,10 @@ def test_entrypoint_contract_paths_exist() -> None:
     assert ".github/prompts/plan-start.prompt.md" in agents_text
     assert ".github/prompts/plan-resume.prompt.md" in agents_text
     assert ".github/prompts/plan-closeout.prompt.md" in agents_text
+    assert ".github/prompts/start-work.prompt.md" in agents_text
+    assert ".github/prompts/pr-workflow.prompt.md" in agents_text
     assert ".github/prompts/code-review.prompt.md" in agents_text
+    assert ".github/prompts/doc-updates.prompt.md" in agents_text
     assert ".github/prompts/scope-boundary.prompt.md" in agents_text
     assert "scripts/dev/plan-start-check.py" in agents_text
     assert "docs/agent_router/00_AUTHORITY.md" in agents_text

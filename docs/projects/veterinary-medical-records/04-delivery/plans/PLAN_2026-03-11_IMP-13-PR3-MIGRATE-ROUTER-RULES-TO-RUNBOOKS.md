@@ -102,10 +102,10 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ### Phase 3 — Update AGENTS.md routing and validate
 
-- [ ] P3-A 🔄 ⏳ IN PROGRESS (agent, 2026-03-11) — Update AGENTS.md routing table to add entries for `start-work`, `doc-updates`, `pr-workflow`.
-- [ ] P3-B 🔄 — Run L2 validation (`scripts/ci/test-L2.ps1 -BaseRef main`). Fix any contract test failures.
+- [x] P3-A 🔄 — Update AGENTS.md routing table to add entries for `start-work`, `doc-updates`, `pr-workflow`. — ✅ `no-commit (checkpoint commit deferred; changes ready)`
+- [x] P3-B 🔄 — Run L2 validation (`scripts/ci/test-L2.ps1 -BaseRef main`). Fix any contract test failures. — ✅ `no-commit (L2 passed; checkpoint commit deferred)`
 
-> Blocker (2026-03-11): L2 stopped at the remote base sync guard because `refactor/imp-13-activate-runbook-routing` was behind `origin/main` by 1 commit (`9851cd8a1`). Sync the branch, then re-run P3-B.
+> Note (2026-03-11): Remote base sync blocker was resolved by merge commit `034476a8` before the successful L2 re-run.
 
 > 📌 **Commit checkpoint — P3 complete.** Suggested message: `refactor(ops): update AGENTS.md routing for new runbooks (IMP-13)`. Run L2; if red, fix and re-run. Then wait for user.
 
@@ -136,7 +136,7 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ## Active Prompt
 
-Prompt 4 — Update routing and validate.
+Prompt 5 — User validation gate (P4).
 
 ---
 

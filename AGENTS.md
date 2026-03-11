@@ -3,10 +3,13 @@
 Start with the matching operational runbook for the current intent. Keep reads minimal.
 
 ## Runbooks
+- Start new work or create a branch → `.github/prompts/start-work.prompt.md`
 - Create a plan → `.github/prompts/plan-create.prompt.md`
 - Continue an active plan or any git operation during a plan → run `python scripts/dev/plan-start-check.py`, then load `.github/prompts/plan-start.prompt.md` for unresolved plan-start or `.github/prompts/plan-resume.prompt.md` for the current step
 - Close out a plan before merge → `.github/prompts/plan-closeout.prompt.md`
+- Create or update a pull request → `.github/prompts/pr-workflow.prompt.md`
 - Code review → `.github/prompts/code-review.prompt.md`
+- Documentation updates or doc maintenance → `.github/prompts/doc-updates.prompt.md`
 - Commit-task scope boundary or handoff → `.github/prompts/scope-boundary.prompt.md`
 
 ## Global Rules
