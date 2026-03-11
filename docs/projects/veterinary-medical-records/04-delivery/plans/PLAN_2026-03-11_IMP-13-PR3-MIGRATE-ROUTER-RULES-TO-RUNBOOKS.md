@@ -3,13 +3,13 @@
 > **Operational rules:** See [plan-execution-protocol.md](../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
 
 **Backlog item:** [imp-13-operational-runbook-architecture.md](../Backlog/imp-13-operational-runbook-architecture.md)
-**Branch:** PENDING PLAN-START RESOLUTION
+**Branch:** `refactor/imp-13-activate-runbook-routing`
 **PR:** Pending (PR created on explicit user request)
 **User Story:** IMP-13
 **Prerequisite:** PR-2 (Fase B) merged to `main`; AGENTS.md rewired to `.prompt.md` routing.
-**Worktree:** PENDING PLAN-START RESOLUTION
-**Execution Mode:** PENDING USER SELECTION
-**Model Assignment:** PENDING USER SELECTION
+**Worktree:** `d:\Git\worktrees\cuarto`
+**Execution Mode:** Autonomous
+**Model Assignment:** Default
 
 ---
 
@@ -75,11 +75,11 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ### Phase 0 — Plan-start preflight (mandatory)
 
-- [ ] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata.
-- [ ] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata.
-- [ ] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata.
-- [ ] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata.
-- [ ] P0-E 🔄 — Record plan-start snapshot commit.
+- [x] P0-A 🔄 — Resolve execution branch and update `**Branch:**` metadata. — ✅ `pending-snapshot`
+- [x] P0-B 🔄 — Resolve execution worktree and update `**Worktree:**` metadata. — ✅ `pending-snapshot`
+- [x] P0-C 🚧 — Ask user to choose `Execution Mode` and update metadata. — ✅ Autonomous
+- [x] P0-D 🚧 — Ask user to choose `Model Assignment` and update metadata. — ✅ Default — GPT-5.4
+- [ ] P0-E 🔄 — Record plan-start snapshot commit. ⏳ IN PROGRESS (GitHub Copilot, 2026-03-11)
 
 ### Phase 1 — Enrich existing runbooks
 
@@ -134,7 +134,7 @@ Each runbook draws from specific router modules. This table is the authoritative
 
 ## Active Prompt
 
-None — plan not yet started.
+Prompt 1 — Plan-start preflight (completing P0-E).
 
 ---
 
