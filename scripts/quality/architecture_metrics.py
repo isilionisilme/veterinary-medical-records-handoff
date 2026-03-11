@@ -9,6 +9,8 @@ Usage:
     python scripts/quality/architecture_metrics.py
     python scripts/quality/architecture_metrics.py --baseline 2026-02-23
     python scripts/quality/architecture_metrics.py --check --warn-cc 11 --max-cc 30 --max-loc 500
+    python scripts/quality/architecture_metrics.py --check --base-ref main --warn-cc 11
+        --max-cc 30 --max-loc 500 --max-loc-growth 50
 """
 
 from __future__ import annotations
@@ -114,6 +116,14 @@ def _changed_backend_python_paths(base_ref: str | None) -> set[str]:
             if _is_backend_app_path(path) and path.endswith(".py"):
                 changed.add(path)
     return changed
+
+
+def _base_ref_loc(base_ref: str, rel_path: str) -> int:
+    """Count LOC of a file at the given git ref. Returns 0 if not found (new file)."""
+    result = _run(["git", "show", f"{base_ref}:{rel_path}"])
+    if result.returncode != 0:
+        return 0
+    return sum(1 for _ in result.stdout.splitlines())
 
 
 def _layer_of(path: Path) -> str | None:
@@ -593,6 +603,8 @@ def check_thresholds(
     max_loc: int,
     warn_cc: int,
     changed_backend_paths: set[str] | None = None,
+    base_ref: str | None = None,
+    max_loc_growth: int = 50,
 ) -> tuple[list[str], list[str]]:
     """Return warning and failure lists for backend CI complexity checks."""
     warnings: list[str] = []
@@ -622,7 +634,21 @@ def check_thresholds(
         if changed_backend_paths is not None and fp not in changed_backend_paths:
             continue
         if count > max_loc:
-            failures.append(f"FAIL: LOC {count} > {max_loc}: {fp}")
+            base_loc = _base_ref_loc(base_ref, fp) if base_ref else 0
+            delta = count - base_loc
+            if base_loc > max_loc:
+                # Pre-existing violation
+                if delta > max_loc_growth:
+                    failures.append(
+                        f"FAIL: LOC {count} (delta +{delta}) > growth cap {max_loc_growth}: {fp}"
+                    )
+                else:
+                    warnings.append(
+                        f"WARNING: LOC {count} > {max_loc} (pre-existing, delta +{delta}): {fp}"
+                    )
+            else:
+                # This PR crossed the threshold
+                failures.append(f"FAIL: LOC {count} > {max_loc}: {fp}")
 
     return warnings, failures
 
@@ -651,6 +677,12 @@ def main() -> int:
     parser.add_argument("--max-cc", type=int, default=30, help="Max CC for --check (default: 30)")
     parser.add_argument(
         "--max-loc", type=int, default=500, help="Max LOC for --check (default: 500)"
+    )
+    parser.add_argument(
+        "--max-loc-growth",
+        type=int,
+        default=50,
+        help="Max LOC growth allowed in files already above --max-loc (default: 50)",
     )
     parser.add_argument("--json-only", action="store_true", help="Output only JSON, no Markdown")
     args = parser.parse_args()
@@ -709,7 +741,13 @@ def main() -> int:
                 print("\n✅ No changed backend Python files to evaluate.", file=sys.stderr)
                 return 0
         warnings, failures = check_thresholds(
-            data, args.max_cc, args.max_loc, args.warn_cc, changed_backend_paths
+            data,
+            args.max_cc,
+            args.max_loc,
+            args.warn_cc,
+            changed_backend_paths,
+            base_ref=args.base_ref,
+            max_loc_growth=args.max_loc_growth,
         )
         if warnings:
             print(f"\n⚠️  {len(warnings)} warning(s):", file=sys.stderr)
