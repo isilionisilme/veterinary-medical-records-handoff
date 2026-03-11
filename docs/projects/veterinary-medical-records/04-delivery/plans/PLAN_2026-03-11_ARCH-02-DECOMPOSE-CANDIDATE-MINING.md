@@ -5,7 +5,7 @@
 **Branch:** `refactor/arch-02-implement-candidate-mining`
 **PR:** See `## PR Roadmap`
 **Backlog item:** [arch-02-decompose-candidate-mining.md](../../Backlog/arch-02-decompose-candidate-mining.md)
-**Follow-up plan:** [PLAN_2026-03-11_ARCH-02-CORRECTNESS-FIXES.md](./PLAN_2026-03-11_ARCH-02-CORRECTNESS-FIXES.md)
+**Review artifact:** [PLAN_2026-03-11_ARCH-02-CORRECTNESS-FIXES.md](./PLAN_2026-03-11_ARCH-02-CORRECTNESS-FIXES.md)
 **Prerequisite:** ARCH-03 completed (CI complexity gates)
 **Worktree:** `D:\Git\worktrees\arch02-impl`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)
@@ -76,14 +76,13 @@ Move `_candidate_sort_key()` and `_map_candidates_to_global_schema()` into `cand
 
 ## PR Roadmap
 
-Delivery split into 2 sequential PRs.
+Delivery published as 1 effective PR.
 
 | PR | Branch | Steps | Scope | Status | URL |
 |---|---|---|---|---|---|
-| PR-1 | `refactor/arch-02-implement-candidate-mining` | A1-E4 | Candidate mining decomposition + parity restoration + full validation | Ready to open | — |
-| PR-2 | `docs/arch-02-plan-followup` | F1 | Plan split/traceability closeout docs update | Planned (after PR-1) | — |
+| PR-1 | `refactor/arch-02-implement-candidate-mining` | A1-E4 | Candidate mining decomposition + parity restoration + validation + plan traceability | Ready to open | — |
 
-**Merge strategy:** sequential. Merge PR-1 first. Rebase PR-2 onto updated `main` before opening.
+**Merge strategy:** single PR. A multi-PR split was considered during execution, but the documentation closeout was absorbed into the same branch after validation and publication.
 
 ---
 
@@ -126,11 +125,8 @@ Delivery split into 2 sequential PRs.
 - [x] [PR-1] E3 🔄 — Run architecture metrics checks and confirm ARCH-02 thresholds (function LOC <= 100, CC <= 20). — ✅ `no-commit (refactored modules verified by AST LOC scan + radon CC)`
 - [x] [PR-1] E4 🚧 — Hard-gate cleared: final validation completed, code committed, and branch pushed after explicit user approval. — ✅ `2a7d1114`
 
-📌 PR-1 checkpoint reached (code scope complete).
-
-### Phase 6 - Plan split closeout
-
-- [ ] [PR-2] F1 🔄 — Retrofit plan split closeout commit in this plan (`docs(plan): retrofit PR split for arch-02-decompose-candidate-mining`) and open PR-2 from dedicated docs branch.
+- [x] [PR-1] E5 🔄 — Reconcile plan/traceability updates after split analysis and keep delivery on a single effective PR. — ✅ `4d786db8`
+- [x] [PR-1] E6 🔄 — Retrofit PR split notes in-place, then reconcile back to one effective PR after user decision. — ✅ `cb2b8fa0`
 
 ---
 
@@ -161,7 +157,7 @@ Delivery split into 2 sequential PRs.
 
 ## Active Prompt
 
-Execution complete through E3. Stopped at E4 hard-gate awaiting explicit user approval for commit and PR workflow.
+Execution complete through E6. Branch is pushed and ready for PR creation on explicit user request.
 
 ---
 
@@ -200,9 +196,9 @@ From [ARCH-02 backlog item](../../Backlog/arch-02-decompose-candidate-mining.md)
 - Focused ARCH-02 function LOC check: AST scan over `candidate_mining.py`, `candidate_ranking.py`, `field_patterns.py`, and `extractors/*.py` — no function exceeded `100 LOC`.
 
 📋 Evidence:
-- Step: E4
+- Step: E4-E6
 - Code commit: `2a7d1114`
-- Plan commit: pending
+- Plan commit: `cb2b8fa0`
 
 ---
 

@@ -3,7 +3,7 @@
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, scope boundary template, commit conventions, and handoff behavior.
 
 **Branch:** `refactor/arch-02-post-pr1-correctness-fixes`
-**PR:** Pending (follow-up branch after PR-1)
+**PR:** Not planned as separate PR (absorbed into parent branch)
 **Related plan:** [PLAN_2026-03-11_ARCH-02-DECOMPOSE-CANDIDATE-MINING.md](./PLAN_2026-03-11_ARCH-02-DECOMPOSE-CANDIDATE-MINING.md)
 **Worktree:** `D:\Git\worktrees\arch02-post-pr1`
 **CI Mode:** `2) Pipeline depth-1 gate` (default)
@@ -35,8 +35,8 @@ After ARCH-02 decomposition, a correctness/regression-safety review found two re
 
 Finding 3 (extractor execution order and dedup metadata priority) is accepted as non-blocking and out of scope for this fix plan.
 
-This plan is intentionally parked as a follow-up artifact so the current branch keeps a single active execution plan for CI and plan guards.
-Its scoped fixes were absorbed into the parent ARCH-02 implementation commit.
+This plan is intentionally retained as a review artifact recording the correctness findings and the accepted fix scope.
+Its scoped fixes were absorbed into the parent ARCH-02 implementation commit, so no separate branch or PR will be opened from this document.
 
 ---
 
