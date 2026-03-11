@@ -16,6 +16,13 @@ from backend.app.settings import get_settings
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_DB_PATH = BASE_DIR / "data" / "documents.db"
+_SCHEMA_TABLE_INFO_SQL = {
+    "documents": "PRAGMA table_info(documents)",
+    "document_status_history": "PRAGMA table_info(document_status_history)",
+    "processing_runs": "PRAGMA table_info(processing_runs)",
+    "artifacts": "PRAGMA table_info(artifacts)",
+    "calibration_aggregates": "PRAGMA table_info(calibration_aggregates)",
+}
 
 
 def get_database_path() -> Path:
@@ -74,7 +81,10 @@ def ensure_schema() -> None:
 
 
 def _table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
-    rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    pragma_sql = _SCHEMA_TABLE_INFO_SQL.get(table)
+    if pragma_sql is None:
+        raise ValueError(f"Unsupported schema table for PRAGMA lookup: {table}")
+    rows = conn.execute(pragma_sql).fetchall()
     return {row["name"] for row in rows}
 
 

@@ -23,11 +23,19 @@ def _index_names(conn: sqlite3.Connection) -> set[str]:
 
 def test_table_columns_returns_existing_column_names() -> None:
     conn = _conn()
-    conn.execute("CREATE TABLE sample (id TEXT PRIMARY KEY, name TEXT NOT NULL)")
+    conn.execute("CREATE TABLE documents (id TEXT PRIMARY KEY, name TEXT NOT NULL)")
 
-    columns = database._table_columns(conn, "sample")
+    columns = database._table_columns(conn, "documents")
 
     assert columns == {"id", "name"}
+
+
+def test_table_columns_rejects_non_allowlisted_table() -> None:
+    conn = _conn()
+    conn.execute("CREATE TABLE sample (id TEXT PRIMARY KEY, name TEXT NOT NULL)")
+
+    with pytest.raises(ValueError, match="Unsupported schema table"):
+        database._table_columns(conn, "sample")
 
 
 def test_ensure_documents_schema_creates_table_from_scratch() -> None:
