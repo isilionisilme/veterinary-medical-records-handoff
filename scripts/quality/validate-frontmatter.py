@@ -163,12 +163,12 @@ def main() -> int:
     if all_violations:
         print(f"Frontmatter validation: {len(all_violations)} violation(s) in {len(files)} files\n")
         for v in all_violations:
-            print(f"  ✗ {v}")
+            print(f"  X {v}")
         if not fix_mode:
             return 1
 
     if not all_violations:
-        print(f"Frontmatter validation: 0 violations in {len(files)} files ✓")
+        print(f"Frontmatter validation: 0 violations in {len(files)} files OK")
 
     return 0
 

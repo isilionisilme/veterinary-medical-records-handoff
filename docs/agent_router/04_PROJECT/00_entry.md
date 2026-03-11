@@ -17,3 +17,4 @@ Split, token-optimized versions of `docs/projects/veterinary-medical-records/*`.
 
 ## Propagated updates
 - Canonical sync 2026-03-09: navigation/TOC and frontmatter normalization propagation refresh.
+- Canonical sync 2026-03-11: project ADR inventory expanded with re-accretion governance (`ADR-ARCH-0007`).

@@ -104,7 +104,7 @@ This directory contains the consolidated backlog for veterinary-medical-records.
 | ARCH-13 | Implement Production Authentication | Release 20 | [arch-13-implement-production-authentication.md](arch-13-implement-production-authentication.md) |
 | ARCH-14 | Add Content Validation for PDF Uploads | Release 21 | [arch-14-add-content-validation-pdf-uploads.md](arch-14-add-content-validation-pdf-uploads.md) |
 | ARCH-15 | Explicitly Declare pydantic in requirements.txt | Release 20 | [arch-15-declare-pydantic-in-requirements.md](arch-15-declare-pydantic-in-requirements.md) |
-| ARCH-16 | Create Re-accretion Prevention ADR | Release 20 | [arch-16-create-re-accretion-prevention-adr.md](arch-16-create-re-accretion-prevention-adr.md) |
+| ARCH-16 | Create Re-accretion Prevention ADR | Release 20 | [arch-16-create-re-accretion-prevention-adr.md](completed/arch-16-create-re-accretion-prevention-adr.md) |
 | ARCH-17 | Simplify extraction_observability/ Subsystem | Release 21 | [arch-17-simplify-extraction-observability.md](arch-17-simplify-extraction-observability.md) |
 | ARCH-18 | Extract Frontend State Management Layer | Release 21 | [arch-18-extract-frontend-state-management.md](arch-18-extract-frontend-state-management.md) |
 | ARCH-19 | Create Operational Runbooks | Release 21 | [arch-19-create-operational-runbooks.md](arch-19-create-operational-runbooks.md) |
