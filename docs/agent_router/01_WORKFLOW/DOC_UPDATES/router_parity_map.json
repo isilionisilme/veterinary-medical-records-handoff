@@ -229,26 +229,6 @@
       ]
     },
     {
-      "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL (including user-triggered PR opening policy, flat plan-file naming, plan-start preflight gating, explicit branch/worktree resolution, and no-implicit-default rules) must map to execution protocol owner module.",
-      "router_modules": [
-        {
-          "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md",
-          "required_terms": [
-            "EXECUTION_PROTOCOL — Modules",
-            "plan-execution-protocol.md"
-          ]
-        },
-        {
-          "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/10_purpose.md",
-          "required_terms": [
-            "PLAN_<YYYY-MM-DD>_<SLUG>.md",
-            "no plan folders, no annex files"
-          ]
-        }
-      ]
-    },
-    {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
       "description": "Project EXECUTION_RULES compatibility stub must remain discoverable through execution protocol routing.",
       "router_modules": [
@@ -257,18 +237,6 @@
           "required_terms": [
             "EXECUTION_PROTOCOL — Modules",
             "plan-execution-protocol.md"
-          ]
-        }
-      ]
-    },
-    {
-      "source_doc": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
-      "description": "Project PLAN_MANAGEMENT must remain discoverable through project docs owner routing, including the single-file plan naming rule, mandatory Phase 0 plan-start preflight guidance, and placeholder metadata policy for branch/worktree plus explicit user selections.",
-      "router_modules": [
-        {
-          "path": "docs/agent_router/04_PROJECT/00_entry.md",
-          "required_terms": [
-            "Project Docs (Modules)"
           ]
         }
       ]

@@ -145,28 +145,3 @@ def test_evaluate_parity_excludes_source_matching_required_and_excluded_globs() 
         exclude_source_globs=["docs/projects/veterinary-medical-records/04-delivery/plans/**"],
     )
     assert findings == []
-
-
-def test_evaluate_parity_excludes_backlog_docs_from_root_glob_scope() -> None:
-    evaluate_parity = _load_evaluate_parity()
-    findings = evaluate_parity(
-        changed_files=["docs/projects/veterinary-medical-records/04-delivery/Backlog/README.md"],
-        rules=[
-            {
-                "source_doc": (
-                    "docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md"
-                ),
-                "router_modules": [
-                    {
-                        "path": "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/00_entry.md",
-                        "required_terms": ["IMPLEMENTATION_PLAN — Modules"],
-                    }
-                ],
-            }
-        ],
-        repo_root=REPO_ROOT,
-        fail_on_unmapped_sources=True,
-        required_source_globs=["docs/projects/veterinary-medical-records/*.md"],
-        exclude_source_globs=["docs/projects/veterinary-medical-records/04-delivery/Backlog/*"],
-    )
-    assert findings == []

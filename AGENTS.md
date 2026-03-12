@@ -4,9 +4,6 @@ Start with the matching operational runbook for the current intent. Keep reads m
 
 ## Runbooks
 - Start new work or create a branch → `.github/prompts/start-work.prompt.md`
-- Create a plan → `.github/prompts/plan-create.prompt.md`
-- Continue an active plan or any git operation during a plan → run `python scripts/dev/plan-start-check.py`, then load `.github/prompts/plan-start.prompt.md` for unresolved plan-start or `.github/prompts/plan-resume.prompt.md` for the current step
-- Close out a plan before merge → `.github/prompts/plan-closeout.prompt.md`
 - Create or update a pull request → `.github/prompts/pr-workflow.prompt.md`
 - Code review → `.github/prompts/code-review.prompt.md`
 - Documentation updates or doc maintenance → `.github/prompts/doc-updates.prompt.md`
@@ -17,8 +14,6 @@ Start with the matching operational runbook for the current intent. Keep reads m
 - New branches must use `<category>/<slug>` and follow `docs/agent_router/01_WORKFLOW/BRANCHING/00_entry.md`.
 - If docs changed, documentation was updated, or the user mentions documentation updates in any language or paraphrase, load `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md` and run the DOC_UPDATES normalization pass once before finishing.
 - If a required standard cannot be satisfied, stop and escalate the blocker.
-- During plan execution, continue only with the first `[ ]` step that belongs to the active agent for this chat.
-- Use token-efficiency policy during plan execution: `iterative-retrieval` before execution and `strategic-compact` at step close.
 - Include final `How to test` for user-validatable changes.
 
 ## Router References

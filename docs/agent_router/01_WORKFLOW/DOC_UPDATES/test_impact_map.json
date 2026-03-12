@@ -107,32 +107,8 @@
       ]
     },
     {
-      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md",
-      "description": "Project PLAN_EXECUTION_PROTOCOL changes, including flat plan-file naming, mandatory plan-start preflight gating, explicit branch/worktree resolution, and no-implicit-default rules, require EXECUTION_PROTOCOL router parity propagation and doc-updates guard alignment.",
-      "required_any": [
-        "scripts/docs/generate-router-files.py",
-        "backend/tests/unit/test_doc_updates_contract.py",
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/docs/check_doc_test_sync.py",
-        "scripts/docs/check_doc_router_parity.py",
-        "scripts/docs/check_router_directionality.py"
-      ]
-    },
-    {
       "doc_glob": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
       "description": "Project EXECUTION_RULES compatibility stub changes require EXECUTION_PROTOCOL routing parity and doc-updates guard alignment.",
-      "required_any": [
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
-        "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-        "scripts/docs/check_doc_test_sync.py",
-        "scripts/docs/check_doc_router_parity.py",
-        "scripts/docs/check_router_directionality.py"
-      ]
-    },
-    {
-      "doc_glob": "docs/projects/veterinary-medical-records/03-ops/plan-creation.md",
-      "description": "Project PLAN_MANAGEMENT changes, including single-file plan naming, mandatory Phase 0 plan-start preflight, and placeholder metadata rules for branch/worktree plus explicit user selections, require project owner routing parity and doc-updates guard alignment.",
       "required_any": [
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json",
         "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",

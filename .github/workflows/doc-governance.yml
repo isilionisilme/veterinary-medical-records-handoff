@@ -71,18 +71,6 @@ jobs:
       - name: Run router drift guard
         run: python scripts/docs/generate-router-files.py --check
 
-  plan_execution_guard:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Run plan execution guard
-        run: python scripts/ci/check_plan_execution_guard.py --branch "${{ github.head_ref || github.ref_name }}"
-
   doc_governance_tests:
     runs-on: ubuntu-latest
     steps:
