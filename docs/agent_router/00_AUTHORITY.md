@@ -11,7 +11,7 @@ Use this file to route by **intent**. Load only the module(s) listed below.
 - Testing → `docs/agent_router/01_WORKFLOW/TESTING/00_entry.md`
 - Documentation updates → `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md`
 - User-visible change → `docs/agent_router/02_PRODUCT/USER_VISIBLE/00_entry.md`
-- Plan audit / compliance check → `docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md`
+- Plan audit / compliance check (historical) → `docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md`
 - Engineering standards (shared) → `docs/agent_router/03_SHARED/00_entry.md`
 - Project design / requirements / contracts → `docs/agent_router/04_PROJECT/00_entry.md`
 - Assistant benchmarks → `metrics/llm_benchmarks/README.md`

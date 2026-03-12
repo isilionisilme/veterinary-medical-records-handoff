@@ -230,12 +230,12 @@
     },
     {
       "source_doc": "docs/projects/veterinary-medical-records/03-ops/execution-rules.md",
-      "description": "Project EXECUTION_RULES compatibility stub must remain discoverable through execution protocol routing.",
+      "description": "Project EXECUTION_RULES compatibility stub must remain discoverable through a concrete historical execution-protocol anchor.",
       "router_modules": [
         {
-          "path": "docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md",
+          "path": "docs/agent_router/00_AUTHORITY.md",
           "required_terms": [
-            "EXECUTION_PROTOCOL — Modules",
+            "Plan audit / compliance check (historical)",
             "plan-execution-protocol.md"
           ]
         }

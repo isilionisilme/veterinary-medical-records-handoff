@@ -1,6 +1,6 @@
 # IMP-15 — Remove Plan/Backlog Governance Layer
 
-**Status:** In Progress
+**Status:** Implemented
 
 **Type:** CI / Process Improvement (governance removal)
 
@@ -37,4 +37,4 @@ The plan execution guard, plan-start checker, plan-close-step helper, plan agent
 **Dependencies**
 - Subsumes ARCH-28 scope (ARCH-28 is a subset of this work).
 
-**Plan:** [PLAN_2026-03-12_IMP-15-REMOVE-PLAN-BACKLOG-GOVERNANCE-LAYER](../plans/PLAN_2026-03-12_IMP-15-REMOVE-PLAN-BACKLOG-GOVERNANCE-LAYER.md)
+**Plan:** [PLAN_2026-03-12_GUARD-REMOVE-BACKLOG-RULES](../../plans/PLAN_2026-03-12_GUARD-REMOVE-BACKLOG-RULES.md)

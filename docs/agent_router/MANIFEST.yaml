@@ -27,8 +27,6 @@ outputs:
         entry: docs/agent_router/03_SHARED/DOCUMENTATION_GUIDELINES/00_entry.md
       - name: WAY_OF_WORKING
         entry: docs/agent_router/03_SHARED/WAY_OF_WORKING/00_entry.md
-      - name: EXECUTION_PROTOCOL
-        entry: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md
       - name: UX_GUIDELINES
         entry: docs/agent_router/03_SHARED/UX_GUIDELINES/00_entry.md
       - name: BRAND_GUIDELINES
@@ -170,59 +168,6 @@ outputs:
   - target: docs/agent_router/03_SHARED/WAY_OF_WORKING/80_definition-of-done.md
     source: docs/shared/03-ops/way-of-working.md
     sections: ["9. Definition of Done"]
-
-  # ═══════════════════════════════════════════════════════════════
-  # 03_SHARED/EXECUTION_PROTOCOL — from plan-execution-protocol.md
-  # ═══════════════════════════════════════════════════════════════
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md
-    type: index
-    title: "EXECUTION_PROTOCOL — Modules"
-    sources:
-      - docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/10_purpose.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["Purpose", "File Structure"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/20_execution-mode.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["1. Execution Mode Defaults"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/30_iterations-state.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["2. Atomic Iterations", "3. Extended Execution State"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/40_step-eligibility.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["4. Step Eligibility Rule (Hard Rule)", "5. Continuation-Intent-Only Rule"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/50_rollback-governance.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["6. Rollback Procedure", "7. Plan Governance"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/60_step-completion.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["8. Step Completion Integrity (Hard Rules)"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/70_format-preflight.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["9. Format-Before-Commit (Mandatory)"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/80_next-step-prompt.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["10. Next-Step Message (Mandatory)", "11. Prompt Strategy"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/90_hard-gates-scope.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["12. Hard-Gates: Structured Decision Protocol", "13. SCOPE BOUNDARY Procedure (Two-Commit Strategy for Commit Tasks)"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/100_iteration-lifecycle.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["14. Iteration Lifecycle Protocol"]
-
-  - target: docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/110_conventions.md
-    source: docs/projects/veterinary-medical-records/03-ops/plan-execution-protocol.md
-    sections: ["15. Plan Todo Projection (Chat) (Hard Rule)", "16. Token-Efficiency Policy", "17. Commit Conventions", "18. How to Add a New User Story"]
 
   # ═══════════════════════════════════════════════════════════════
   # 03_SHARED/BRAND_GUIDELINES — from brand-guidelines.md

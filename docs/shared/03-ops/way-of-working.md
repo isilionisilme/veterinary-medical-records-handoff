@@ -188,9 +188,7 @@ Branches must be **short-lived** and focused on a single user story or a single 
 - Commit history must remain **readable** to support reasoning and review.
 - **Agent commit confirmation (hard rule):** AI agents must present the staged
   files and proposed commit message to the user and wait for explicit confirmation before running `git commit`.
-  Auto-commit without user confirmation is only permitted during active plan
-  execution when the plan's execution mode is `Autonomous`
-  (see plan-execution-protocol.md §7).
+  Auto-commit without user confirmation is not permitted.
 
 ### Commit Message Conventions
 

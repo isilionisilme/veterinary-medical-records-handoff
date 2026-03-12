@@ -12,6 +12,5 @@ Start with `AGENTS.md` (repo root) and `docs/agent_router/00_AUTHORITY.md` for i
 - `docs/agent_router/03_SHARED/CODING_STANDARDS/00_entry.md`
 - `docs/agent_router/03_SHARED/DOCUMENTATION_GUIDELINES/00_entry.md`
 - `docs/agent_router/03_SHARED/WAY_OF_WORKING/00_entry.md`
-- `docs/agent_router/03_SHARED/EXECUTION_PROTOCOL/00_entry.md`
 - `docs/agent_router/03_SHARED/UX_GUIDELINES/00_entry.md`
 - `docs/agent_router/03_SHARED/BRAND_GUIDELINES/00_entry.md`
