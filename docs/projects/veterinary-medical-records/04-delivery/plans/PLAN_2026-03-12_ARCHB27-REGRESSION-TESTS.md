@@ -1,9 +1,17 @@
-# Plan B: Regression Tests — Visit Scoping & Projection Pipeline
+# Plan ARCHB27: Regression Tests — Visit Scoping & Projection Pipeline
 
-**Backlog item:** [arch-27-regression-tests-visit-scoping.md](../Backlog/arch-27-regression-tests-visit-scoping.md)
+> **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, SCOPE BOUNDARY template, commit conventions, and handoff messages.
+
+**Branch:** docs/archb27-regression-tests-plan
+**Worktree:** D:/Git/worktrees/code-permanent-2
+**Execution Mode:** Autonomous
+**Model Assignment:** Uniform
+**PR:** Pending (PR created on explicit user request)
+**Backlog item (ARCH-27 / ARCHB27):** [arch-27-regression-tests-visit-scoping.md](../Backlog/arch-27-regression-tests-visit-scoping.md)
+**Backlink:** [ARCH-27 Plan section](../Backlog/arch-27-regression-tests-visit-scoping.md#plan)
 
 ## TL;DR
-Añadir tests que cubren los edge cases de mayor riesgo en el pipeline visit scoping/projection extraído en ARCH-01: fecha duplicada, campo sin visit (unassigned fallback), y derivación de peso desde raw text.
+Añadir tests que cubren los edge cases de mayor riesgo en el pipeline visit scoping/projection extraído en ARCH-01 para el scope ARCHB27: fecha duplicada, campo sin visit (unassigned fallback), y derivación de peso desde raw text.
 
 ## Prerequisitos
 - Branch: crear `test/arch-01-regression-coverage` desde `main` actualizado
