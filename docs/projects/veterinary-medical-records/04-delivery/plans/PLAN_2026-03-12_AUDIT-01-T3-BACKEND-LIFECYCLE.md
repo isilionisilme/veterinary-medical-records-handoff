@@ -232,32 +232,32 @@ healthcheck:
 
 ### Phase 0 — Preflight
 
-- [ ] P0-A 🔄 — Create branch `improvement/audit-01-t3-backend-lifecycle` from latest `main`. Verify clean worktree. **AGENTE: GPT-5.4**
+- [x] P0-A 🔄 — Create branch `improvement/audit-01-t3-backend-lifecycle` from latest `main`. Verify clean worktree. **AGENTE: GPT-5.4**
 
 ### Phase 1 — A3: Shutdown Timeout
 
-- [ ] P1-A 🔄 — Add `asyncio.wait_for` timeout to `stop()`. **AGENTE: GPT-5.4**
-- [ ] P1-B 🔄 — Add unit test for shutdown timeout behavior. **AGENTE: GPT-5.4**
-- [ ] P1-C 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
+- [x] P1-A 🔄 — Add `asyncio.wait_for` timeout to `stop()`. **AGENTE: GPT-5.4**
+- [x] P1-B 🔄 — Add unit test for shutdown timeout behavior. **AGENTE: GPT-5.4**
+- [x] P1-C 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
 
 ### Phase 2 — B4: Probes
 
-- [ ] P2-A 🔄 — Add `/health/live` endpoint. **AGENTE: GPT-5.4**
-- [ ] P2-B 🔄 — Add `/health/ready` endpoint. **AGENTE: GPT-5.4**
-- [ ] P2-C 🔄 — Add tests for new endpoints. **AGENTE: GPT-5.4**
-- [ ] P2-D 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
+- [x] P2-A 🔄 — Add `/health/live` endpoint. **AGENTE: GPT-5.4**
+- [x] P2-B 🔄 — Add `/health/ready` endpoint. **AGENTE: GPT-5.4**
+- [x] P2-C 🔄 — Add tests for new endpoints. **AGENTE: GPT-5.4**
+- [x] P2-D 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
 
 ### Phase 3 — Docker Config
 
-- [ ] P3-A 🔄 — Update Dockerfile CMD with `--timeout-graceful-shutdown 30`. **AGENTE: GPT-5.4**
-- [ ] P3-B 🔄 — Add `stop_grace_period: 45s` to docker-compose.yml. **AGENTE: GPT-5.4**
-- [ ] P3-C 🔄 — Update healthcheck to use `/health/ready`. **AGENTE: GPT-5.4**
-- [ ] P3-D 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
+- [x] P3-A 🔄 — Update Dockerfile CMD with `--timeout-graceful-shutdown 30`. **AGENTE: GPT-5.4**
+- [x] P3-B 🔄 — Add `stop_grace_period: 45s` to docker-compose.yml. **AGENTE: GPT-5.4**
+- [x] P3-C 🔄 — Update healthcheck to use `/health/ready`. **AGENTE: GPT-5.4**
+- [x] P3-D 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
 
 ### Phase 4 — Final
 
-- [ ] P4-A 🔄 — Full validation (tests + lint). **AGENTE: GPT-5.4**
-- [ ] P4-B 🚧 — Present commit proposal to user. **AGENTE: GPT-5.4**
+- [x] P4-A 🔄 — Full validation (tests + lint). **AGENTE: GPT-5.4**
+- [x] P4-B 🚧 — Present commit proposal to user. **AGENTE: GPT-5.4**
 
 ---
 
@@ -276,11 +276,11 @@ healthcheck:
 
 ## Acceptance Criteria
 
-- [ ] `stop()` returns within 16 seconds even if scheduler task is stuck
-- [ ] `/health/live` returns 200 unconditionally
-- [ ] `/health/ready` returns 200/503 based on dependency status
-- [ ] `/health` continues to work (backward compatible)
-- [ ] Dockerfile CMD includes `--timeout-graceful-shutdown 30`
-- [ ] docker-compose.yml includes `stop_grace_period: 45s`
-- [ ] 709+ tests pass, ≥91% coverage
-- [ ] `ruff check` + `ruff format` clean
+- [x] `stop()` returns within 16 seconds even if scheduler task is stuck
+- [x] `/health/live` returns 200 unconditionally
+- [x] `/health/ready` returns 200/503 based on dependency status
+- [x] `/health` continues to work (backward compatible)
+- [x] Dockerfile CMD includes `--timeout-graceful-shutdown 30`
+- [x] docker-compose.yml includes `stop_grace_period: 45s`
+- [x] 709+ tests pass, ≥91% coverage
+- [x] `ruff check` + `ruff format` clean
