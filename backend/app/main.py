@@ -34,10 +34,13 @@ from backend.app.config import (
     processing_enabled,
 )
 from backend.app.infra import database
+from backend.app.infra.correlation import get_request_id
 from backend.app.infra.file_storage import LocalFileStorage
+from backend.app.infra.middleware import CorrelationIdMiddleware
 from backend.app.infra.rate_limiter import limiter
 from backend.app.infra.scheduler_lifecycle import SchedulerLifecycle
 from backend.app.infra.sqlite_document_repository import SqliteDocumentRepository
+from backend.app.logging_config import configure_logging
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 from backend.app.settings import clear_settings_cache, get_settings
@@ -108,6 +111,7 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         """FastAPI lifespan handler used to perform startup initialization."""
 
+        configure_logging(settings.log_level)
         database.ensure_schema()
         repository = cast(DocumentRepository, app.state.document_repository)
         storage = cast(FileStorage, app.state.file_storage)
@@ -161,7 +165,11 @@ def create_app() -> FastAPI:
         message = str(exc.detail) if isinstance(exc.detail, str) else default_message
         return JSONResponse(
             status_code=exc.status_code,
-            content={"error_code": error_code, "message": message},
+            content={
+                "error_code": error_code,
+                "message": message,
+                "request_id": get_request_id(),
+            },
         )
 
     app.state.limiter = limiter
@@ -198,10 +206,13 @@ def create_app() -> FastAPI:
                 content={
                     "error_code": "UNAUTHORIZED",
                     "message": "Missing or invalid bearer token.",
+                    "request_id": get_request_id(),
                 },
             )
 
         return await call_next(request)
+
+    app.add_middleware(CorrelationIdMiddleware)
 
     global MAX_UPLOAD_SIZE
     MAX_UPLOAD_SIZE = ROUTE_MAX_UPLOAD_SIZE  # re-export for compatibility

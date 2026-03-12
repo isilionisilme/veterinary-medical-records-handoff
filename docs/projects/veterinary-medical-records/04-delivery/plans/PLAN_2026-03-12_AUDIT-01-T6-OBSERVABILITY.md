@@ -308,29 +308,29 @@ log_level: str = _getenv("LOG_LEVEL") or "INFO"
 
 ### Phase 0 — Preflight
 
-- [ ] P0-A 🔄 — Create branch `improvement/audit-01-t6-observability` from latest `main`. Verify clean worktree. **AGENTE: Claude Opus 4.6**
+- [x] P0-A — Create branch `improvement/audit-01-t6-observability` from latest `main`. Verify clean worktree. **AGENTE: Claude Opus 4.6** — ✅ `no-commit (branch already existed at main)`
 
 ### Phase 1 — C1: Correlation ID (Claude)
 
-- [ ] P1-A 🔄 — Create `correlation.py` with contextvars. **AGENTE: Claude Opus 4.6**
-- [ ] P1-B 🔄 — Create `CorrelationIdFilter` logging filter. **AGENTE: Claude Opus 4.6**
-- [ ] P1-C 🔄 — Create `CorrelationIdMiddleware` in `middleware.py`. **AGENTE: Claude Opus 4.6**
-- [ ] P1-D 🔄 — Register middleware in `main.py`. **AGENTE: Claude Opus 4.6**
-- [ ] P1-E 🔄 — Add correlation ID tests. **AGENTE: Claude Opus 4.6**
-- [ ] P1-F 🚧 — Checkpoint: present diff for user review. **AGENTE: Claude Opus 4.6**
+- [x] P1-A — Create `correlation.py` with contextvars. **AGENTE: Claude Opus 4.6** — ✅ `1b0cc0dd`
+- [x] P1-B — Create `CorrelationIdFilter` logging filter. **AGENTE: Claude Opus 4.6** — ✅ `1b0cc0dd`
+- [x] P1-C — Create `CorrelationIdMiddleware` in `middleware.py`. **AGENTE: Claude Opus 4.6** — ✅ `1b0cc0dd`
+- [x] P1-D — Register middleware in `main.py`. **AGENTE: Claude Opus 4.6** — ✅ `1b0cc0dd`
+- [x] P1-E — Add correlation ID tests. **AGENTE: Claude Opus 4.6** — ✅ `1b0cc0dd`
+- [x] P1-F — Checkpoint: present diff for user review. **AGENTE: Claude Opus 4.6** — ✅ `no-commit (checkpoint)`
 
 ### Phase 2 — C2: JSON Logging (GPT-5.4)
 
-- [ ] P2-A 🔄 — Add `python-json-logger` to requirements. **AGENTE: GPT-5.4**
-- [ ] P2-B 🔄 — Create `logging_config.py`. **AGENTE: GPT-5.4**
-- [ ] P2-C 🔄 — Call `configure_logging()` in lifespan. **AGENTE: GPT-5.4**
-- [ ] P2-D 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
+- [x] P2-A — Add `python-json-logger` to requirements. **AGENTE: GPT-5.4** — ✅ `no-commit (pending C2 commit)`
+- [x] P2-B — Create `logging_config.py`. **AGENTE: GPT-5.4** — ✅ `no-commit (pending C2 commit)`
+- [x] P2-C — Call `configure_logging()` in lifespan. **AGENTE: GPT-5.4** — ✅ `no-commit (pending C2 commit)`
+- [x] P2-D — Checkpoint: present diff for user review. **AGENTE: GPT-5.4** — ✅ `no-commit (checkpoint)`
 
 ### Phase 3 — C3: LOG_LEVEL (GPT-5.4)
 
-- [ ] P3-A 🔄 — Add `log_level` to Settings. **AGENTE: GPT-5.4**
-- [ ] P3-B 🔄 — Add test for LOG_LEVEL env var. **AGENTE: GPT-5.4**
-- [ ] P3-C 🚧 — Checkpoint: present diff for user review. **AGENTE: GPT-5.4**
+- [x] P3-A — Add `log_level` to Settings. **AGENTE: GPT-5.4** — ✅ `no-commit (pending C3 commit)`
+- [x] P3-B — Add test for LOG_LEVEL env var. **AGENTE: GPT-5.4** — ✅ `no-commit (pending C3 commit)`
+- [x] P3-C — Checkpoint: present diff for user review. **AGENTE: GPT-5.4** — ✅ `no-commit (checkpoint)`
 
 ### Phase 4 — Final
 

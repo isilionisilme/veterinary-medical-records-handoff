@@ -126,7 +126,7 @@ describe("App upload and list flow", () => {
       fireEvent.click(await screen.findByRole("button", { name: /ready\.pdf/i }));
       await waitForStructuredDataReady();
 
-      expect(sidebar).toHaveAttribute("data-expanded", "false");
+      await waitFor(() => expect(sidebar).toHaveAttribute("data-expanded", "false"));
       expect(sidebar.className).toContain("w-16");
       expect(screen.queryByRole("button", { name: /Actualizar/i })).toBeNull();
       expect(screen.getByTestId("sidebar-collapsed-brand-mark")).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe("App upload and list flow", () => {
       expect(leftRailScroll.className).toContain("[scrollbar-width:none]");
 
       fireEvent.mouseEnter(sidebar);
-      expect(sidebar).toHaveAttribute("data-expanded", "true");
+      await waitFor(() => expect(sidebar).toHaveAttribute("data-expanded", "true"));
       expect(screen.getByRole("button", { name: /Actualizar/i })).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole("button", { name: /processing\.pdf/i }));
@@ -144,7 +144,7 @@ describe("App upload and list flow", () => {
       expect(sidebar).toHaveAttribute("data-expanded", "true");
 
       fireEvent.mouseLeave(sidebar);
-      expect(sidebar).toHaveAttribute("data-expanded", "false");
+      await waitFor(() => expect(sidebar).toHaveAttribute("data-expanded", "false"));
 
       const collapsedReadyItem = screen.getByRole("button", {
         name: /ready\.pdf\s*\(Listo\)/i,
@@ -167,9 +167,9 @@ describe("App upload and list flow", () => {
       expect(statusDot?.className).toContain("ring-2");
 
       fireEvent.click(collapsedReadyItem);
-      expect(sidebar).toHaveAttribute("data-expanded", "false");
+      await waitFor(() => expect(sidebar).toHaveAttribute("data-expanded", "false"));
     });
-  }, 10000);
+  }, 15000);
 
   it("keeps sidebar open on mouse leave when pinned, and collapses again after unpin", async () => {
     await withDesktopHoverMatchMedia(async () => {

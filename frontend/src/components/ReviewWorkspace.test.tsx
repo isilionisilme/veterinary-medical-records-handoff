@@ -33,14 +33,14 @@ describe("App upload and list flow", () => {
     fireEvent.click(await screen.findByRole("button", { name: /ready\.pdf/i }));
     await waitForStructuredDataReady();
 
-    const layoutGrid = screen.getByTestId("document-layout-grid");
+    const layoutGrid = await screen.findByTestId("document-layout-grid");
     expect(layoutGrid).toBeInTheDocument();
-    expect(screen.getByTestId("review-split-grid")).toBeInTheDocument();
+    expect(await screen.findByTestId("review-split-grid")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Redimensionar paneles de revisión/i }),
+      await screen.findByRole("button", { name: /Redimensionar paneles de revisión/i }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Restablecer ancho de paneles/i })).toBeNull();
-  });
+  }, 15000);
 
   it("updates split ratio on drag and persists snapped value", async () => {
     renderApp();

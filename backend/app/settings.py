@@ -36,6 +36,7 @@ class Settings:
     vet_records_human_edit_neutral_candidate_confidence: str | None
     vet_records_rate_limit_upload: str | None
     vet_records_rate_limit_download: str | None
+    log_level: str
     pdf_extractor_force: str
     include_interpretation_candidates: bool
     auth_token: str | None
@@ -48,6 +49,10 @@ class Settings:
             raise ValueError("VET_RECORDS_DB_PATH cannot be empty")
         if not self.vet_records_storage_path.strip():
             raise ValueError("VET_RECORDS_STORAGE_PATH cannot be empty")
+        if not self.log_level.strip():
+            object.__setattr__(self, "log_level", "INFO")
+        else:
+            object.__setattr__(self, "log_level", self.log_level.strip().upper())
         if not self.app_version.strip():
             object.__setattr__(self, "app_version", "dev")
         if not self.git_commit.strip():
@@ -78,6 +83,7 @@ def get_settings() -> Settings:
         ),
         vet_records_rate_limit_upload=_getenv("VET_RECORDS_RATE_LIMIT_UPLOAD"),
         vet_records_rate_limit_download=_getenv("VET_RECORDS_RATE_LIMIT_DOWNLOAD"),
+        log_level=_getenv("LOG_LEVEL") or "INFO",
         pdf_extractor_force=(_getenv("PDF_EXTRACTOR_FORCE") or ""),
         include_interpretation_candidates=(
             (_getenv("VET_RECORDS_INCLUDE_INTERPRETATION_CANDIDATES") or "") != ""

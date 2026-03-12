@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { type ConfidenceBucket } from "../lib/structuredDataFilters";
 
@@ -17,7 +17,17 @@ export function useStructuredDataFilters({
   const [showOnlyWithValue, setShowOnlyWithValue] = useState(false);
   const [showOnlyEmpty, setShowOnlyEmpty] = useState(false);
   const structuredSearchInputRef = useRef<HTMLInputElement | null>(null);
-  const structuredSearchTerm = useDeferredValue(structuredSearchInput);
+  const [structuredSearchTerm, setStructuredSearchTerm] = useState(structuredSearchInput);
+
+  useEffect(() => {
+    const debounceTimer = window.setTimeout(() => {
+      setStructuredSearchTerm(structuredSearchInput);
+    }, 200);
+
+    return () => {
+      window.clearTimeout(debounceTimer);
+    };
+  }, [structuredSearchInput]);
 
   useEffect(() => {
     if (activeConfidencePolicy || selectedConfidenceBuckets.length === 0) {
