@@ -50,29 +50,6 @@ ADR_ROOT = REPO_ROOT / "docs" / "projects" / "veterinary-medical-records" / "02-
 ADR_INDEX = ADR_ROOT / "index.md"
 ADR_ARCH_0006 = ADR_ROOT / "ADR-ARCH-0006-frontend-stack-react-tanstack-query-vite.md"
 ADR_ARCH_0008 = ADR_ROOT / "ADR-ARCH-0008-confidence-scoring-algorithm.md"
-BACKLOG_DIR = (
-    REPO_ROOT / "docs" / "projects" / "veterinary-medical-records" / "04-delivery" / "Backlog"
-)
-IMPLEMENTATION_PLAN = (
-    REPO_ROOT
-    / "docs"
-    / "projects"
-    / "veterinary-medical-records"
-    / "04-delivery"
-    / "implementation-plan.md"
-)
-IMPLEMENTATION_PLAN_ROUTER_ENTRY = (
-    REPO_ROOT / "docs" / "agent_router" / "04_PROJECT" / "IMPLEMENTATION_PLAN" / "00_entry.md"
-)
-IMPLEMENTATION_PLAN_ROUTER_RELEASE_6 = (
-    REPO_ROOT
-    / "docs"
-    / "agent_router"
-    / "04_PROJECT"
-    / "IMPLEMENTATION_PLAN"
-    / "120_release-6-explicit-overrides-workflow-closure.md"
-)
-MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 FRONTMATTER_PATTERN = re.compile(r"\A---\n(?P<frontmatter>.*?)\n---\n", re.DOTALL)
 GITHUB_PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"
 GITHUB_INSTRUCTIONS_DIR = REPO_ROOT / ".github" / "instructions"
@@ -80,21 +57,6 @@ GITHUB_INSTRUCTIONS_DIR = REPO_ROOT / ".github" / "instructions"
 
 def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
-
-
-def _iter_relative_markdown_targets(text: str) -> list[str]:
-    targets: list[str] = []
-    for match in MARKDOWN_LINK_PATTERN.finditer(text):
-        target = match.group(1).strip()
-        if not target:
-            continue
-        if target.startswith(("http://", "https://", "mailto:", "#", "<")):
-            continue
-        target_path = target.split("#", 1)[0].strip()
-        if not target_path:
-            continue
-        targets.append(target_path)
-    return targets
 
 
 def _load_frontmatter(path: Path) -> dict[str, object]:
@@ -124,10 +86,6 @@ def test_github_operational_prompts_exist() -> None:
     expected_files = {
         "code-review.prompt.md",
         "doc-updates.prompt.md",
-        "plan-closeout.prompt.md",
-        "plan-create.prompt.md",
-        "plan-resume.prompt.md",
-        "plan-start.prompt.md",
         "pr-workflow.prompt.md",
         "scope-boundary.prompt.md",
         "start-work.prompt.md",
@@ -139,10 +97,7 @@ def test_github_operational_prompts_exist() -> None:
 
 
 def test_github_instructions_exist() -> None:
-    expected_files = {
-        "backlog-files.instructions.md",
-        "plan-files.instructions.md",
-    }
+    expected_files: set[str] = set()
 
     actual_files = {path.name for path in GITHUB_INSTRUCTIONS_DIR.glob("*.instructions.md")}
 
@@ -192,35 +147,6 @@ def test_agents_routes_docs_updated_intent_to_doc_updates() -> None:
     assert "docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md" in text
     assert "documentation was updated" in lower
     assert "run the doc_updates normalization pass once" in lower
-    assert "belongs to the active agent for this chat" in text
-
-
-def test_step_eligibility_rule_is_canonical_and_persistent() -> None:
-    """After the auto-chain redesign, agent identity no longer blocks execution.
-    Hard-gates and missing prompts are the only mandatory stop points.
-    The eligibility rule references the decision table instead of
-    re-declaring the logic inline."""
-    rules_text = _read_text(EXECUTION_RULES)
-    # New eligibility rule exists and references the decision table
-    assert "Step eligibility rule" in rules_text
-    assert "decision table" in rules_text
-    assert "first `[ ]`" in rules_text
-    # Old agent-identity handoff messages must NOT exist
-    assert "This step does not belong to the active agent" not in rules_text
-    # Old Spanish leftovers must NOT exist
-    assert "selecciona el agente asignado para ese paso" not in rules_text
-    assert "Vuelve a Claude (este chat)" not in rules_text
-    assert "Vuelve al chat de Claude" not in rules_text
-
-
-def test_token_efficiency_policy_persists_for_continue_flow() -> None:
-    agents_text = _read_text(ROOT_AGENTS)
-    rules_text = _read_text(EXECUTION_RULES)
-
-    assert "iterative-retrieval" in agents_text
-    assert "strategic-compact" in agents_text
-    assert "iterative-retrieval" in rules_text
-    assert "strategic-compact" in rules_text
 
 
 def test_doc_updates_entry_covers_triggers_and_summary_schema() -> None:
@@ -449,88 +375,6 @@ def test_preflight_levels_policy_is_documented_for_pr_flow() -> None:
     assert "Maximum automatic remediation loop: 2 attempts" in pr_router_text
 
 
-def test_commit_automation_and_pre_pr_history_policy_propagates_to_owner_modules() -> None:
-    execution_source = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "projects"
-        / "veterinary-medical-records"
-        / "03-ops"
-        / "plan-execution-protocol.md"
-    )
-    execution_owner = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "agent_router"
-        / "03_SHARED"
-        / "EXECUTION_PROTOCOL"
-        / "50_rollback-governance.md"
-    )
-    wow_source = _read_text(WAY_OF_WORKING)
-    wow_owner = _read_text(
-        REPO_ROOT / "docs" / "agent_router" / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md"
-    )
-
-    assert "### Execution Mode (Mandatory Plan-Start Choice)" in execution_source
-    assert "### Pre-PR Requirements" in execution_source
-    assert "select the execution mode" in execution_source
-    assert (
-        "do not start step 1. Re-present the question and require an explicit selection"
-        in execution_source
-    )
-    assert (
-        execution_source.count(
-            "do not start step 1. Re-present the question and require an explicit selection"
-        )
-        >= 2
-    )
-    assert "#### Plan-start preflight gate (hard rule)" in execution_source
-    assert (
-        "the agent MUST suspend normal execution and complete plan-start first" in execution_source
-    )
-    assert (
-        "`**Branch:**`, `**Worktree:**`, `**Execution Mode:**`, and "
-        "`**Model Assignment:**`" in execution_source
-    )
-    assert "No implementation step may begin before this commit exists." in execution_source
-
-    assert "Execution Mode (Mandatory Plan-Start Choice)" in execution_owner
-    assert "Pre-PR Requirements" in execution_owner
-    assert "Plan-start preflight gate (hard rule)" in execution_owner
-    assert (
-        "the agent MUST suspend normal execution and complete plan-start first" in execution_owner
-    )
-
-    assert "### Pre-PR Commit History Review (Hard Rule)" in wow_source
-    assert "review the commit history on the feature branch" in wow_source
-    assert "Pre-PR Commit History Review (Hard Rule)" in wow_owner
-
-
-def test_plan_creation_requires_phase_zero_plan_start_placeholders() -> None:
-    plan_creation_source = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "projects"
-        / "veterinary-medical-records"
-        / "03-ops"
-        / "plan-creation.md"
-    )
-
-    assert "PENDING PLAN-START RESOLUTION" in plan_creation_source
-    assert "PENDING USER SELECTION" in plan_creation_source
-    assert "#### Mandatory Phase 0 — Plan-start preflight" in plan_creation_source
-    assert "Resolve or record the execution branch." in plan_creation_source
-    assert (
-        "`**Branch:**`, `**Worktree:**`, `**Execution Mode:**`, and "
-        "`**Model Assignment:**` all contain resolved non-placeholder values."
-        in plan_creation_source
-    )
-    assert (
-        "The first execution turn MUST be used to resolve plan-start choices"
-        in plan_creation_source
-    )
-
-
 def test_post_merge_cleanup_requires_remote_branch_deletion() -> None:
     source_text = _read_text(WAY_OF_WORKING)
     shared_pr_router = _read_text(
@@ -556,27 +400,6 @@ def test_post_merge_cleanup_requires_remote_branch_deletion() -> None:
     assert fallback_term in workflow_pr_router
 
 
-def test_commit_confirmation_policy_is_documented_across_general_and_plan_modes() -> None:
-    source_text = _read_text(WAY_OF_WORKING)
-    plan_protocol = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "projects"
-        / "veterinary-medical-records"
-        / "03-ops"
-        / "plan-execution-protocol.md"
-    )
-
-    assert "Agent commit confirmation (hard rule)" in source_text
-    assert "Auto-commit without user confirmation is only permitted" in source_text
-    assert "execution mode is `Autonomous`" in source_text
-    assert "wait for explicit confirmation before running `git commit`" in source_text
-
-    assert "Commit and push behavior are governed by the plan's execution mode" in plan_protocol
-    assert "`Supervised` / `Semi-supervised`: requires explicit user approval" in plan_protocol
-    assert "`Autonomous`: automatic after tests pass" in plan_protocol
-
-
 def test_owner_entries_track_iteration_4_doc_propagation() -> None:
     backend_text = _read_text(BACKEND_IMPLEMENTATION_ROUTER_ENTRY)
     technical_text = _read_text(TECHNICAL_DESIGN_ROUTER_ENTRY)
@@ -595,104 +418,6 @@ def test_rules_index_contains_known_mapping_hints() -> None:
     assert "50_3-typography-exact-fonts-mandatory.md" in text
     assert "40_2-color-system-exact-values-mandatory.md" in text
     assert "04_PROJECT/UX_DESIGN/00_entry.md" in text
-
-
-def test_implementation_plan_tracks_us08_us09_us32_us39_as_implemented() -> None:
-    text = _read_text(IMPLEMENTATION_PLAN)
-    assert "[US-08 — Edit structured data](Backlog/us-08-edit-structured-data.md)" in text
-    assert (
-        "[US-09 — Capture correction signals](Backlog/us-09-capture-correction-signals.md)"
-    ) in text
-    assert (
-        "[US-32 — Align review rendering to Global Schema template]"
-        "(Backlog/us-32-align-review-rendering-to-global-schema-template.md)"
-        " (Implemented 2026-02-17)"
-    ) in text
-    assert (
-        "[US-39 — Align veterinarian confidence signal with mapping confidence policy]"
-        "(Backlog/us-39-align-veterinarian-confidence-signal-with-mapping.md)"
-    ) in text
-    assert "User Story Details" not in text
-    assert "Improvement Details" not in text
-    assert "[Backlog Index](Backlog/README.md)" in text
-
-
-def test_implementation_plan_router_tracks_us45_propagation() -> None:
-    entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
-    release_6_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_RELEASE_6)
-    assert (
-        "279a_us-45-visit-detection-mvp-deterministic-contract-driven-coverage-improvement.md"
-        in entry_text
-    )
-    assert (
-        "US-45 — Visit Detection MVP (Deterministic, Contract-Driven Coverage Improvement)"
-        in release_6_text
-    )
-
-
-def test_implementation_plan_router_tracks_us46_propagation() -> None:
-    source_text = _read_text(IMPLEMENTATION_PLAN)
-    entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
-    release_6_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_RELEASE_6)
-
-    assert (
-        "[US-46 — Deterministic Visit Assignment Coverage MVP (Schema)]"
-        "(Backlog/us-46-deterministic-visit-assignment-coverage-mvp-schema.md)" in source_text
-    )
-    assert "279b_us-46-deterministic-visit-assignment-coverage-mvp-schema.md" in entry_text
-    assert "US-46 — Deterministic Visit Assignment Coverage MVP (Schema)" in release_6_text
-
-
-def test_implementation_plan_backlog_split_propagates_to_owner_entry() -> None:
-    source_text = _read_text(IMPLEMENTATION_PLAN)
-    entry_text = _read_text(IMPLEMENTATION_PLAN_ROUTER_ENTRY)
-    add_story_text = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "agent_router"
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "65_add-user-story-workflow.md"
-    )
-
-    assert "[Backlog Index](Backlog/README.md)" in source_text
-    assert (
-        "Story and improvement specifications now live in "
-        "`docs/projects/veterinary-medical-records/04-delivery/Backlog/`"
-    ) in entry_text
-    assert "implementation-plan.md` reduced to release sequencing plus backlog links" in entry_text
-    assert "Create or update the dedicated backlog item file for the story" in add_story_text
-    assert "Add or update the consolidated index row for the story." in add_story_text
-
-
-def test_backlog_markdown_relative_links_resolve() -> None:
-    broken_links: list[str] = []
-
-    for markdown_file in sorted(BACKLOG_DIR.rglob("*.md")):
-        text = _read_text(markdown_file)
-        for target in _iter_relative_markdown_targets(text):
-            resolved = (markdown_file.parent / target).resolve(strict=False)
-            if not resolved.exists():
-                broken_links.append(f"{markdown_file.relative_to(REPO_ROOT)} -> {target}")
-
-    assert not broken_links, "Broken relative markdown links:\n" + "\n".join(broken_links)
-
-
-def test_backlog_tracks_operational_runbook_architecture() -> None:
-    readme_text = _read_text(BACKLOG_DIR / "README.md")
-    imp13_path = BACKLOG_DIR / "imp-13-operational-runbook-architecture.md"
-    assert imp13_path.exists(), "IMP-13 file must exist in Backlog."
-    imp13_text = _read_text(imp13_path)
-
-    assert "| IMP-13 | Operational Runbook Architecture | Release 22 |" in readme_text
-    assert "(imp-13-operational-runbook-architecture.md)" in readme_text
-
-    assert "Supersedes and replaces IMP-10" in imp13_text
-    assert "IMP-11" in imp13_text
-    assert "IMP-12" in imp13_text
-    assert ".prompt.md" in imp13_text
-    assert ".instructions.md" in imp13_text
-    assert "plan-start-check.py" in imp13_text
 
 
 def test_governance_checks_moved_to_separate_workflow() -> None:

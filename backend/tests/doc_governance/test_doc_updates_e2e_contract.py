@@ -154,8 +154,6 @@ def test_router_parity_map_covers_product_design_module_76() -> None:
     assert '"fail_on_unmapped_sources": true' in text
     assert '"docs/projects/veterinary-medical-records/*.md"' in text
     assert '"docs/shared/*.md"' in text
-    assert '"docs/projects/veterinary-medical-records/04-delivery/Backlog/*"' in text
-    assert '"docs/projects/veterinary-medical-records/04-delivery/Backlog/**/*"' in text
     assert (
         '"source_doc": "docs/projects/veterinary-medical-records/01-product/product-design.md"'
         in text

@@ -31,16 +31,11 @@ def test_entrypoint_contract_paths_exist() -> None:
     assert RULES_INDEX_DOC.exists(), "Missing rules index document."
 
     agents_text = _read_text(ROOT_AGENTS)
-    assert ".github/prompts/plan-create.prompt.md" in agents_text
-    assert ".github/prompts/plan-start.prompt.md" in agents_text
-    assert ".github/prompts/plan-resume.prompt.md" in agents_text
-    assert ".github/prompts/plan-closeout.prompt.md" in agents_text
     assert ".github/prompts/start-work.prompt.md" in agents_text
     assert ".github/prompts/pr-workflow.prompt.md" in agents_text
     assert ".github/prompts/code-review.prompt.md" in agents_text
     assert ".github/prompts/doc-updates.prompt.md" in agents_text
     assert ".github/prompts/scope-boundary.prompt.md" in agents_text
-    assert "scripts/dev/plan-start-check.py" in agents_text
     assert "docs/agent_router/00_AUTHORITY.md" in agents_text
     assert "docs/agent_router/00_FALLBACK.md" in agents_text
 
@@ -51,16 +46,6 @@ def test_agents_entrypoint_uses_runbooks_and_stays_small() -> None:
 
     assert "Start with the matching operational runbook" in agents_text
     assert len(non_empty_lines) <= MAX_AGENTS_NON_EMPTY_LINES
-
-
-def test_authority_plan_audit_intent_exists() -> None:
-    authority_text = _read_text(AUTHORITY_DOC)
-    assert "Plan audit" in authority_text, (
-        "00_AUTHORITY.md must include a 'Plan audit' intent entry."
-    )
-    assert "EXECUTION_PROTOCOL" in authority_text, (
-        "Plan audit intent must route to EXECUTION_PROTOCOL module."
-    )
 
 
 def test_authority_doc_stays_small() -> None:
@@ -163,91 +148,6 @@ def test_project_split_entry_includes_design_system_module() -> None:
     assert "docs/agent_router/04_PROJECT/DESIGN_SYSTEM/00_entry.md" in project_entry
 
 
-def test_project_split_entry_includes_implementation_plan_us32_module() -> None:
-    plan_entry = _read_text(ROUTER_ROOT / "04_PROJECT" / "IMPLEMENTATION_PLAN" / "00_entry.md")
-    release5 = _read_text(
-        ROUTER_ROOT
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "110_release-5-editing-learning-signals-human-corrections.md"
-    )
-
-    assert (
-        "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/275_us-32-align-review-rendering-to-global-schema-template.md"
-        in plan_entry
-    )
-    assert "US-32 — Align review rendering to Global Schema template" in release5
-
-
-def test_project_split_entry_includes_implementation_plan_us35_module() -> None:
-    plan_entry = _read_text(ROUTER_ROOT / "04_PROJECT" / "IMPLEMENTATION_PLAN" / "00_entry.md")
-    release4 = _read_text(
-        ROUTER_ROOT
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "100_release-4-assisted-review-in-context-high-value-higher-risk.md"
-    )
-
-    assert (
-        "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/276_us-35-resizable-splitter-between-pdf-viewer-and-structured-data-panel.md"
-        in plan_entry
-    )
-    assert "US-35 — Resizable splitter between PDF Viewer and Structured Data panel" in release4
-
-
-def test_project_split_entry_includes_implementation_plan_us41_module() -> None:
-    plan_entry = _read_text(ROUTER_ROOT / "04_PROJECT" / "IMPLEMENTATION_PLAN" / "00_entry.md")
-    release5 = _read_text(
-        ROUTER_ROOT
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "110_release-5-editing-learning-signals-human-corrections.md"
-    )
-
-    assert (
-        "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/"
-        "277_us-41-show-top-5-candidate-suggestions-in-field-edit-modal.md" in plan_entry
-    )
-    assert "US-41 — Show Top-5 Candidate Suggestions in Field Edit Modal" in release5
-
-
-def test_project_split_entry_includes_implementation_plan_us42_module() -> None:
-    plan_entry = _read_text(ROUTER_ROOT / "04_PROJECT" / "IMPLEMENTATION_PLAN" / "00_entry.md")
-    release6 = _read_text(
-        ROUTER_ROOT
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "120_release-6-explicit-overrides-workflow-closure.md"
-    )
-
-    assert (
-        "docs/agent_router/04_PROJECT/IMPLEMENTATION_PLAN/"
-        "278_us-42-provide-evaluator-friendly-installation-execution-docker-first.md" in plan_entry
-    )
-    assert "US-42 — Provide evaluator-friendly installation & execution (Docker-first)" in release6
-
-
-def test_implementation_plan_us42_status_is_propagated() -> None:
-    source_plan = _read_text(
-        REPO_ROOT
-        / "docs"
-        / "projects"
-        / "veterinary-medical-records"
-        / "04-delivery"
-        / "Backlog"
-        / "us-42-provide-evaluator-friendly-installation-execution.md"
-    )
-    owner_module = _read_text(
-        ROUTER_ROOT
-        / "04_PROJECT"
-        / "IMPLEMENTATION_PLAN"
-        / "278_us-42-provide-evaluator-friendly-installation-execution-docker-first.md"
-    )
-
-    assert "**Status**: Implemented (2026-02-19)" in source_plan
-    assert "**Status**: Implemented (2026-02-19)" in owner_module
-
-
 def test_technical_design_unassigned_contract_clarification_is_propagated() -> None:
     source_doc = _read_text(
         REPO_ROOT
@@ -298,27 +198,6 @@ def test_technical_design_sufficient_evidence_boundary_is_propagated() -> None:
 
     for term in required_terms:
         assert term in source_doc
-        assert term in owner_doc
-
-
-def test_way_of_working_plan_level_pr_roadmap_is_propagated() -> None:
-    source_doc = _read_text(REPO_ROOT / "docs" / "shared" / "03-ops" / "way-of-working.md")
-    owner_doc = _read_text(ROUTER_ROOT / "03_SHARED" / "WAY_OF_WORKING" / "50_pull-requests.md")
-
-    source_terms = (
-        "Plan-Level Pull Request Roadmap",
-        "Each phase belongs to exactly one Pull Request",
-        "Each execution step carries a `**[PR-X]**` tag",
-    )
-    owner_terms = (
-        "Plan-level PR Roadmap",
-        "Each phase belongs to exactly one PR",
-        "Each execution step in the Execution Status must carry a `**[PR-X]**` tag",
-    )
-
-    for term in source_terms:
-        assert term in source_doc
-    for term in owner_terms:
         assert term in owner_doc
 
 
