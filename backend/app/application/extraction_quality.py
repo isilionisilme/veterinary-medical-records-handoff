@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import re
 
-QUALITY_SCORE_THRESHOLD = 0.60
+from backend.app.application.extraction_constants import (
+    QUALITY_SCORE_THRESHOLD,
+)
+
 SUSPICIOUS_SUBSTITUTIONS = (
     "dratamiento",
     "draquea",

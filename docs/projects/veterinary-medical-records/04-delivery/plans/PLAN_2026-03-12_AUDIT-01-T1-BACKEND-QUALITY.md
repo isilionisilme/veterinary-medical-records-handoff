@@ -249,12 +249,12 @@ Target: CC ≤ 5 for the dispatcher, CC ≤ 5 per validator.
 
 ### Phase 2 — A2: Refactor Triage
 
-- [ ] P2-A 🔄 — Create individual validator functions. **AGENTE: Claude Opus 4.6**
-- [ ] P2-B 🔄 — Create dispatch table. **AGENTE: Claude Opus 4.6**
-- [ ] P2-C 🔄 — Simplify `_suspicious_accepted_flags` to use dispatch table. **AGENTE: Claude Opus 4.6**
-- [ ] P2-D 🔄 — Verify CC ≤ 10 with radon. **AGENTE: Claude Opus 4.6**
-- [ ] P2-E 🔄 — Run full test suite. **AGENTE: Claude Opus 4.6**
-- [ ] P2-F 🚧 — Checkpoint: present diff for user review. **AGENTE: Claude Opus 4.6**
+- [x] P2-A 🔄 — Create individual validator functions. — ✅ `no-commit (local refactor applied)` **AGENTE: Claude Opus 4.6**
+- [x] P2-B 🔄 — Create dispatch table. — ✅ `no-commit (local refactor applied)` **AGENTE: Claude Opus 4.6**
+- [x] P2-C 🔄 — Simplify `_suspicious_accepted_flags` to use dispatch table. — ✅ `no-commit (CC 32→5 local validation)` **AGENTE: Claude Opus 4.6**
+- [x] P2-D 🔄 — Verify CC ≤ 10 with radon. — ✅ `no-commit (radon local pass)` **AGENTE: Claude Opus 4.6**
+- [x] P2-E 🔄 — Run full test suite. — ✅ `no-commit (709 passed, 2 xfailed)` **AGENTE: Claude Opus 4.6**
+- [x] P2-F 🚧 — Checkpoint: present diff for user review. — ✅ `no-commit (reviewed in chat)` **AGENTE: Claude Opus 4.6**
 
 ### Phase 3 — Final
 

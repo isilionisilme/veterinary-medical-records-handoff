@@ -45,9 +45,9 @@ Do not use this file for normative rules, router ownership, or product documenta
 ## Current Execution Snapshot
 
 **Overall plan status:** In progress
-**Completed implementation scope:** A1 only
-**Pending implementation scope:** A2 and final validation
-**Current blocker status:** No blocker currently recorded. A2 can proceed from this branch state.
+**Completed implementation scope:** A1 and A2
+**Pending implementation scope:** Final validation, commit split, and push
+**Current blocker status:** No blocker currently recorded. Branch is ready for final validation and publication.
 
 ---
 
@@ -68,6 +68,22 @@ Behavioral note:
 
 - the weight lower bound used by triage was aligned from `0.2` to `0.5` kg to match the canonical normalization threshold already used in `field_normalizers.py`
 
+### A2 — Triage dispatch-table refactor
+
+Status: Implemented
+
+Changes applied:
+
+- decomposed `_suspicious_accepted_flags` in `backend/app/application/extraction_observability/triage.py` into field-specific validator functions
+- added `_FIELD_VALIDATORS` dispatch table to map normalized field keys to validator callables
+- reduced dispatcher complexity by moving field-specific checks into small pure helpers
+- preserved existing flag semantics while keeping `MAX_VALUE_LENGTH` enforcement in the dispatcher
+
+Behavioral note:
+
+- the refactor was intentionally behavior-preserving; the goal was structural decomposition and complexity reduction, not rule expansion
+- resulting validator complexity is within the plan target for the refactored triage path, with `_suspicious_accepted_flags` reduced from CC 32 to CC 5
+
 ---
 
 ## Files Changed So Far
@@ -76,6 +92,8 @@ Behavioral note:
 - `backend/app/application/extraction_observability/triage.py`
 - `backend/app/application/field_normalizers.py`
 - `backend/app/application/extraction_quality.py`
+- `docs/projects/veterinary-medical-records/04-delivery/plans/PLAN_2026-03-12_AUDIT-01-T1-BACKEND-QUALITY.md`
+- `docs/projects/veterinary-medical-records/04-delivery/plans/IMPLEMENTATION_REPORT_2026-03-12_AUDIT-01-T1-BACKEND-QUALITY.md`
 
 ---
 
@@ -91,6 +109,16 @@ Behavioral note:
 - `scripts/ci/test-L2.ps1 -BaseRef main` → passed on current branch state
 - backend, frontend, Docker image, and shared contract checks all passed in the final L2 run
 
+### Focused validation for A2
+
+- `python -m radon cc -s backend/app/application/extraction_observability/triage.py` → `_suspicious_accepted_flags` reduced to `A (5)`; `_validate_microchip` at `B (10)`; remaining new validators at `B (9)` or better
+- `python -m radon cc -n C -s backend/app/application/extraction_observability/triage.py` → only pre-existing out-of-scope functions remained above the threshold (`build_extraction_triage`, `_log_triage_report`)
+- `ruff check backend/app/application/extraction_observability/triage.py` → passed after import ordering fix
+- `ruff format --check backend/app/application/extraction_observability/triage.py` → passed
+- `python -m pytest backend/tests/ -x --tb=short -q` → passed (`709 passed, 2 xfailed`, coverage `91.68%`)
+- `python -m pytest backend/tests/ -x --tb=short -q -k triage` → test selection passed (`13 passed, 698 deselected`); coverage gate failed as expected under filtered execution and does not indicate a regression
+- `scripts/ci/test-L1.ps1 -BaseRef HEAD` → passed
+
 ---
 
 ## Reviewer Guidance
@@ -100,25 +128,27 @@ Behavioral note:
 - treat A1 as a DRY and consistency change, not as a business-logic expansion
 - verify that all extracted constants correspond to existing literals already in use
 - pay special attention to the intentional weight-threshold unification to `0.5` kg
-- note that the latest recorded L2 run is green for the current branch state
+- note that A2 is a structural refactor focused on complexity reduction, not a rules rewrite
+- confirm that the dispatch table preserves field-key coverage for the triage cases implemented before the refactor
+- note that the latest recorded L2 run before this A2 commit sequence was green for the branch state; rerun L2 after the split commits before push
 
 ### For master-plan review agents
 
 - this track has started and has meaningful implementation progress
 - A1 is implemented and locally validated
-- A2 has not yet been implemented in this branch state
-- the current cross-stack L2 gate is green for the branch state captured in this report
+- A2 is now implemented and locally validated
+- the remaining work is final gate execution and publication, not feature work
 
 ---
 
 ## Open Risks And Follow-Up
 
-- A2 still carries the main structural risk in this track because `_suspicious_accepted_flags` has not yet been decomposed into validators
-- final track completion still requires radon validation for complexity targets
-- before closing the track, L2 should be rerun after A2 because complexity and dispatch changes will materially alter `triage.py`
+- the main remaining risk is publication validation, not implementation correctness
+- `build_extraction_triage` and `_log_triage_report` still exceed CC 10, but they were already pre-existing and are out of scope for this track plan
+- L2 still must be rerun after the split commits because A2 materially changed `triage.py`
 
 ---
 
 ## Next Expected Agent Action
 
-Proceed with A2 refactor in `triage.py`, then rerun focused backend validation and L2.
+Create the split commits, rerun L2, and publish the branch if the user approves the final push.

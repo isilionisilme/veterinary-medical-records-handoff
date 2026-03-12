@@ -5,9 +5,24 @@ from __future__ import annotations
 import logging
 import re
 import unicodedata
+from collections.abc import Callable
 from datetime import date, datetime
 from typing import Any
 
+from backend.app.application.extraction_constants import (
+    CLINIC_ADDRESS_MIN_LENGTH,
+    CLINIC_NAME_MIN_LENGTH,
+    DAYS_PER_YEAR,
+    MAX_PET_AGE_YEARS,
+    MAX_VALUE_LENGTH,
+    MICROCHIP_MAX_DIGITS,
+    MICROCHIP_MIN_DIGITS,
+    OWNER_ADDRESS_MAX_LENGTH,
+    PET_NAME_MIN_LENGTH,
+    PHONE_DIGIT_COUNT,
+    WEIGHT_MAX_KG,
+    WEIGHT_MIN_KG,
+)
 from backend.app.application.field_normalizers import CANONICAL_SPECIES
 
 from .snapshot import (
@@ -59,138 +74,185 @@ def _extract_first_number(value: str) -> float | None:
         return None
 
 
+def _validate_microchip(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    compact_digits = re.sub(r"\D", "", value)
+    if any(char.isalpha() for char in value):
+        flags.append("microchip_contains_letters")
+    if len(value.split()) > 1:
+        flags.append("microchip_multiple_words")
+    if not (MICROCHIP_MIN_DIGITS <= len(value) <= MICROCHIP_MAX_DIGITS):
+        flags.append("microchip_length_out_of_range")
+    if not value.isdigit():
+        flags.append("microchip_non_digit_characters")
+    if re.search(r"(?i)\b(?:tel(?:[eé]fono)?|movil|m[oó]vil)\b", value):
+        flags.append("microchip_phone_context")
+    if re.search(r"(?i)\b(?:nif|dni|nie|pasaporte|documento)\b", value):
+        flags.append("microchip_document_id_context")
+    if len(compact_digits) == PHONE_DIGIT_COUNT and compact_digits.startswith(("6", "7", "8", "9")):
+        flags.append("microchip_phone_like_digits")
+    return flags
+
+
+def _validate_weight(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    letter_tokens = re.findall(r"[A-Za-z]+", value)
+    if [token for token in letter_tokens if token.lower() not in {"kg", "kgs"}]:
+        flags.append("weight_contains_non_kg_letters")
+    numeric_value = _extract_first_number(value)
+    if numeric_value is None:
+        flags.append("weight_missing_numeric_value")
+    elif numeric_value < WEIGHT_MIN_KG or numeric_value > WEIGHT_MAX_KG:
+        flags.append("weight_out_of_range")
+    return flags
+
+
+def _validate_species(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    if _normalize_text(value) not in CANONICAL_SPECIES:
+        return ["species_outside_allowed_set"]
+    return []
+
+
+def _validate_sex(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    if _normalize_text(value) not in {"macho", "hembra"}:
+        return ["sex_outside_allowed_set"]
+    return []
+
+
+def _validate_pet_name(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    if value.isdigit():
+        flags.append("pet_name_numeric_only")
+    if len(value) <= PET_NAME_MIN_LENGTH:
+        flags.append("pet_name_too_short")
+    if re.search(r"\b(?:especie|raza|sexo|chip|fecha|peso)\b", value, re.IGNORECASE):
+        flags.append("pet_name_contains_field_label")
+    if re.search(r"\d{2}[/\-.]\d{2}[/\-.]\d{2,4}", value):
+        flags.append("pet_name_contains_embedded_date")
+    _stop = {"nombre", "datos", "cliente", "historial", "visita"}
+    if _normalize_text(value) in _stop:
+        flags.append("pet_name_is_stopword")
+    return flags
+
+
+def _validate_clinic_name(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    compact = _normalize_text(value)
+    if value.isdigit():
+        flags.append("clinic_name_numeric_only")
+    if len(value.strip()) <= CLINIC_NAME_MIN_LENGTH:
+        flags.append("clinic_name_too_short")
+    if re.search(
+        r"(?i)\b(?:c/|calle|av\.?|avenida|cp\b|portal|piso|puerta|direcci[oó]n|domicilio)\b",
+        value,
+    ) and re.search(r"\d", value):
+        flags.append("clinic_name_address_like")
+    if not re.search(r"\b(?:clinica|veterinari|hospital|centro|vet)\b", compact):
+        flags.append("clinic_name_missing_institution_token")
+    return flags
+
+
+def _validate_clinic_address(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    compact = _normalize_text(value)
+    if value.isdigit():
+        flags.append("clinic_address_numeric_only")
+    if len(value.strip()) < CLINIC_ADDRESS_MIN_LENGTH:
+        flags.append("clinic_address_too_short")
+    if re.search(r"(?i)\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", value):
+        flags.append("clinic_address_contains_email")
+    if re.search(r"(?i)\b(?:tel(?:[eé]fono)?|movil|m[oó]vil)\b", value):
+        flags.append("clinic_address_contains_phone_token")
+    if re.search(rf"\b\d{{{PHONE_DIGIT_COUNT},}}\b", value):
+        flags.append("clinic_address_contains_phone_number")
+    has_po_box = bool(
+        re.search(r"(?i)\b(?:po\s*box|apartado\s+postal|apdo\.?\s*postal)\b", compact)
+    )
+    has_street_token = bool(
+        re.search(
+            r"(?i)\b(?:c/|calle|av\.?|avenida|plaza|paseo|camino|carretera|ctra\.?|portal|puerta)\b",
+            value,
+        )
+    )
+    if has_po_box and not has_street_token:
+        flags.append("clinic_address_po_box_without_street")
+    return flags
+
+
+def _validate_owner_address(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    compact = _normalize_text(value)
+    if len(value.strip()) < CLINIC_ADDRESS_MIN_LENGTH:
+        flags.append("owner_address_too_short")
+    if len(value.strip()) > OWNER_ADDRESS_MAX_LENGTH:
+        flags.append("owner_address_too_long")
+    has_address_token = bool(_ADDRESS_TOKEN_RE.search(compact))
+    has_digits = bool(re.search(r"\d", value))
+    if not has_address_token or not has_digits:
+        flags.append("owner_address_no_address_tokens")
+    if all_fields:
+        clinic_address_payload = all_fields.get("clinic_address")
+        if (
+            isinstance(clinic_address_payload, dict)
+            and clinic_address_payload.get("status") == "accepted"
+        ):
+            clinic_address_value = _as_text(clinic_address_payload.get("valueNormalized"))
+            if clinic_address_value and _normalize_text(clinic_address_value) == compact:
+                flags.append("owner_address_matches_clinic_address")
+    return flags
+
+
+def _validate_dob(value: str, all_fields: dict[str, Any] | None) -> list[str]:
+    flags: list[str] = []
+    try:
+        dob_date = datetime.strptime(value, "%d/%m/%Y").date()
+        today = date.today()
+        if dob_date > today:
+            flags.append("dob_future_date")
+        age_years = (today - dob_date).days / DAYS_PER_YEAR
+        if age_years > MAX_PET_AGE_YEARS:
+            flags.append("dob_implausibly_old")
+        if all_fields:
+            visit_date_payload = all_fields.get("visit_date")
+            if (
+                isinstance(visit_date_payload, dict)
+                and visit_date_payload.get("status") == "accepted"
+            ):
+                visit_date_value = _as_text(visit_date_payload.get("valueNormalized"))
+                if visit_date_value and visit_date_value == value:
+                    flags.append("dob_matches_visit_date")
+    except (ValueError, AttributeError):
+        pass
+    return flags
+
+
+_FIELD_VALIDATORS: dict[str, Callable[[str, dict[str, Any] | None], list[str]]] = {
+    "microchip_id": _validate_microchip,
+    "weight": _validate_weight,
+    "species": _validate_species,
+    "sex": _validate_sex,
+    "pet_name": _validate_pet_name,
+    "clinic_name": _validate_clinic_name,
+    "clinic_address": _validate_clinic_address,
+    "owner_address": _validate_owner_address,
+    "dob": _validate_dob,
+}
+
+
 def _suspicious_accepted_flags(
     field_key: str, value: str | None, all_fields: dict[str, Any] | None = None
 ) -> list[str]:
     if not value:
         return []
-    flags: list[str] = []
     normalized_value = value.strip()
-    normalized_key = field_key.strip().lower()
-    if len(normalized_value) > 80:
+    if not normalized_value:
+        return []
+    flags: list[str] = []
+    if len(normalized_value) > MAX_VALUE_LENGTH:
         flags.append("value_too_long")
-    if normalized_key == "microchip_id":
-        compact_digits = re.sub(r"\D", "", normalized_value)
-        if any(char.isalpha() for char in normalized_value):
-            flags.append("microchip_contains_letters")
-        if len(normalized_value.split()) > 1:
-            flags.append("microchip_multiple_words")
-        if len(normalized_value) < 9 or len(normalized_value) > 15:
-            flags.append("microchip_length_out_of_range")
-        if not normalized_value.isdigit():
-            flags.append("microchip_non_digit_characters")
-        if re.search(r"(?i)\b(?:tel(?:[eé]fono)?|movil|m[oó]vil)\b", normalized_value):
-            flags.append("microchip_phone_context")
-        if re.search(r"(?i)\b(?:nif|dni|nie|pasaporte|documento)\b", normalized_value):
-            flags.append("microchip_document_id_context")
-        if len(compact_digits) == 9 and compact_digits.startswith(("6", "7", "8", "9")):
-            flags.append("microchip_phone_like_digits")
-    if normalized_key == "weight":
-        letter_tokens = re.findall(r"[A-Za-z]+", normalized_value)
-        if [token for token in letter_tokens if token.lower() not in {"kg", "kgs"}]:
-            flags.append("weight_contains_non_kg_letters")
-        numeric_value = _extract_first_number(normalized_value)
-        if numeric_value is None:
-            flags.append("weight_missing_numeric_value")
-        elif numeric_value < 0.2 or numeric_value > 120:
-            flags.append("weight_out_of_range")
-    if normalized_key == "species" and _normalize_text(normalized_value) not in CANONICAL_SPECIES:
-        flags.append("species_outside_allowed_set")
-    if normalized_key == "sex" and _normalize_text(normalized_value) not in {"macho", "hembra"}:
-        flags.append("sex_outside_allowed_set")
-    if normalized_key == "pet_name":
-        if normalized_value.isdigit():
-            flags.append("pet_name_numeric_only")
-        if len(normalized_value) <= 1:
-            flags.append("pet_name_too_short")
-        if re.search(r"\b(?:especie|raza|sexo|chip|fecha|peso)\b", normalized_value, re.IGNORECASE):
-            flags.append("pet_name_contains_field_label")
-        if re.search(r"\d{2}[/\-.]\d{2}[/\-.]\d{2,4}", normalized_value):
-            flags.append("pet_name_contains_embedded_date")
-        # Stopword-only names (e.g. "Nombre", "Datos")
-        _stop = {"nombre", "datos", "cliente", "historial", "visita"}
-        if _normalize_text(normalized_value) in _stop:
-            flags.append("pet_name_is_stopword")
-    if normalized_key == "clinic_name":
-        compact = _normalize_text(normalized_value)
-        if normalized_value.isdigit():
-            flags.append("clinic_name_numeric_only")
-        if len(normalized_value.strip()) <= 2:
-            flags.append("clinic_name_too_short")
-        if re.search(
-            r"(?i)\b(?:c/|calle|av\.?|avenida|cp\b|portal|piso|puerta|direcci[oó]n|domicilio)\b",
-            normalized_value,
-        ) and re.search(r"\d", normalized_value):
-            flags.append("clinic_name_address_like")
-        if not re.search(r"\b(?:clinica|veterinari|hospital|centro|vet)\b", compact):
-            flags.append("clinic_name_missing_institution_token")
-    if normalized_key == "clinic_address":
-        compact = _normalize_text(normalized_value)
-        if normalized_value.isdigit():
-            flags.append("clinic_address_numeric_only")
-        if len(normalized_value.strip()) < 10:
-            flags.append("clinic_address_too_short")
-        if re.search(r"(?i)\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b", normalized_value):
-            flags.append("clinic_address_contains_email")
-        if re.search(r"(?i)\b(?:tel(?:[eé]fono)?|movil|m[oó]vil)\b", normalized_value):
-            flags.append("clinic_address_contains_phone_token")
-        if re.search(r"\b\d{9,}\b", normalized_value):
-            flags.append("clinic_address_contains_phone_number")
-        has_po_box = bool(
-            re.search(r"(?i)\b(?:po\s*box|apartado\s+postal|apdo\.?\s*postal)\b", compact)
-        )
-        has_street_token = bool(
-            re.search(
-                r"(?i)\b(?:c/|calle|av\.?|avenida|plaza|paseo|camino|carretera|ctra\.?|portal|puerta)\b",
-                normalized_value,
-            )
-        )
-        if has_po_box and not has_street_token:
-            flags.append("clinic_address_po_box_without_street")
-    if normalized_key == "owner_address":
-        compact = _normalize_text(normalized_value)
-        if len(normalized_value.strip()) < 10:
-            flags.append("owner_address_too_short")
-        if len(normalized_value.strip()) > 120:
-            flags.append("owner_address_too_long")
-        has_address_token = bool(_ADDRESS_TOKEN_RE.search(compact))
-        has_digits = bool(re.search(r"\d", normalized_value))
-        if not has_address_token or not has_digits:
-            flags.append("owner_address_no_address_tokens")
-        if all_fields:
-            clinic_address_payload = all_fields.get("clinic_address")
-            if (
-                isinstance(clinic_address_payload, dict)
-                and clinic_address_payload.get("status") == "accepted"
-            ):
-                clinic_address_value = _as_text(clinic_address_payload.get("valueNormalized"))
-                if clinic_address_value and _normalize_text(clinic_address_value) == compact:
-                    flags.append("owner_address_matches_clinic_address")
-    if normalized_key == "dob":
-        # Parse dob value (format: DD/MM/YYYY)
-        try:
-            dob_date = datetime.strptime(normalized_value, "%d/%m/%Y").date()
-            today = date.today()
-            # Flag 1: dob_future_date — date of birth is in the future
-            if dob_date > today:
-                flags.append("dob_future_date")
-            # Flag 2: dob_implausibly_old — animal older than 40 years
-            age_years = (today - dob_date).days / 365.25
-            if age_years > 40:
-                flags.append("dob_implausibly_old")
-            # Flag 3: dob_matches_visit_date — dob == visit_date (possible field confusion)
-            if all_fields:
-                visit_date_payload = all_fields.get("visit_date")
-                if (
-                    isinstance(visit_date_payload, dict)
-                    and visit_date_payload.get("status") == "accepted"
-                ):
-                    visit_date_value = _as_text(visit_date_payload.get("valueNormalized"))
-                    if visit_date_value and visit_date_value == normalized_value:
-                        flags.append("dob_matches_visit_date")
-        except (ValueError, AttributeError):
-            # Invalid date format, skip flags
-            pass
+    validator = _FIELD_VALIDATORS.get(field_key.strip().lower())
+    if validator is not None:
+        flags.extend(validator(normalized_value, all_fields))
     return flags
 
 

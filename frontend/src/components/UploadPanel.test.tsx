@@ -26,7 +26,9 @@ describe("App upload and list flow", () => {
 
     const input = screen.getByLabelText(/Archivo PDF/i);
     const file = new File(["pdf"], "nuevo.pdf", { type: "application/pdf" });
-    fireEvent.change(input, { target: { files: [file] } });
+    await act(async () => {
+      fireEvent.change(input, { target: { files: [file] } });
+    });
 
     expect(await screen.findByText(/Documento subido correctamente/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Ver documento/i })).toBeNull();

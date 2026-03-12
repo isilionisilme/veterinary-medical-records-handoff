@@ -6,6 +6,13 @@ import re
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 
+from backend.app.application.extraction_constants import (
+    MICROCHIP_MAX_DIGITS,
+    MICROCHIP_MIN_DIGITS,
+    WEIGHT_MAX_KG,
+    WEIGHT_MIN_KG,
+)
+
 _WHITESPACE_PATTERN = re.compile(r"\s+")
 _DATE_PATTERN = re.compile(
     r"\b(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}|\d{4}[\/\-.]\d{1,2}[\/\-.]\d{1,2})\b"
@@ -16,8 +23,6 @@ _WEIGHT_PATTERN = re.compile(
     r"(?P<number>\d+(?:[.,]\d+)?)\s*(?P<unit>kg|kgs|g|gr)?\b",
     re.IGNORECASE,
 )
-_WEIGHT_MIN_KG = 0.5
-_WEIGHT_MAX_KG = 120.0
 
 # pet_name normalization helpers
 _PET_NAME_TRAILING_NOISE = re.compile(
@@ -178,7 +183,7 @@ def normalize_microchip_digits_only(value: object) -> str | None:
         return match.group(1)
 
     compact_digits = re.sub(r"\D", "", cleaned)
-    if 9 <= len(compact_digits) <= 15:
+    if MICROCHIP_MIN_DIGITS <= len(compact_digits) <= MICROCHIP_MAX_DIGITS:
         return compact_digits
     return None
 
@@ -572,7 +577,7 @@ def _normalize_weight(value: object) -> str:
     if unit in ("g", "gr"):
         number = number / 1000.0
 
-    if number <= 0 or number < _WEIGHT_MIN_KG or number > _WEIGHT_MAX_KG:
+    if number <= 0 or number < WEIGHT_MIN_KG or number > WEIGHT_MAX_KG:
         return ""
 
     if number == int(number):

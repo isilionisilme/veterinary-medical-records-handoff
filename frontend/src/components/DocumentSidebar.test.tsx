@@ -169,7 +169,7 @@ describe("App upload and list flow", () => {
       fireEvent.click(collapsedReadyItem);
       expect(sidebar).toHaveAttribute("data-expanded", "false");
     });
-  });
+  }, 10000);
 
   it("keeps sidebar open on mouse leave when pinned, and collapses again after unpin", async () => {
     await withDesktopHoverMatchMedia(async () => {

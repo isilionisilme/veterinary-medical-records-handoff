@@ -234,7 +234,9 @@ describe("App upload and list flow", () => {
     expect(within(screen.getByTestId("right-panel-scroll")).queryByText("—")).toBeNull();
 
     expect(typeof releaseReviewRequest).toBe("function");
-    releaseReviewRequest();
+    await act(async () => {
+      releaseReviewRequest();
+    });
 
     expect(await screen.findByRole("heading", { name: /Datos extraídos/i })).toBeInTheDocument();
   });

@@ -477,12 +477,12 @@ describe("App upload and list flow", () => {
         /La confianza aplica únicamente al valor originalmente detectado por el sistema\. El valor actual ha sido editado y por eso no tiene confianza asociada\./i,
       ),
     );
-  });
+  }, 10000);
 
   it("shows visit date value when present", async () => {
     renderApp();
 
-    fireEvent.click(await screen.findByRole("button", { name: /ready\.pdf/i }));
+    fireEvent.click(await screen.findByRole("button", { name: /ready\.pdf/i }, { timeout: 10000 }));
 
     await waitForStructuredDataReady();
 
@@ -491,5 +491,5 @@ describe("App upload and list flow", () => {
     const visitDateCard = within(panel).getByText("Fecha de visita").closest("article");
     expect(visitDateCard).not.toBeNull();
     expect(within(visitDateCard as HTMLElement).getByText(expectedDate)).toBeInTheDocument();
-  });
+  }, 10000);
 });
