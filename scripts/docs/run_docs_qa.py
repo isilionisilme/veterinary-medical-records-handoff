@@ -45,12 +45,22 @@ def _resolve_cmd(command: str) -> str:
 
 def _changed_files(base_ref: str) -> list[str]:
     result = subprocess.run(
-        ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+        ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{base_ref}...HEAD"],
         check=True,
         capture_output=True,
         text=True,
     )
-    files = [line.strip().replace("\\", "/") for line in result.stdout.splitlines() if line.strip()]
+    files: list[str] = []
+    for line in result.stdout.splitlines():
+        rel = line.strip().replace("\\", "/")
+        if not rel:
+            continue
+
+        # Guard against deleted or moved-away paths that can still appear in some diff scenarios.
+        if not (Path(rel).exists() or (Path.cwd() / rel).exists()):
+            continue
+
+        files.append(rel)
     return sorted(set(files))
 
 
