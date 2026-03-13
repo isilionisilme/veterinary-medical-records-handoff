@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$BaseRef = "main",
-    [ValidateSet("Quick", "Push", "Full")]
+    [ValidateSet("Quick", "Push", "Full", "CI")]
     [string]$Mode = "Push",
     [switch]$All,
     [switch]$ForceFrontend,
@@ -14,6 +14,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONUTF8 = "1"
 
 . (Join-Path $PSScriptRoot "lib\repo-root.ps1")
 $repoRoot = Get-RepoRoot -ScriptRoot $PSScriptRoot
@@ -171,13 +174,13 @@ function Get-ChangedFiles {
     if ($CommitDiffOnly) {
         # Parity mode: only the commit-range diff; mirrors what GitHub Actions sees.
         $sources = @(
-            @("diff", "--name-only", "$BaseRefValue...HEAD")
+            ,@("diff", "--no-ext-diff", "--name-only", "$BaseRefValue...HEAD")
         )
     } else {
         $sources = @(
-            @("diff", "--name-only", "$BaseRefValue...HEAD"),
-            @("diff", "--name-only"),
-            @("diff", "--name-only", "--cached")
+            ,@("diff", "--no-ext-diff", "--name-only", "$BaseRefValue...HEAD")
+            ,@("diff", "--no-ext-diff", "--name-only")
+            ,@("diff", "--no-ext-diff", "--name-only", "--cached")
         )
     }
 
@@ -300,6 +303,29 @@ function Resolve-NpmCommand {
     return "npm"
 }
 
+function Resolve-TempRoot {
+    $candidates = @(
+        $env:TEMP,
+        $env:TMPDIR,
+        $env:TMP,
+        [System.IO.Path]::GetTempPath(),
+        "/tmp"
+    )
+
+    foreach ($candidate in $candidates) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) {
+            continue
+        }
+
+        $normalized = $candidate.Trim()
+        if (Test-Path -LiteralPath $normalized) {
+            return $normalized
+        }
+    }
+
+    throw "Unable to resolve a writable temporary directory."
+}
+
 function Get-ListeningProcessIds {
     param([Parameter(Mandatory = $true)][int]$Port)
 
@@ -357,6 +383,7 @@ function Select-LocalE2EPortPair {
 
 $python = Resolve-PythonCommand
 $npm = Resolve-NpmCommand
+$tempRoot = Resolve-TempRoot
 
 if ($All.IsPresent) {
     $Mode = "Full"
@@ -408,6 +435,18 @@ $docsPatterns = @(
     "scripts/*"
 )
 
+$docsPatternsCi = @(
+    "docs/*",
+    "*.md",
+    "package.json",
+    "package-lock.json",
+    ".markdownlint.yml",
+    ".markdown-link-check.json",
+    ".ci-config-reference/package.json",
+    "scripts/docs/*",
+    "scripts/quality/validate-frontmatter.py"
+)
+
 $dockerPackagingPatterns = @(
     ".dockerignore",
     ".env.example",
@@ -425,12 +464,14 @@ $backendChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $backe
 $frontendChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $frontendPatterns
 $frontendImpactFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $frontendImpactPatterns
 $docsChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $docsPatterns
+$docsChangedFilesCi = Filter-ChangedFiles -Files $changedFiles -Patterns $docsPatternsCi
 $dockerChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $dockerPackagingPatterns
 
 $backendChanged = [bool]($backendChangedFiles | Select-Object -First 1)
 $frontendChanged = [bool]($frontendChangedFiles | Select-Object -First 1)
 $frontendImpacted = [bool]($frontendImpactFiles | Select-Object -First 1)
 $docsChanged = [bool]($docsChangedFiles | Select-Object -First 1)
+$docsChangedCi = [bool]($docsChangedFilesCi | Select-Object -First 1)
 $dockerChanged = [bool]($dockerChangedFiles | Select-Object -First 1)
 
 $forceFrontendChecks = $ForceFrontend.IsPresent -or $ForceFull.IsPresent
@@ -473,6 +514,15 @@ switch ($Mode) {
         $runFrontendGuards = $frontendImpacted -or $forceFrontendChecks
         $runDocker = -not $SkipDocker.IsPresent -and ($dockerChanged -or $forceAllChecks)
         $runE2E = -not $SkipE2E.IsPresent -and ($frontendImpacted -or $backendChanged -or $forceFrontendChecks)
+    }
+    "CI" {
+        # Dedicated CI parity profile: mirrors .github/workflows/ci.yml gate intent.
+        $runDocs = $docsChangedCi
+        $runBackendFull = $backendChanged
+        $runFrontendFull = $frontendChanged -or $backendChanged -or $forceFrontendChecks
+        $runFrontendGuards = $frontendChanged -or $forceFrontendChecks
+        $runDocker = -not $SkipDocker.IsPresent -and $dockerChanged
+        $runE2E = -not $SkipE2E.IsPresent -and ($frontendChanged -or $backendChanged -or $forceFrontendChecks)
     }
 }
 
@@ -660,7 +710,7 @@ if ($runFrontendFull) {
 if ($runE2E) {
     Invoke-Step "Frontend E2E (Playwright)" {
         $selectedPorts = Select-LocalE2EPortPair
-        $runtimeRoot = Join-Path $env:TEMP ("vmr-playwright-e2e-{0}-{1}" -f $PID, $selectedPorts.Backend)
+        $runtimeRoot = Join-Path $tempRoot ("vmr-playwright-e2e-{0}-{1}" -f $PID, $selectedPorts.Backend)
         $storageRoot = Join-Path $runtimeRoot "storage"
         $dbPath = Join-Path $runtimeRoot "documents.db"
 
@@ -722,7 +772,7 @@ if ($runDocker) {
     Invoke-Step "Assert backend shared contract in image" {
         $backendCid = (& docker create vetrecords-backend:ci).Trim()
         try {
-            $backendContract = Join-Path $env:TEMP "backend_global_schema_contract.json"
+            $backendContract = Join-Path $tempRoot "backend_global_schema_contract.json"
             if (Test-Path $backendContract) {
                 Remove-Item $backendContract -Force
             }
@@ -743,7 +793,7 @@ if ($runDocker) {
     Invoke-Step "Assert frontend shared contract in image" {
         $frontendCid = (& docker create vetrecords-frontend:ci).Trim()
         try {
-            $frontendContract = Join-Path $env:TEMP "frontend_global_schema_contract.json"
+            $frontendContract = Join-Path $tempRoot "frontend_global_schema_contract.json"
             if (Test-Path $frontendContract) {
                 Remove-Item $frontendContract -Force
             }
