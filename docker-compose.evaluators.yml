@@ -1,0 +1,7 @@
+services:
+  wiki:
+    build:
+      context: ../veterinary-medical-records-documentation
+      dockerfile: Dockerfile.docs
+    ports:
+      - "${DOCS_PORT:-8081}:8000"
