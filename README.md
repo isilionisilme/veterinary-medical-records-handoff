@@ -21,13 +21,29 @@ Prerequisites:
 Run evaluation mode:
 - `docker compose up --build`
 
+Run evaluation mode with app + documentation wiki:
+- `docker compose -f docker-compose.yml -f docker-compose.evaluators.yml up --build`
+- PowerShell wrapper (attached): `./scripts/up-app.ps1`
+- PowerShell wrapper (detached): `./scripts/up-app.ps1 -Detached`
+- Windows one-click launcher (repo root, detached): `start-app.cmd`
+- macOS/Linux launcher (repo root, detached): `./start-app.sh`
+- View logs after one-click start: `docker compose -f docker-compose.yml -f docker-compose.evaluators.yml logs -f`
+
 Open:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:8000`
 - OpenAPI docs: `http://localhost:8000/docs`
+- Wiki: `http://localhost:8081`
 
 Stop:
 - `docker compose down`
+- `docker compose -f docker-compose.yml -f docker-compose.evaluators.yml down`
+- PowerShell wrapper: `./scripts/down-app.ps1`
+- Windows one-click launcher (repo root): `stop-app.cmd`
+- macOS/Linux launcher (repo root): `./stop-app.sh`
+
+Note for macOS/Linux first run:
+- `chmod +x ./start-app.sh ./stop-app.sh`
 
 Scope and sequencing source of truth:
 - [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md)
