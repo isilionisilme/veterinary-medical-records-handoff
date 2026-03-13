@@ -1,4 +1,7 @@
-"""Integration tests covering guarded interpretation edit flows and correction signals."""
+"""Integration tests covering guarded interpretation edit flows and correction signals.
+
+Scenario focus: conflict guards and correction-signal accumulation behavior.
+"""
 
 from __future__ import annotations
 

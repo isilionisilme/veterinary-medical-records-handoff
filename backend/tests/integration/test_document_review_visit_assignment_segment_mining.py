@@ -1,4 +1,7 @@
-"""Integration tests covering visit-segment mining for grouped review payloads."""
+"""Integration tests covering visit-segment mining for grouped review payloads.
+
+Scenario focus: mined diagnosis/medication/procedure population without duplication.
+"""
 
 from __future__ import annotations
 

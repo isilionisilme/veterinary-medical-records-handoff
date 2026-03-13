@@ -1,4 +1,7 @@
-"""Integration tests covering raw-text-driven multi-visit assignment population."""
+"""Integration tests covering raw-text-driven multi-visit assignment population.
+
+Scenario focus: segment-derived field backfill and cross-visit raw-text extraction.
+"""
 
 from __future__ import annotations
 

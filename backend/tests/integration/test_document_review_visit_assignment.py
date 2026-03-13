@@ -1,4 +1,7 @@
-"""Integration tests covering baseline document review visit assignment behavior."""
+"""Integration tests covering baseline document review visit assignment behavior.
+
+Scenario focus: canonical visit grouping and evidence-based multi-visit assignment.
+"""
 
 from __future__ import annotations
 

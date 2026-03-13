@@ -1,4 +1,7 @@
-"""Integration tests covering ambiguous or non-visit date assignment guards."""
+"""Integration tests covering ambiguous or non-visit date assignment guards.
+
+Scenario focus: preserving unassigned state for ambiguous or non-visit dates.
+"""
 
 from __future__ import annotations
 

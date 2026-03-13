@@ -1,4 +1,7 @@
-"""Integration tests covering successful interpretation edit flows."""
+"""Integration tests covering successful interpretation edit flows.
+
+Scenario focus: edit versioning, noop handling, and confidence preservation.
+"""
 
 from __future__ import annotations
 

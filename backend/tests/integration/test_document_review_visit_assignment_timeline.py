@@ -1,4 +1,7 @@
-"""Integration tests covering raw-text timeline visit assignment behavior."""
+"""Integration tests covering raw-text timeline visit assignment behavior.
+
+Scenario focus: timeline-derived visit creation and nearest-date assignment rules.
+"""
 
 from __future__ import annotations
 

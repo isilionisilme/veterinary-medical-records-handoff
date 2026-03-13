@@ -1,4 +1,7 @@
-"""Integration tests covering document review status transitions."""
+"""Integration tests covering document review status transitions.
+
+Scenario focus: idempotency and calibration rollback on reviewed-state toggles.
+"""
 
 from __future__ import annotations
 

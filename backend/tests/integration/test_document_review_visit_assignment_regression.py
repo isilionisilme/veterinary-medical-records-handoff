@@ -1,4 +1,7 @@
-"""Integration tests covering visit-assignment regression guards."""
+"""Integration tests covering visit-assignment regression guards.
+
+Scenario focus: deterministic assignment invariants across known regression cases.
+"""
 
 from __future__ import annotations
 

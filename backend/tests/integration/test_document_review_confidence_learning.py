@@ -1,4 +1,7 @@
-"""Integration tests covering document review confidence and learning signals."""
+"""Integration tests covering document review confidence and learning signals.
+
+Scenario focus: calibration deltas, confidence composition, and learning updates.
+"""
 
 from __future__ import annotations
 
