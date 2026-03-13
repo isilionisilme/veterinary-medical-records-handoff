@@ -1,6 +1,6 @@
 # Veterinary Medical Records Processing — Technical Exercise
 
-![CI](https://github.com/isilfrith/veterinary-medical-records/actions/workflows/ci.yml/badge.svg?branch=main)
+![CI](https://github.com/isilionisilme/veterinary-medical-records-handoff/actions/workflows/ci.yml/badge.svg?branch=main)
 ![Python](https://img.shields.io/badge/python-3.11-blue)
 ![React](https://img.shields.io/badge/react-18-61dafb)
 ![License](https://img.shields.io/badge/license-MIT-blue)
