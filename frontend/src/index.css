@@ -45,16 +45,26 @@
   --shadow-subtle: none;
 
   --status-success: #3f9e86;
+  --status-info: #4b7fa1;
   --status-warn: #c99645;
   --status-error: #c45f5c;
   --status-success-bg: #e7f4ef;
-  --status-info-bg: #f3f6f9;
+  --status-info-bg: #edf3f8;
   --status-error-bg: #f9eceb;
   --confidence-low: var(--status-error);
   --confidence-med: var(--status-warn);
   --confidence-high: var(--status-success);
   --status-critical: var(--status-error);
   --status-missing: #9ca3af;
+  --toast-success-border: var(--status-success);
+  --toast-success-bg: var(--status-success-bg);
+  --toast-success-text: var(--color-text);
+  --toast-info-border: var(--status-info);
+  --toast-info-bg: var(--status-info-bg);
+  --toast-info-text: var(--color-text);
+  --toast-error-border: var(--status-error);
+  --toast-error-bg: var(--status-error-bg);
+  --toast-error-text: var(--status-error);
   --dot-offset: 2px;
   --field-row-dot-col: 16px;
   --field-row-label-col: 132px;

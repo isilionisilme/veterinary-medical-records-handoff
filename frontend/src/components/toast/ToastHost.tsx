@@ -17,22 +17,22 @@ const TOAST_BASE_CLASS = "rounded-2xl border px-5 py-4 shadow-subtle";
 
 function getToastKindClass(kind: "success" | "info" | "error"): string {
   if (kind === "success") {
-    return "border-statusSuccess text-text";
+    return "border-toastSuccessBorder text-toastSuccessText";
   }
   if (kind === "info") {
-    return "border-accent text-text";
+    return "border-toastInfoBorder text-toastInfoText";
   }
-  return "border-statusError text-statusError";
+  return "border-toastErrorBorder text-toastErrorText";
 }
 
 function getToastKindBackground(kind: "success" | "info" | "error"): React.CSSProperties {
   if (kind === "success") {
-    return { backgroundColor: "var(--status-success-bg)" };
+    return { backgroundColor: "var(--toast-success-bg)" };
   }
   if (kind === "info") {
-    return { backgroundColor: "var(--status-info-bg)" };
+    return { backgroundColor: "var(--toast-info-bg)" };
   }
-  return { backgroundColor: "var(--status-error-bg)" };
+  return { backgroundColor: "var(--toast-error-bg)" };
 }
 
 function getUploadToastTopClass(hasConnectivityToast: boolean): string {
