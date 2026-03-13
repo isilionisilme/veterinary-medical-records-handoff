@@ -6,11 +6,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ROUTER_ROOT = REPO_ROOT / "docs" / "agent_router"
 ROOT_AGENTS = REPO_ROOT / "AGENTS.md"
+COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
 AUTHORITY_DOC = ROUTER_ROOT / "00_AUTHORITY.md"
 FALLBACK_DOC = ROUTER_ROOT / "00_FALLBACK.md"
 RULES_INDEX_DOC = ROUTER_ROOT / "00_RULES_INDEX.md"
 
 DOC_REF_PATTERN = re.compile(r"(docs/[A-Za-z0-9_./-]+\.md)")
+PROMPT_REF_PATTERN = re.compile(r"\.github/prompts/[A-Za-z0-9-]+\.prompt\.md")
 
 MAX_AUTHORITY_CHARS = 3000
 MAX_AGENTS_NON_EMPTY_LINES = 30
@@ -24,8 +26,30 @@ def _extract_doc_refs(text: str) -> set[str]:
     return set(DOC_REF_PATTERN.findall(text))
 
 
+def _extract_prompt_refs(text: str) -> set[str]:
+    return set(PROMPT_REF_PATTERN.findall(text))
+
+
+def _extract_bullets_under_header(text: str, header: str) -> list[str]:
+    lines = text.splitlines()
+    capture = False
+    bullets: list[str] = []
+
+    for line in lines:
+        if line.strip() == header:
+            capture = True
+            continue
+        if capture and line.startswith("## "):
+            break
+        if capture and line.startswith("- "):
+            bullets.append(line[2:].strip())
+
+    return bullets
+
+
 def test_entrypoint_contract_paths_exist() -> None:
     assert ROOT_AGENTS.exists(), "Missing root AGENTS.md entrypoint."
+    assert COPILOT_INSTRUCTIONS.exists(), "Missing .github/copilot-instructions.md entrypoint."
     assert AUTHORITY_DOC.exists(), "Missing authority router document."
     assert FALLBACK_DOC.exists(), "Missing fallback router document."
     assert RULES_INDEX_DOC.exists(), "Missing rules index document."
@@ -38,6 +62,18 @@ def test_entrypoint_contract_paths_exist() -> None:
     assert ".github/prompts/scope-boundary.prompt.md" in agents_text
     assert "docs/agent_router/00_AUTHORITY.md" in agents_text
     assert "docs/agent_router/00_FALLBACK.md" in agents_text
+
+
+def test_copilot_instructions_stay_aligned_with_agents_entrypoint() -> None:
+    agents_text = _read_text(ROOT_AGENTS)
+    copilot_text = _read_text(COPILOT_INSTRUCTIONS)
+
+    assert "Source of truth: keep this file behaviorally aligned with `AGENTS.md`." in copilot_text
+    assert _extract_prompt_refs(copilot_text) == _extract_prompt_refs(agents_text)
+    copilot_rules = _extract_bullets_under_header(copilot_text, "## Global Rules")
+    agent_rules = _extract_bullets_under_header(agents_text, "## Global Rules")
+
+    assert copilot_rules == agent_rules
 
 
 def test_agents_entrypoint_uses_runbooks_and_stays_small() -> None:
