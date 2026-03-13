@@ -46,7 +46,6 @@ COPY .githooks/pre-commit /app/.githooks/pre-commit
 COPY .github/copilot-instructions.md /app/.github/copilot-instructions.md
 COPY docs /app/docs
 COPY .github/workflows/ci.yml /app/.github/workflows/ci.yml
-COPY .github/workflows/doc-governance.yml /app/.github/workflows/doc-governance.yml
 COPY .github/prompts /app/.github/prompts
 COPY metrics/llm_benchmarks/SCENARIOS.md /app/metrics/llm_benchmarks/SCENARIOS.md
 COPY Dockerfile.backend /app/Dockerfile.backend

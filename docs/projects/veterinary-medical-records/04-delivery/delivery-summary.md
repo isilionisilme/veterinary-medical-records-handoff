@@ -8,19 +8,17 @@ last-updated: 2026-03-02
 
 # Delivery Summary
 
-
 **Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [At a glance](#at-a-glance)
 - [Phase 1 — Architecture audit (12-Factor)](#phase-1--architecture-audit-12-factor)
 - [Phase 2 — Structural refactor](#phase-2--structural-refactor)
-  - [Frontend: `App.tsx` (5,998 LOC → 9-line shell + 8 modules)](#frontend-apptsx-5998-loc-%E2%86%92-9-line-shell--8-modules)
-  - [Backend: `processing_runner.py` (2,901 LOC → 5 modules)](#backend-processing_runnerpy-2901-loc-%E2%86%92-5-modules)
-  - [Backend: `document_service.py` (1,874 LOC → 8 modules)](#backend-document_servicepy-1874-loc-%E2%86%92-8-modules)
+  - [Frontend: `App.tsx` (5,998 LOC → 9-line shell + 8 modules)](#frontend-apptsx-5998-loc--9-line-shell--8-modules)
+  - [Backend: `processing_runner.py` (2,901 LOC → 5 modules)](#backend-processing_runnerpy-2901-loc--5-modules)
+  - [Backend: `document_service.py` (1,874 LOC → 8 modules)](#backend-document_servicepy-1874-loc--8-modules)
   - [Test redistribution](#test-redistribution)
 - [Phase 3 — Tooling quick wins](#phase-3--tooling-quick-wins)
 - [Phase 4 — Test quality](#phase-4--test-quality)
@@ -50,12 +48,12 @@ last-updated: 2026-03-02
   - [CI & Process](#ci--process)
 - [Iteration 11 — E2E Expansion + Error UX + Testing Depth + DX Hardening (Phase 18)](#iteration-11--e2e-expansion--error-ux--testing-depth--dx-hardening-phase-18)
   - [Phase A — Quick wins](#phase-a--quick-wins)
-  - [Phase B — E2E expansion (5→20 tests)](#phase-b--e2e-expansion-5%E2%86%9220-tests)
+  - [Phase B — E2E expansion (5→20 tests)](#phase-b--e2e-expansion-520-tests)
   - [Phase C — Error UX + performance](#phase-c--error-ux--performance)
   - [Phase D — Testing depth + architecture](#phase-d--testing-depth--architecture)
   - [Operational improvements (Iter 11)](#operational-improvements-iter-11)
 - [Iteration 12 — E2E Coverage Expansion + Accessibility + Project Close-Out (Phase 19)](#iteration-12--e2e-coverage-expansion--accessibility--project-close-out-phase-19)
-  - [Phase A — E2E expansion (20→65 tests, 8→22 specs)](#phase-a--e2e-expansion-20%E2%86%9265-tests-8%E2%86%9222-specs)
+  - [Phase A — E2E expansion (20→65 tests, 8→22 specs)](#phase-a--e2e-expansion-2065-tests-822-specs)
   - [Phase B — WCAG accessibility](#phase-b--wcag-accessibility)
   - [Phase C — Architecture & README](#phase-c--architecture--readme)
   - [Phase D — Documentation close-out](#phase-d--documentation-close-out)
@@ -84,7 +82,8 @@ last-updated: 2026-03-02
 
 ## Phase 1 — Architecture audit (12-Factor)
 
-Audited the backend against the 12-Factor App methodology. Implemented 4 of 5 top-priority items (1 discarded — SQLite concurrency risk).
+Audited the backend against the 12-Factor App methodology.
+Implemented 4 of 5 top-priority items (1 discarded — SQLite concurrency risk).
 
 | Change | Detail |
 |--------|--------|
@@ -108,7 +107,9 @@ Three monolithic files decomposed into cohesive modules. No behavioral changes.
 |--------|-------|
 | 1 file, 5,998 lines | `App.tsx` (9 LOC shell) + `AppWorkspace.tsx` (5,760 LOC) + 37 component files (5,457 LOC) |
 
-Key extracted components: `PdfViewer` (831), `DocumentsSidebar` (430), `FieldEditDialog` (417), `ToastHost` (159), `UploadDropzone` (77), `SourcePanel` (60), plus 20+ UI primitives.
+Key extracted components: `PdfViewer` (831), `DocumentsSidebar` (430),
+`FieldEditDialog` (417), `ToastHost` (159), `UploadDropzone` (77),
+`SourcePanel` (60), plus 20+ UI primitives.
 
 ### Backend: `processing_runner.py` (2,901 LOC → 5 modules)
 
@@ -165,7 +166,8 @@ Frontend and backend test suites audited for fragile patterns, duplicated fixtur
 | Frontend test files | ~15 | 20 |
 | Frontend tests | ~145 | 162 |
 
-Key improvements: removed duplicated suites, added `cli.py` tests (was 0%), improved `_edit_helpers.py` coverage, consolidated fragile timer-based patterns.
+Key improvements: removed duplicated suites, added `cli.py` tests (was 0%),
+improved `_edit_helpers.py` coverage, consolidated fragile timer-based patterns.
 
 ---
 
@@ -200,13 +202,15 @@ Key improvements: removed duplicated suites, added `cli.py` tests (was 0%), impr
 | Processing feedback | Status polling (1.5s→5s), long-processing warning |
 | Error handling | Connectivity dedup, graceful degradation, expandable tech details |
 
-Frictions fixed: ~20 missing Spanish accent marks in UI strings, CSS loading spinner added to `index.html`, page language set to `es`.
+Frictions fixed: ~20 missing Spanish accent marks in UI strings,
+CSS loading spinner added to `index.html`, page language set to `es`.
 
 ---
 
 ## Phase 7 — Closeout
 
-Final verification: all 7 CI checks green, PR #145 updated, no regressions. Plan `AI_ITERATIVE_EXECUTION_PLAN.md` fully executed — all steps `[x]`.
+Final verification: all 7 CI checks green, PR #145 updated, no regressions.
+Plan `AI_ITERATIVE_EXECUTION_PLAN.md` fully executed — all steps `[x]`.
 
 ---
 
@@ -369,7 +373,8 @@ Two-PR strategy: PR A (CI governance) + PR B (refactor + coverage).
 **PR:** #163  
 **Branch:** `improvement/iteration-9-e2e`
 
-First end-to-end test suite for the application, covering the 4 critical user flows. Added Playwright infrastructure with CI integration.
+First end-to-end test suite for the application, covering the 4 critical user
+flows. Added Playwright infrastructure with CI integration.
 
 ### E2E test evidence
 
@@ -385,7 +390,9 @@ First end-to-end test suite for the application, covering the 4 critical user fl
 
 - New `e2e` job in GitHub Actions: starts Docker stack, runs `npm run test:e2e`, uploads artifacts on failure.
 - Playwright configured: Chromium-only, headless, `baseURL: http://localhost:80`, HTML reporter.
-- `data-testid` attributes added to key components: `review-toggle-btn`, `field-edit-dialog`, `field-edit-input`, `field-edit-save`, `field-edit-cancel`, `field-edit-btn-${id}`.
+- `data-testid` attributes added to key components: `review-toggle-btn`,
+  `field-edit-dialog`, `field-edit-input`, `field-edit-save`,
+  `field-edit-cancel`, `field-edit-btn-${id}`.
 
 ### Operational improvements (Iter 9)
 
@@ -447,6 +454,7 @@ Comprehensive hardening pass targeting security gaps, resilience, performance, a
 | Test suite | 372+ backend, 263+ frontend, 5 E2E — all green |
 | Backend coverage | 90% (enforced ≥85%) |
 | Frontend coverage | 85% (enforced ≥80%) |
+
 ---
 
 ## Iteration 11 — E2E Expansion + Error UX + Testing Depth + DX Hardening (Phase 18)
@@ -454,7 +462,8 @@ Comprehensive hardening pass targeting security gaps, resilience, performance, a
 **PR:** #167  
 **Branch:** `improvement/iteration-11`
 
-Massive E2E expansion (5→20 tests), user-facing error UX, latency benchmarks, backend failure-path coverage, repository split by aggregate, and OpenAPI polish.
+Massive E2E expansion (5→20 tests), user-facing error UX, latency benchmarks,
+backend failure-path coverage, repository split by aggregate, and OpenAPI polish.
 
 ### Phase A — Quick wins
 
@@ -466,7 +475,8 @@ Massive E2E expansion (5→20 tests), user-facing error UX, latency benchmarks, 
 
 ### Phase B — E2E expansion (5→20 tests)
 
-Playwright E2E suite expanded from 5 tests to **20 tests across 8 spec files**, covering the core Phases 0–2 of the E2E coverage plan.
+Playwright E2E suite expanded from 5 tests to **20 tests across 8 spec files**,
+covering the core Phases 0–2 of the E2E coverage plan.
 
 | Spec | Tests | Flows covered |
 |------|-------|--------------|
@@ -479,7 +489,9 @@ Playwright E2E suite expanded from 5 tests to **20 tests across 8 spec files**, 
 | `field-editing.spec.ts` | 3 | Open edit dialog → modify → save → verify |
 | `review-workflow.spec.ts` | 2 | Mark reviewed toggle + read-only mode |
 
-Infrastructure: 17 new `data-testid` attributes, `e2e/helpers.ts` reusable helpers, tiered Playwright projects (smoke/core/extended), npm scripts (`test:e2e:smoke`, `test:e2e:all`).
+Infrastructure: 17 new `data-testid` attributes, `e2e/helpers.ts` reusable
+helpers, tiered Playwright projects (smoke/core/extended), npm scripts
+(`test:e2e:smoke`, `test:e2e:all`).
 
 ### Phase C — Error UX + performance
 
@@ -522,11 +534,13 @@ Infrastructure: 17 new `data-testid` attributes, `e2e/helpers.ts` reusable helpe
 **PR:** #169  
 **Branch:** `improvement/iteration-12-final`
 
-Final iteration: massive E2E expansion (20→65 tests), automated accessibility auditing, architecture documentation, and project close-out documentation.
+Final iteration: massive E2E expansion (20→65 tests), automated accessibility
+auditing, architecture documentation, and project close-out documentation.
 
 ### Phase A — E2E expansion (20→65 tests, 8→22 specs)
 
-Playwright E2E suite expanded from 20 tests to **65 tests across 22 spec files**, completing all 4 phases of the E2E coverage plan.
+Playwright E2E suite expanded from 20 tests to **65 tests across 22 spec files**,
+completing all 4 phases of the E2E coverage plan.
 
 | Spec (new) | Tests | Plan step |
 |------------|-------|-----------|
