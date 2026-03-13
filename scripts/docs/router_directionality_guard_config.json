@@ -1,6 +1,0 @@
-{
-  "exempt_protected_files": [
-    "docs/agent_router/01_WORKFLOW/DOC_UPDATES/router_parity_map.json",
-    "docs/agent_router/01_WORKFLOW/DOC_UPDATES/test_impact_map.json"
-  ]
-}
