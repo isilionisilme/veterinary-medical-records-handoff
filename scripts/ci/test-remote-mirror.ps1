@@ -16,12 +16,20 @@ Set-Location $repoRoot
 function Resolve-RemoteRefParts {
     param([Parameter(Mandatory = $true)][string]$Ref)
 
-    $trimmed = $Ref.Trim()
-    if ([string]::IsNullOrWhiteSpace($trimmed)) {
+    $normalized = $Ref.Trim()
+    if ([string]::IsNullOrWhiteSpace($normalized)) {
         throw "BaseRef cannot be empty."
     }
 
-    if ($trimmed -match '^(?<remote>[^/]+)/(?<branch>.+)$') {
+    if ($normalized.StartsWith("refs/heads/", [System.StringComparison]::OrdinalIgnoreCase)) {
+        $normalized = $normalized.Substring("refs/heads/".Length)
+    }
+
+    if ($normalized.StartsWith("refs/remotes/", [System.StringComparison]::OrdinalIgnoreCase)) {
+        $normalized = $normalized.Substring("refs/remotes/".Length)
+    }
+
+    if ($normalized -match '^(?<remote>[^/]+)/(?<branch>.+)$') {
         return @{
             Remote = $Matches.remote
             Branch = $Matches.branch
@@ -31,8 +39,8 @@ function Resolve-RemoteRefParts {
 
     return @{
         Remote = "origin"
-        Branch = $trimmed
-        Canonical = "origin/$trimmed"
+        Branch = $normalized
+        Canonical = "origin/$normalized"
     }
 }
 
@@ -47,6 +55,14 @@ if ($LASTEXITCODE -ne 0) {
 & git show-ref --verify --quiet ("refs/remotes/{0}/{1}" -f $remoteRef.Remote, $remoteRef.Branch)
 if ($LASTEXITCODE -ne 0) {
     throw "Remote mirror failed: missing refs/remotes/$($remoteRef.Remote)/$($remoteRef.Branch). Push blocked."
+}
+
+& git merge-base --is-ancestor $remoteRef.Canonical HEAD
+if ($LASTEXITCODE -ne 0) {
+    throw (
+        "Remote mirror failed: current branch does not contain the latest $($remoteRef.Canonical). " +
+        "Rebase or merge $($remoteRef.Canonical) before pushing."
+    )
 }
 
 $scriptPath = Join-Path $PSScriptRoot "test-CI.ps1"
