@@ -4,18 +4,24 @@
 
 Detect the user's intent and load the matching runbook **before** acting. Keep reads minimal.
 
+Source of truth: keep this file behaviorally aligned with `AGENTS.md`. If intent routing or shared rules change, update both files in the same change and keep the contract test green.
+
 | Intent | Runbook |
 |---|---|
-| Start new work, create a branch, begin a task | `.github/prompts/start-work.prompt.md` |
+| Start new work or create a branch | `.github/prompts/start-work.prompt.md` |
 | Create or update a pull request | `.github/prompts/pr-workflow.prompt.md` |
 | Code review | `.github/prompts/code-review.prompt.md` |
 | Documentation updates or doc maintenance | `.github/prompts/doc-updates.prompt.md` |
-| Commit, push, or git operation during active plan | `.github/prompts/scope-boundary.prompt.md` |
+| Commit-task scope boundary or handoff | `.github/prompts/scope-boundary.prompt.md` |
 
-## Global rules
+## Global Rules
 
-- Never commit directly to `main`; always use a feature branch + PR unless the user explicitly authorizes otherwise.
-- New branches must use `<category>/<slug>` (see `.github/prompts/start-work.prompt.md` for the category table).
-- After any documentation change, run the DOC_UPDATES normalization pass (see `.github/prompts/doc-updates.prompt.md`).
+- No direct commits to `main`; use a feature branch + PR unless the user explicitly authorizes otherwise.
+- New branches must use `<category>/<slug>` and follow `docs/agent_router/01_WORKFLOW/BRANCHING/00_entry.md`.
+- If docs changed, documentation was updated, or the user mentions documentation updates in any language or paraphrase, load `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md` and run the DOC_UPDATES normalization pass once before finishing.
 - If a required standard cannot be satisfied, stop and escalate the blocker.
-- Always include a `How to test` section for user-validatable changes.
+- Include final `How to test` for user-validatable changes.
+
+## Validation
+
+When this file changes, validate routing behavior with a fresh Copilot Chat conversation and keep the AGENTS/copilot-instructions contract test passing.
