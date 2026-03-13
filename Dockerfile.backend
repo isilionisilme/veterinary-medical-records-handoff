@@ -40,7 +40,6 @@ USER root
 COPY backend/tests /app/backend/tests
 COPY requirements-dev.txt /app/requirements-dev.txt
 COPY scripts /app/scripts
-COPY docs /app/docs
 COPY .github/workflows/ci.yml /app/.github/workflows/ci.yml
 COPY metrics/llm_benchmarks/SCENARIOS.md /app/metrics/llm_benchmarks/SCENARIOS.md
 COPY Dockerfile.backend /app/Dockerfile.backend
