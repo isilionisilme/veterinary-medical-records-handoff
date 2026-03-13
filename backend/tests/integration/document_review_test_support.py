@@ -7,7 +7,6 @@ import json
 import re
 from pathlib import Path
 
-import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.domain import models as app_models
@@ -50,24 +49,6 @@ def _load_us46_mixed_multi_visit_assignment_baseline() -> dict[str, object]:
         "assigned_visit_scoped_fields": payload.get("assigned_visit_scoped_fields"),
         "unassigned_visit_scoped_fields": payload.get("unassigned_visit_scoped_fields"),
     }
-
-
-@pytest.fixture
-def test_db(tmp_path, monkeypatch):
-    db_path = tmp_path / "documents.db"
-    monkeypatch.setenv("VET_RECORDS_DB_PATH", str(db_path))
-    monkeypatch.setenv("VET_RECORDS_STORAGE_PATH", str(tmp_path / "storage"))
-    monkeypatch.setenv("VET_RECORDS_DISABLE_PROCESSING", "true")
-    database.ensure_schema()
-    return db_path
-
-
-@pytest.fixture
-def test_client(test_db):
-    from backend.app.main import app
-
-    with TestClient(app) as client:
-        yield client
 
 
 def _upload_sample_document(test_client: TestClient) -> str:
