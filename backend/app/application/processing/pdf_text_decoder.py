@@ -2,23 +2,24 @@
 
 from __future__ import annotations
 
-from . import pdf_extraction_nodeps as core
+from . import pdf_fallback_shared as shared
+from .pdf_content_tokenizer import _tokenize_pdf_content
 from .pdf_text_quality import _decoded_text_score, _normalize_candidate_text
 
 
 def _extract_text_chunks_from_content_stream(
     *,
     chunk: bytes,
-    font_to_cmap: dict[str, core.PdfCMap],
-    fallback_cmaps: list[core.PdfCMap],
+    font_to_cmap: dict[str, shared.PdfCMap],
+    fallback_cmaps: list[shared.PdfCMap],
 ) -> list[str]:
     extracted: list[str] = []
     in_text_object = False
     active_font: str | None = None
-    active_cmap: core.PdfCMap | None = None
+    active_cmap: shared.PdfCMap | None = None
     operand_stack: list[object] = []
 
-    for token in core._tokenize_pdf_content(chunk):
+    for token in _tokenize_pdf_content(chunk):
         if not isinstance(token, str):
             operand_stack.append(token)
             continue
@@ -89,11 +90,11 @@ def _extract_text_chunks_from_content_stream(
 def _decode_token_for_font(
     *,
     token_bytes: bytes,
-    active_cmap: core.PdfCMap | None,
+    active_cmap: shared.PdfCMap | None,
     active_font: str | None,
-    font_to_cmap: dict[str, core.PdfCMap],
-    fallback_cmaps: list[core.PdfCMap],
-) -> tuple[str, core.PdfCMap | None]:
+    font_to_cmap: dict[str, shared.PdfCMap],
+    fallback_cmaps: list[shared.PdfCMap],
+) -> tuple[str, shared.PdfCMap | None]:
     if active_cmap is not None:
         return _decode_pdf_text_token(token_bytes, [active_cmap]), active_cmap
 
@@ -105,7 +106,7 @@ def _decode_token_for_font(
         return _decode_pdf_text_token(token_bytes, []), None
 
     best_text = ""
-    best_cmap: core.PdfCMap | None = None
+    best_cmap: shared.PdfCMap | None = None
     best_score = float("-inf")
     for cmap in fallback_cmaps[:4]:
         decoded = _decode_pdf_text_token(token_bytes, [cmap])
@@ -120,11 +121,11 @@ def _decode_token_for_font(
 def _decode_tj_array_for_font(
     *,
     array_items: list[object],
-    active_cmap: core.PdfCMap | None,
+    active_cmap: shared.PdfCMap | None,
     active_font: str | None,
-    font_to_cmap: dict[str, core.PdfCMap],
-    fallback_cmaps: list[core.PdfCMap],
-) -> tuple[str, core.PdfCMap | None]:
+    font_to_cmap: dict[str, shared.PdfCMap],
+    fallback_cmaps: list[shared.PdfCMap],
+) -> tuple[str, shared.PdfCMap | None]:
     if active_cmap is not None:
         candidate_cmaps = [active_cmap]
     else:
@@ -135,7 +136,7 @@ def _decode_tj_array_for_font(
         return "", None
 
     best_text = ""
-    best_cmap: core.PdfCMap | None = None
+    best_cmap: shared.PdfCMap | None = None
     best_score = float("-inf")
     for cmap in candidate_cmaps:
         parts: list[str] = []
@@ -157,7 +158,7 @@ def _decode_tj_array_for_font(
     return best_text, best_cmap
 
 
-def _decode_pdf_text_token(token: bytes, cmaps: list[core.PdfCMap | None]) -> str:
+def _decode_pdf_text_token(token: bytes, cmaps: list[shared.PdfCMap | None]) -> str:
     candidates: list[str] = [token.decode("latin-1", errors="ignore")]
     for cmap in cmaps:
         if cmap is None:
@@ -179,7 +180,7 @@ def _decode_pdf_text_token(token: bytes, cmaps: list[core.PdfCMap | None]) -> st
     return best_text
 
 
-def _decode_bytes_with_cmap(token: bytes, cmap: core.PdfCMap) -> str:
+def _decode_bytes_with_cmap(token: bytes, cmap: shared.PdfCMap) -> str:
     chars: list[str] = []
     index = 0
     while index < len(token):

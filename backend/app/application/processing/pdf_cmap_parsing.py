@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import re
 
-from . import pdf_extraction_nodeps as core
+from . import pdf_fallback_shared as shared
+from .pdf_page_structure import _extract_object_stream
 
 _CODESPACE_RANGE_PATTERN = re.compile(
     rb"\d+\s+begincodespacerange(.*?)endcodespacerange",
@@ -18,7 +19,7 @@ _BFRANGE_ARRAY_PATTERN = re.compile(rb"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*\[(
 _BFRANGE_ARRAY_ENTRY_PATTERN = re.compile(rb"<([0-9A-Fa-f]+)>")
 
 
-def _parse_tounicode_cmap(chunk: bytes) -> core.PdfCMap | None:
+def _parse_tounicode_cmap(chunk: bytes) -> shared.PdfCMap | None:
     if b"begincmap" not in chunk:
         return None
 
@@ -64,7 +65,7 @@ def _parse_tounicode_cmap(chunk: bytes) -> core.PdfCMap | None:
 
     if not mapping:
         return None
-    return core.PdfCMap(
+    return shared.PdfCMap(
         codepoints=mapping,
         code_lengths=tuple(sorted(code_lengths, reverse=True)),
     )
@@ -82,12 +83,12 @@ def _decode_unicode_hex(hex_value: bytes) -> str:
     return raw.decode("latin-1", errors="ignore")
 
 
-def _extract_cmaps_by_object(objects: dict[int, bytes]) -> dict[int, core.PdfCMap]:
-    cmaps: dict[int, core.PdfCMap] = {}
+def _extract_cmaps_by_object(objects: dict[int, bytes]) -> dict[int, shared.PdfCMap]:
+    cmaps: dict[int, shared.PdfCMap] = {}
     for object_id, object_payload in objects.items():
-        if core._deadline_exceeded():
+        if shared.deadline_exceeded():
             break
-        stream = core._extract_object_stream(object_payload, max_bytes=core.MAX_CMAP_STREAM_BYTES)
+        stream = _extract_object_stream(object_payload, max_bytes=shared.MAX_CMAP_STREAM_BYTES)
         if stream is None:
             continue
         cmap = _parse_tounicode_cmap(stream)

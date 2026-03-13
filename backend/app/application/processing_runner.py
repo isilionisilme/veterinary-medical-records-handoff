@@ -12,10 +12,11 @@ from backend.app.application.processing import scheduler as _scheduler
 
 def _reexport_all(module: object) -> None:
     namespace = getattr(module, "__dict__", {})
-    for name, value in namespace.items():
-        if name.startswith("__"):
-            continue
-        globals().setdefault(name, value)
+    public_names = getattr(module, "__all__", None)
+    if public_names is None:
+        public_names = [name for name in namespace if not name.startswith("__")]
+    for name in public_names:
+        globals().setdefault(name, namespace[name])
 
 
 for _module in (

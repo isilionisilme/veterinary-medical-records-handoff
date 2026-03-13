@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from . import pdf_extraction_nodeps as core
+from . import pdf_fallback_shared as shared
 
 _PAGE_TYPE_PATTERN = re.compile(rb"/Type\s*/Page\b")
 _PAGE_CONTENTS_ARRAY_PATTERN = re.compile(rb"/Contents\s*\[(.*?)\]", re.DOTALL)
@@ -22,9 +22,9 @@ _OBJECT_STREAM_PATTERN = re.compile(rb"stream\r?\n(.*?)\r?\nendstream", re.DOTAL
 def _collect_page_content_streams(
     *,
     objects: dict[int, bytes],
-    cmap_by_object: dict[int, core.PdfCMap],
-) -> list[tuple[bytes, dict[str, core.PdfCMap]]]:
-    page_streams: list[tuple[bytes, dict[str, core.PdfCMap]]] = []
+    cmap_by_object: dict[int, shared.PdfCMap],
+) -> list[tuple[bytes, dict[str, shared.PdfCMap]]]:
+    page_streams: list[tuple[bytes, dict[str, shared.PdfCMap]]] = []
     for page_payload in objects.values():
         if not _PAGE_TYPE_PATTERN.search(page_payload):
             continue
@@ -59,8 +59,8 @@ def _extract_font_to_cmap_for_page(
     *,
     page_payload: bytes,
     objects: dict[int, bytes],
-    cmap_by_object: dict[int, core.PdfCMap],
-) -> dict[str, core.PdfCMap]:
+    cmap_by_object: dict[int, shared.PdfCMap],
+) -> dict[str, shared.PdfCMap]:
     resource_payload = _resolve_page_resources(page_payload=page_payload, objects=objects)
     if resource_payload is None:
         return {}
@@ -86,9 +86,9 @@ def _build_font_to_cmap_from_page_resources(
     *,
     resource_payload: bytes,
     objects: dict[int, bytes],
-    cmap_by_object: dict[int, core.PdfCMap],
-) -> dict[str, core.PdfCMap]:
-    mapping: dict[str, core.PdfCMap] = {}
+    cmap_by_object: dict[int, shared.PdfCMap],
+) -> dict[str, shared.PdfCMap]:
+    mapping: dict[str, shared.PdfCMap] = {}
     for font_name, font_object_id in _extract_font_entries_from_resource_payload(
         resource_payload=resource_payload,
         objects=objects,
@@ -137,7 +137,7 @@ def _extract_object_stream(object_payload: bytes, max_bytes: int | None = None) 
     raw_stream = match.group(1)
     if max_bytes is not None and len(raw_stream) > max_bytes:
         return None
-    inflated = core._inflate_pdf_stream(raw_stream)
+    inflated = shared.inflate_pdf_stream(raw_stream)
     if inflated is not None:
         if max_bytes is not None and len(inflated) > max_bytes:
             return None

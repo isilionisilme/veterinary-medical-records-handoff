@@ -15,16 +15,16 @@ from backend.app.application.extraction_quality import (
 )
 from backend.app.application.processing_runner import (
     PDF_EXTRACTOR_FORCE_ENV,
-    _extract_pdf_text_with_extractor,
-    _extract_pdf_text_without_external_dependencies,
-    _parse_pdf_literal_string,
     _process_document,
+    extract_pdf_text_with_extractor,
+    extract_pdf_text_without_external_dependencies,
+    parse_pdf_literal_string,
 )
 
 
 def test_parse_pdf_literal_string_handles_common_escapes() -> None:
     payload = b"(Linea\\nDos\\t\\050ok\\051\\\\)"
-    parsed, next_index = _parse_pdf_literal_string(payload, 1)
+    parsed, next_index = parse_pdf_literal_string(payload, 1)
 
     assert parsed == "Linea\nDos\t(ok)\\"
     assert next_index == len(payload)
@@ -36,7 +36,7 @@ def test_fallback_extractor_reads_text_from_compressed_stream(tmp_path) -> None:
     pdf_path = tmp_path / "sample.pdf"
     pdf_path.write_bytes(pdf_bytes)
 
-    extracted = _extract_pdf_text_without_external_dependencies(pdf_path)
+    extracted = extract_pdf_text_without_external_dependencies(pdf_path)
 
     assert "Historia clinica" in extracted
 
@@ -89,7 +89,7 @@ def test_extractor_auto_mode_falls_back_when_fitz_is_unavailable(monkeypatch, tm
         lambda _path: "fallback text",
     )
 
-    text, extractor = _extract_pdf_text_with_extractor(sample)
+    text, extractor = extract_pdf_text_with_extractor(sample)
 
     assert extractor == "fallback"
     assert text == "fallback text"
@@ -109,12 +109,12 @@ def test_extractor_force_modes_choose_expected_path(monkeypatch, tmp_path) -> No
     )
 
     monkeypatch.setenv(PDF_EXTRACTOR_FORCE_ENV, "fitz")
-    fitz_text, fitz_extractor = _extract_pdf_text_with_extractor(sample)
+    fitz_text, fitz_extractor = extract_pdf_text_with_extractor(sample)
     assert fitz_extractor == "fitz"
     assert fitz_text == "fitz text"
 
     monkeypatch.setenv(PDF_EXTRACTOR_FORCE_ENV, "fallback")
-    fallback_text, fallback_extractor = _extract_pdf_text_with_extractor(sample)
+    fallback_text, fallback_extractor = extract_pdf_text_with_extractor(sample)
     assert fallback_extractor == "fallback"
     assert fallback_text == "fallback text"
 

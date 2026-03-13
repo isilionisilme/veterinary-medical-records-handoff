@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from . import pdf_extraction_nodeps as core
+from . import pdf_fallback_shared as shared
 
 _HEX_STRING_PATTERN = re.compile(rb"<([0-9A-Fa-f\s]+)>")
 _WHITESPACE_BYTES_PATTERN = re.compile(rb"\s+")
@@ -34,7 +34,7 @@ def _tokenize_pdf_content(content: bytes) -> list[object]:
     index = 0
     length = len(content)
     while index < length:
-        if core._deadline_exceeded():
+        if shared.deadline_exceeded():
             return tokens
         byte = content[index]
 
@@ -63,7 +63,7 @@ def _tokenize_pdf_content(content: bytes) -> list[object]:
                 continue
             tokens.append(token)
 
-        if len(tokens) >= core.MAX_TOKENS_PER_STREAM:
+        if len(tokens) >= shared.MAX_TOKENS_PER_STREAM:
             return tokens
     return tokens
 
@@ -72,7 +72,7 @@ def _parse_pdf_array(content: bytes, index: int) -> tuple[list[object], int]:
     values: list[object] = []
     length = len(content)
     while index < length:
-        if core._deadline_exceeded() or len(values) >= core.MAX_ARRAY_ITEMS:
+        if shared.deadline_exceeded() or len(values) >= shared.MAX_ARRAY_ITEMS:
             return values, length
         byte = content[index]
 
@@ -115,7 +115,7 @@ def _parse_pdf_literal_string_bytes(blob: bytes, index: int) -> tuple[bytes, int
     length = len(blob)
 
     while index < length:
-        if core._deadline_exceeded():
+        if shared.deadline_exceeded():
             return bytes(result), length
         byte = blob[index]
         index += 1

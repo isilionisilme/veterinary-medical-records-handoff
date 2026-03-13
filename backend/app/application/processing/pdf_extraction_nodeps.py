@@ -3,47 +3,21 @@
 from __future__ import annotations
 
 import re
-import time
-import zlib
 from collections.abc import Callable
-from contextvars import ContextVar
-from dataclasses import dataclass
 from pathlib import Path
+
+from . import pdf_fallback_shared as shared
 
 _PDF_STREAM_PATTERN = re.compile(rb"stream\r?\n(.*?)\r?\nendstream", re.DOTALL)
 _OBJECT_PATTERN = re.compile(rb"(\d+)\s+(\d+)\s+obj(.*?)endobj", re.DOTALL)
 
-MAX_CONTENT_STREAM_BYTES = 8 * 1024 * 1024
-MAX_TEXT_CHUNKS = 20000
-MAX_TOKENS_PER_STREAM = 25000
-MAX_ARRAY_ITEMS = 3000
-MAX_SINGLE_STREAM_BYTES = 1 * 1024 * 1024
-MAX_EXTRACTION_SECONDS = 20.0
-MAX_CMAP_STREAM_BYTES = 256 * 1024
-
-_ACTIVE_EXTRACTION_DEADLINE: ContextVar[float | None] = ContextVar(
-    "_ACTIVE_EXTRACTION_DEADLINE", default=None
-)
-
-
-@dataclass(frozen=True, slots=True)
-class PdfCMap:
-    codepoints: dict[int, str]
-    code_lengths: tuple[int, ...]
-
 
 def _deadline_exceeded() -> bool:
-    deadline = _ACTIVE_EXTRACTION_DEADLINE.get()
-    if deadline is None:
-        return False
-    return time.monotonic() > deadline
+    return shared.deadline_exceeded()
 
 
 def _inflate_pdf_stream(stream: bytes) -> bytes | None:
-    try:
-        return zlib.decompress(stream)
-    except zlib.error:
-        return None
+    return shared.inflate_pdf_stream(stream)
 
 
 def _parse_pdf_objects(pdf_bytes: bytes) -> dict[int, bytes]:
@@ -57,8 +31,8 @@ def _extract_pdf_text_without_external_dependencies(
     file_path: Path,
     *,
     parse_pdf_objects: Callable[[bytes], dict[int, bytes]] | None = None,
-    extract_cmaps_by_object: Callable[[dict[int, bytes]], dict[int, PdfCMap]] | None = None,
-    collect_page_content_streams: Callable[..., list[tuple[bytes, dict[str, PdfCMap]]]]
+    extract_cmaps_by_object: Callable[[dict[int, bytes]], dict[int, shared.PdfCMap]] | None = None,
+    collect_page_content_streams: Callable[..., list[tuple[bytes, dict[str, shared.PdfCMap]]]]
     | None = None,
     inflate_pdf_stream: Callable[[bytes], bytes | None] | None = None,
     extract_text_chunks_from_content_stream: Callable[..., list[str]] | None = None,
@@ -68,8 +42,7 @@ def _extract_pdf_text_without_external_dependencies(
     from .pdf_text_decoder import _extract_text_chunks_from_content_stream
     from .pdf_text_quality import _sanitize_text_chunks, _stitch_text_chunks
 
-    started_at = time.monotonic()
-    _deadline_token = _ACTIVE_EXTRACTION_DEADLINE.set(started_at + MAX_EXTRACTION_SECONDS)
+    _deadline_token = shared.start_extraction_deadline(shared.MAX_EXTRACTION_SECONDS)
 
     parse_pdf_objects_fn = parse_pdf_objects or _parse_pdf_objects
     extract_cmaps_by_object_fn = extract_cmaps_by_object or _extract_cmaps_by_object
@@ -93,10 +66,10 @@ def _extract_pdf_text_without_external_dependencies(
         for chunk, font_to_cmap in page_streams:
             if _deadline_exceeded():
                 break
-            if not chunk or len(chunk) > MAX_SINGLE_STREAM_BYTES:
+            if not chunk or len(chunk) > shared.MAX_SINGLE_STREAM_BYTES:
                 continue
             total_bytes += len(chunk)
-            if total_bytes > MAX_CONTENT_STREAM_BYTES:
+            if total_bytes > shared.MAX_CONTENT_STREAM_BYTES:
                 break
             text_chunks.extend(
                 extract_text_chunks_fn(
@@ -105,7 +78,7 @@ def _extract_pdf_text_without_external_dependencies(
                     fallback_cmaps=list(font_to_cmap.values()),
                 )
             )
-            if len(text_chunks) > MAX_TEXT_CHUNKS:
+            if len(text_chunks) > shared.MAX_TEXT_CHUNKS:
                 break
 
         if not page_streams:
@@ -122,13 +95,9 @@ def _extract_pdf_text_without_external_dependencies(
                         fallback_cmaps=[],
                     )
                 )
-                if len(text_chunks) > MAX_TEXT_CHUNKS:
+                if len(text_chunks) > shared.MAX_TEXT_CHUNKS:
                     break
 
         return _stitch_text_chunks(_sanitize_text_chunks(text_chunks))
     finally:
-        _ACTIVE_EXTRACTION_DEADLINE.reset(_deadline_token)
-
-
-from .pdf_content_tokenizer import _tokenize_pdf_content as _tokenize_pdf_content  # noqa: E402
-from .pdf_page_structure import _extract_object_stream as _extract_object_stream  # noqa: E402
+        shared.restore_extraction_deadline(_deadline_token)

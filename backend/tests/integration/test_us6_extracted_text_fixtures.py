@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from backend.app.application.extraction_quality import is_usable_extracted_text
-from backend.app.application.processing_runner import PDF_EXTRACTOR_FORCE_ENV, _extract_pdf_text
+from backend.app.application.processing_runner import PDF_EXTRACTOR_FORCE_ENV, extract_pdf_text
 
 FIXTURES_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "pdfs"
 HAS_FITZ = importlib.util.find_spec("fitz") is not None
@@ -39,7 +39,7 @@ def _strip_accents(value: str) -> str:
 def test_clinical_history_1_fallback_is_rejected_as_low_quality() -> None:
     os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fallback"
     try:
-        text = _extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
 
@@ -60,7 +60,7 @@ def test_clinical_history_1_fitz_quality_when_available() -> None:
 
     os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fitz"
     try:
-        text = _extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
 
@@ -88,7 +88,7 @@ def test_clinical_history_1_extracts_usable_readable_text() -> None:
     else:
         os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fallback"
     try:
-        text = _extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_1.pdf"))
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
 
@@ -105,7 +105,7 @@ def test_clinical_history_2_extracts_partial_but_usable_text() -> None:
     os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fallback"
     try:
         started_at = time.monotonic()
-        text = _extract_pdf_text(_fixture_path("clinical_history_2.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_2.pdf"))
         elapsed = time.monotonic() - started_at
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
@@ -120,7 +120,7 @@ def test_clinical_history_2_extracts_partial_but_usable_text() -> None:
 
     os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fitz"
     try:
-        text = _extract_pdf_text(_fixture_path("clinical_history_2.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_2.pdf"))
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
 
@@ -135,7 +135,7 @@ def test_clinical_history_4_scanned_is_usable_only_when_output_is_readable() -> 
     else:
         os.environ[PDF_EXTRACTOR_FORCE_ENV] = "fallback"
     try:
-        text = _extract_pdf_text(_fixture_path("clinical_history_4-scanned.pdf"))
+        text = extract_pdf_text(_fixture_path("clinical_history_4-scanned.pdf"))
     finally:
         os.environ.pop(PDF_EXTRACTOR_FORCE_ENV, None)
 
