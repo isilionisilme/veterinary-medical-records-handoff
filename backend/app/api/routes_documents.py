@@ -350,7 +350,7 @@ def get_document_original(
 @limiter.limit(_upload_rate_limit)
 async def upload_document(
     request: Request,
-    file: UploadFile = File(  # noqa: B008
+    file: UploadFile = File(  # noqa: B008 - FastAPI uses File() as default for dependency injection
         ...,
         description="Document file to register (validated for type/extension and size).",
     ),
