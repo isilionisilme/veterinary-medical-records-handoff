@@ -473,5 +473,3 @@ def test_document_review_exposes_months_for_derived_age_under_one_year(test_clie
     assert age_fields[0]["value"] == "0"
     assert age_fields[0]["display_value"] == "5 meses"
     assert age_fields[0]["display_value"] == data["global_schema"]["age_display"]
-
-

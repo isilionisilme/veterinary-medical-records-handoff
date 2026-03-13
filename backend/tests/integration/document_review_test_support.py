@@ -264,5 +264,3 @@ def _get_calibration_counts(
     if row is None:
         return (0, 0)
     return (int(row["accept_count"]), int(row["edit_count"]))
-
-

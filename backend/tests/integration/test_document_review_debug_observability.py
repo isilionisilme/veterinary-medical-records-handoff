@@ -464,5 +464,3 @@ def test_document_review_visit_scoping_observability_returns_409_without_complet
     body = response.json()
     assert body["error_code"] == "CONFLICT"
     assert body["details"] == {"reason": "NO_COMPLETED_RUN"}
-
-

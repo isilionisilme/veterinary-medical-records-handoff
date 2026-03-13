@@ -591,7 +591,6 @@ def test_document_review_multi_visit_docb_populates_observations_actions_with_hi
         assert coverage >= 0.8
 
 
-
 def test_document_review_multi_visit_reason_for_visit_does_not_override_existing_value(test_client):
     document_id = _upload_sample_document(test_client)
     run_id = str(uuid4())
@@ -1630,7 +1629,6 @@ def test_document_review_boundary_marker_guides_undated_field_assignment(test_cl
     assert "f-medication-undated-after-boundary" in second_visit_field_ids
 
 
-
 def test_document_review_merges_prepopulated_and_inferred_visits_deterministically(test_client):
     document_id = _upload_sample_document(test_client)
     run_id = str(uuid4())
@@ -1860,5 +1858,3 @@ def test_document_review_us46_mixed_multi_visit_assignment_regression_guardrail(
     assert stats["assigned_count"] >= baseline["assigned_visit_scoped_fields"] + 2
     assert stats["unassigned_count"] <= baseline["unassigned_visit_scoped_fields"] - 2
     assert {"diagnosis", "medication", "procedure"}.intersection(stats["assigned_keys"])
-
-

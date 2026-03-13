@@ -768,7 +768,6 @@ def test_document_review_weight_absent_means_no_weight_field(test_client):
                 assert f.get("key") != "weight"
 
 
-
 def test_document_review_derives_latest_weight_from_raw_timeline_without_seed_visit_fields(
     test_client,
 ):
@@ -825,5 +824,3 @@ def test_document_review_derives_latest_weight_from_raw_timeline_without_seed_vi
     top_level_weight_fields = _extract_top_level_fields_by_key(data, "weight")
     assert len(top_level_weight_fields) == 1
     assert top_level_weight_fields[0].get("value") == "29.6 kg"
-
-
