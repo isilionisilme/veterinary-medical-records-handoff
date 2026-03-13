@@ -1,0 +1,2 @@
+Sexo: Hembra Estado: FERTIL Peso: 0
+Paciente: Nala

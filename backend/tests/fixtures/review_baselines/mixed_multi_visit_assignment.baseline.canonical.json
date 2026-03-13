@@ -1,0 +1,9 @@
+{
+  "version": "mixed_multi_visit_assignment.baseline.canonical",
+  "visit_ids": [
+    "visit-2026-02-11",
+    "visit-2026-02-18"
+  ],
+  "assigned_visit_scoped_fields": 0,
+  "unassigned_visit_scoped_fields": 5
+}

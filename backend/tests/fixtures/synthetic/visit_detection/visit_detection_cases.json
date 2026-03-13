@@ -1,0 +1,55 @@
+{
+  "description": "Synthetic raw-text fixtures for multi-visit boundary detection",
+  "version": "2026-03-06",
+  "cases": [
+    {
+      "id": "visit_explicit_keywords_two_visits",
+      "variant": "a",
+      "expected_unique_visit_count": 2,
+      "expected_visit_dates": ["2026-02-11", "2026-02-18"],
+      "text": "Consulta 11/02/2026: dolor de oido.\nVisita 18/02/2026: control y ajuste de medicacion."
+    },
+    {
+      "id": "visit_implicit_keywords_two_visits",
+      "variant": "b",
+      "expected_unique_visit_count": 2,
+      "expected_visit_dates": ["2026-03-01", "2026-03-15"],
+      "text": "Atencion 01/03/2026 por prurito.\nRevision 15/03/2026 con mejoria clinica."
+    },
+    {
+      "id": "visit_section_separator_blocks",
+      "variant": "c",
+      "expected_unique_visit_count": 2,
+      "expected_visit_dates": ["2026-01-10", "2026-01-24"],
+      "text": "=== VISITA ===\nFecha: 10/01/2026\nMotivo: cojeras\n---\n=== CONTROL ===\nFecha: 24/01/2026\nMotivo: seguimiento"
+    },
+    {
+      "id": "visit_dates_without_visit_keyword",
+      "variant": "d",
+      "expected_unique_visit_count": 0,
+      "expected_visit_dates": [],
+      "text": "11/02/2026: se imprime informe administrativo.\n18/02/2026: emision de factura."
+    },
+    {
+      "id": "visit_mixed_date_formats",
+      "variant": "e",
+      "expected_unique_visit_count": 3,
+      "expected_visit_dates": ["2026-02-11", "2026-02-18", "2026-03-01"],
+      "text": "Consulta 11/02/2026 por otitis.\nControl 2026-02-18 con respuesta parcial.\nCita 01-03-2026 para reevaluacion."
+    },
+    {
+      "id": "visit_single_visit_control",
+      "variant": "f",
+      "expected_unique_visit_count": 1,
+      "expected_visit_dates": ["2026-02-11"],
+      "text": "Consulta 11/02/2026: examen general y tratamiento inicial."
+    },
+    {
+      "id": "visit_duplicate_formats_same_visit",
+      "variant": "g",
+      "expected_unique_visit_count": 1,
+      "expected_visit_dates": ["2026-02-18"],
+      "text": "Visita 18/02/2026: control.\nEn cabecera: fecha de consulta 2026-02-18."
+    }
+  ]
+}

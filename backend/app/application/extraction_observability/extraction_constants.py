@@ -1,0 +1,33 @@
+"""Compatibility re-export for shared extraction constants."""
+
+from backend.app.application.extraction_constants import (
+    CLINIC_ADDRESS_MIN_LENGTH,
+    CLINIC_NAME_MIN_LENGTH,
+    DAYS_PER_YEAR,
+    MAX_PET_AGE_YEARS,
+    MAX_VALUE_LENGTH,
+    MICROCHIP_MAX_DIGITS,
+    MICROCHIP_MIN_DIGITS,
+    OWNER_ADDRESS_MAX_LENGTH,
+    PET_NAME_MIN_LENGTH,
+    PHONE_DIGIT_COUNT,
+    QUALITY_SCORE_THRESHOLD,
+    WEIGHT_MAX_KG,
+    WEIGHT_MIN_KG,
+)
+
+__all__ = [
+    "CLINIC_ADDRESS_MIN_LENGTH",
+    "CLINIC_NAME_MIN_LENGTH",
+    "DAYS_PER_YEAR",
+    "MAX_PET_AGE_YEARS",
+    "MAX_VALUE_LENGTH",
+    "MICROCHIP_MAX_DIGITS",
+    "MICROCHIP_MIN_DIGITS",
+    "OWNER_ADDRESS_MAX_LENGTH",
+    "PET_NAME_MIN_LENGTH",
+    "PHONE_DIGIT_COUNT",
+    "QUALITY_SCORE_THRESHOLD",
+    "WEIGHT_MAX_KG",
+    "WEIGHT_MIN_KG",
+]

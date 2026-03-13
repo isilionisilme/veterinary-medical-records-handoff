@@ -1,0 +1,97 @@
+{
+  "description": "Synthetic raw-text fixtures with expected dob (date of birth) extraction",
+  "version": "2026-03-04",
+  "cases": [
+    {
+      "id": "dob_label_fecha_nacimiento_standard",
+      "expected_dob": "15/03/2018",
+      "text": "Paciente: Luna\nFecha de nacimiento: 15/03/2018\nEspecie: Canina"
+    },
+    {
+      "id": "dob_label_f_nac_short_year",
+      "expected_dob": "03/07/15",
+      "text": "Nombre: Rex\nF. Nac.: 3/7/15\nSexo: Macho"
+    },
+    {
+      "id": "dob_label_fnto_iso_format",
+      "expected_dob": "10/01/2020",
+      "text": "Paciente: Kira\nF/Nto: 2020-01-10\nRaza: Golden"
+    },
+    {
+      "id": "dob_label_nacimiento_dot_separator",
+      "expected_dob": "08/12/2019",
+      "text": "Nombre: Toby\nNacimiento: 08.12.2019\nPeso: 7 kg"
+    },
+    {
+      "id": "dob_label_nac_dash_separator",
+      "expected_dob": "22/06/2017",
+      "text": "Paciente: Max\nNac.: 22-06-2017\nEspecie: Canina"
+    },
+    {
+      "id": "dob_label_dob_english",
+      "expected_dob": "01/11/2021",
+      "text": "Patient: Milo\nDOB: 01/11/2021\nBreed: Labrador"
+    },
+    {
+      "id": "dob_label_fecha_nac_short",
+      "expected_dob": "05/01/20",
+      "text": "Paciente: Nila\nFecha nac: 5/1/20\nChip: 941000024967769"
+    },
+    {
+      "id": "dob_label_f_nac_dash_prefix",
+      "expected_dob": "30/04/2016",
+      "text": "Nombre: Thor\nF Nac - 30/04/2016\nSexo: Macho"
+    },
+    {
+      "id": "dob_ocr_noise_typo_fcha",
+      "expected_dob": "12/09/2019",
+      "text": "Paciente: Duna\nFcha nacimiento: 12/09/2019\nEspecie: Felina"
+    },
+    {
+      "id": "dob_ocr_double_space_label",
+      "expected_dob": "18/02/2020",
+      "text": "Nombre: Rocky\nFecha  de  nacimiento: 18/02/2020\nRaza: Mestiza"
+    },
+    {
+      "id": "dob_embedded_in_patient_block",
+      "expected_dob": "25/11/2018",
+      "text": "DATOS DEL PACIENTE\nNombre: Kira | Especie: Canina | Nac.: 25/11/2018 | Chip: 982000411223344"
+    },
+    {
+      "id": "dob_null_no_birthdate",
+      "expected_dob": null,
+      "text": "Paciente: Luna\nEspecie: Canina\nRaza: Golden\nSexo: Hembra"
+    },
+    {
+      "id": "dob_null_visit_date_only",
+      "expected_dob": null,
+      "text": "Paciente: Max\nFecha de visita: 10/02/2024\nMotivo: Vacunación anual"
+    },
+    {
+      "id": "dob_null_discharge_and_document_dates",
+      "expected_dob": null,
+      "text": "Paciente: Toby\nFecha documento: 01/03/2024\nAlta: 05/03/2024\nDiagnóstico: Otitis"
+    },
+    {
+      "id": "dob_with_visit_date_distinct",
+      "expected_dob": "15/03/2018",
+      "text": "Paciente: Luna\nFecha de nacimiento: 15/03/2018\nFecha de visita: 10/02/2024\nMotivo: Revisión"
+    
+},
+    {
+      "id": "dob_null_only_consulta_unlabeled",
+      "expected_dob": null,
+      "text": "Paciente: Rex\nConsulta: 22/01/2025\nVeterinario: Dr. Pérez"
+    },
+    {
+      "id": "dob_null_only_alta_unlabeled",
+      "expected_dob": null,
+      "text": "Paciente: Mía\nAlta: 05/03/2024\nTratamiento: Antibiótico"
+    },
+    {
+      "id": "dob_multiline_label_and_value",
+      "expected_dob": "20/07/2019",
+      "text": "Paciente: Bimba\nFecha de nacimiento:\n20/07/2019\nEspecie: Felina"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .panel-shell {
+    @apply rounded-card border border-borderSubtle bg-surface;
+  }
+
+  .panel-shell-muted {
+    @apply rounded-card border border-borderSubtle bg-surfaceMuted;
+  }
+}
+
+:root {
+  --app-bg: #ebf5ff;
+  --canvas-bg: #ffffff;
+  --card-bg: #ffffff;
+  --app-frame: var(--canvas-bg);
+  --surface: var(--card-bg);
+  --surface-muted: #f2f5f8;
+  --border-subtle: #cfd8e3;
+  --shadow-soft: none;
+
+  --radius-frame: 14px;
+  --radius-card: 10px;
+  --radius-control: 8px;
+  --canvas-gap: 12px;
+
+  --color-page-bg: var(--app-bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-text: #1f2933;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --text-title: var(--color-text);
+  --text-body: var(--color-text);
+  --text-muted: var(--color-text-secondary);
+  --color-border: #d7dee7;
+  --color-border-subtle: var(--border-subtle);
+  --color-accent: #e5603d;
+  --color-accent-foreground: #ffffff;
+  --shadow-subtle: none;
+
+  --status-success: #3f9e86;
+  --status-warn: #c99645;
+  --status-error: #c45f5c;
+  --status-success-bg: #e7f4ef;
+  --status-info-bg: #f3f6f9;
+  --status-error-bg: #f9eceb;
+  --confidence-low: var(--status-error);
+  --confidence-med: var(--status-warn);
+  --confidence-high: var(--status-success);
+  --status-critical: var(--status-error);
+  --status-missing: #9ca3af;
+  --dot-offset: 2px;
+  --field-row-dot-col: 16px;
+  --field-row-label-col: 132px;
+  --field-row-gap-x: 8px;
+  --field-row-gap-y: 11px;
+  --field-row-label-indent: 10px;
+  --field-row-gap: var(--field-row-gap-x);
+  --value-padding-short-x: 12px;
+  --value-padding-short-y: 6px;
+  --value-padding-long-x: 12px;
+  --value-padding-long-y: 10px;
+  --long-text-min-height: 88px;
+  --long-text-max-height: 200px;
+
+  --page-bg: var(--color-page-bg);
+  --title-accent: var(--color-accent);
+}
+
+body {
+  /* prettier-ignore */
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-text);
+  background: var(--color-page-bg);
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.pdf-debug-no-transform-subtree,
+.pdf-debug-no-transform-subtree * {
+  transform: none !important;
+}
+
+body.pdf-debug-no-motion,
+body.pdf-debug-no-motion * {
+  transition: none !important;
+  animation: none !important;
+}

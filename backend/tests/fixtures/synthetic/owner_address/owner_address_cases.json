@@ -1,0 +1,101 @@
+{
+  "description": "Synthetic raw-text fixtures with expected owner_address extraction",
+  "version": "2026-03-06",
+  "cases": [
+    {
+      "id": "owner_address_label_direccion_propietario_standard",
+      "expected_owner_address": "Calle Mayor 12, 28013 Madrid",
+      "text": "Propietario: Juan Garcia\nDireccion del propietario: Calle Mayor 12, 28013 Madrid\nPaciente: Luna"
+    },
+    {
+      "id": "owner_address_label_domicilio_propietario",
+      "expected_owner_address": "Avenida de la Paz 44, 41001 Sevilla",
+      "text": "Datos del cliente\nDomicilio del propietario: Avenida de la Paz 44, 41001 Sevilla\nTelefono: 600123123"
+    },
+    {
+      "id": "owner_address_context_owner_block",
+      "expected_owner_address": "Plaza del Sol 3, 46001 Valencia",
+      "text": "DATOS DEL CLIENTE\nNombre: Marta Ruiz\nDireccion: Plaza del Sol 3, 46001 Valencia\nNIF: 12345678A"
+    },
+    {
+      "id": "owner_address_abbrev_c_slash",
+      "expected_owner_address": "C/ Ortega y Gasset 5, 28006 Madrid",
+      "text": "Titular: Beatriz Abarca\nDir. propietario: C/ Ortega y Gasset 5, 28006 Madrid\nPaciente: Nala"
+    },
+    {
+      "id": "owner_address_abbrev_avda",
+      "expected_owner_address": "Avda. Libertad 102, 15004 A Coruna",
+      "text": "Propietario\nDireccion del titular: Avda. Libertad 102, 15004 A Coruna\nEmail: test@example.com"
+    },
+    {
+      "id": "owner_address_abbrev_pza_cp",
+      "expected_owner_address": "Pza. Castilla 8, CP 28046 Madrid",
+      "text": "Datos propietario\nDomicilio: Pza. Castilla 8, CP 28046 Madrid\nMovil: 611222333"
+    },
+    {
+      "id": "owner_address_multiline_two_lines",
+      "expected_owner_address": "Calle Rio Duero 7\n28020 Madrid",
+      "text": "Propietario: Lucia Torres\nDireccion del propietario:\nCalle Rio Duero 7\n28020 Madrid\nPaciente: Kira"
+    },
+    {
+      "id": "owner_address_mixed_name_plus_address",
+      "expected_owner_address": "C/ Sol 9, 08002 Barcelona",
+      "text": "Titular: Juan Garcia C/ Sol 9, 08002 Barcelona\nPaciente: Coco"
+    },
+    {
+      "id": "owner_address_label_dir_titular",
+      "expected_owner_address": "Calle del Prado 11, 28014 Madrid",
+      "text": "Ficha cliente\nDir. titular: Calle del Prado 11, 28014 Madrid\nTelefono: 699888777"
+    },
+    {
+      "id": "owner_address_label_dir_propietario_short",
+      "expected_owner_address": "Avenida Europa 77, 29010 Malaga",
+      "text": "Cliente\nDir. propietario: Avenida Europa 77, 29010 Malaga\nMascota: Thor"
+    },
+    {
+      "id": "owner_address_dual_owner_and_clinic_owner_wins",
+      "expected_owner_address": "Calle Violeta 14, 03001 Alicante",
+      "text": "Clinica Veterinaria Sol\nDireccion: Avenida Clinica 99, 03005 Alicante\nDatos del propietario\nDireccion: Calle Violeta 14, 03001 Alicante"
+    },
+    {
+      "id": "owner_address_ambiguous_context_owner_hint",
+      "expected_owner_address": "Calle Limon 21, 50002 Zaragoza",
+      "text": "CLIENTE / TITULAR\nNombre: Pedro Marin\nDireccion: Calle Limon 21, 50002 Zaragoza\nPaciente: Misu"
+    },
+    {
+      "id": "owner_address_null_no_owner_address_present",
+      "expected_owner_address": null,
+      "text": "Paciente: Luna\nEspecie: Canina\nRaza: Mestiza\nMicrochip: 941000024967769"
+    },
+    {
+      "id": "owner_address_null_clinic_only_address",
+      "expected_owner_address": null,
+      "text": "Clinica Veterinaria Central\nDireccion de la clinica: Calle Salud 1, 28001 Madrid\nTelefono: 915000000"
+    },
+    {
+      "id": "owner_address_null_ambiguous_without_owner_context",
+      "expected_owner_address": null,
+      "text": "Informe de consulta\nDireccion: Calle Consulta 55, 28010 Madrid\nVeterinario: Dra. Perez"
+    },
+    {
+      "id": "owner_address_null_owner_label_but_no_address_tokens",
+      "expected_owner_address": null,
+      "text": "Propietario: Juan Ruiz\nDireccion del propietario: S/N\nPaciente: Lola"
+    },
+    {
+      "id": "owner_address_null_owner_block_missing_value",
+      "expected_owner_address": null,
+      "text": "DATOS DEL PROPIETARIO\nNombre: Ana\nDireccion del propietario:\nTelefono: 655111222"
+    },
+    {
+      "id": "owner_address_positive_domicilio_titular",
+      "expected_owner_address": "Calle Norte 2, 33201 Gijon",
+      "text": "Titular del animal\nDomicilio del titular: Calle Norte 2, 33201 Gijon\nNIF: 55667788Z"
+    },
+    {
+      "id": "owner_address_positive_context_line_after_label",
+      "expected_owner_address": "Avenida Mar 5, 35001 Las Palmas",
+      "text": "Datos cliente\nDireccion del propietario\nAvenida Mar 5, 35001 Las Palmas\nPaciente: Tiza"
+    }
+  ]
+}

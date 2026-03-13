@@ -1,0 +1,66 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      args:
+        APP_VERSION: ${APP_VERSION:-dev}
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+    environment:
+      VET_RECORDS_DB_PATH: /app/backend/data/documents.db
+      VET_RECORDS_STORAGE_PATH: /app/backend/storage
+      VET_RECORDS_CORS_ORIGINS: http://localhost,http://127.0.0.1,http://localhost:${FRONTEND_PORT:-5173},http://127.0.0.1:${FRONTEND_PORT:-5173}
+      VET_RECORDS_CONFIDENCE_POLICY_VERSION: ${VET_RECORDS_CONFIDENCE_POLICY_VERSION:-v1-local}
+      VET_RECORDS_CONFIDENCE_LOW_MAX: ${VET_RECORDS_CONFIDENCE_LOW_MAX:-0.50}
+      VET_RECORDS_CONFIDENCE_MID_MAX: ${VET_RECORDS_CONFIDENCE_MID_MAX:-0.75}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
+    stop_grace_period: 45s
+    volumes:
+      - ${BACKEND_DATA_DIR:-./backend/data}:/app/backend/data
+      - ${BACKEND_STORAGE_DIR:-./backend/storage}:/app/backend/storage
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-5173}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 10s
+
+  backend-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: test
+    profiles: ["test"]
+    command: ["pytest", "backend/tests", "-q"]
+    environment:
+      VET_RECORDS_DB_PATH: /tmp/documents.db
+      VET_RECORDS_STORAGE_PATH: /tmp/storage
+      VET_RECORDS_CONFIDENCE_POLICY_VERSION: ${VET_RECORDS_CONFIDENCE_POLICY_VERSION:-v1-local}
+      VET_RECORDS_CONFIDENCE_LOW_MAX: ${VET_RECORDS_CONFIDENCE_LOW_MAX:-0.50}
+      VET_RECORDS_CONFIDENCE_MID_MAX: ${VET_RECORDS_CONFIDENCE_MID_MAX:-0.75}
+
+  frontend-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: dev
+    profiles: ["test"]
+    command: ["npm", "run", "test"]

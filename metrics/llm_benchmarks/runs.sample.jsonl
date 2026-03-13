@@ -1,0 +1,1 @@
+{"date_utc":"2026-02-09T00:00:00Z","commit_sha":"0000000000000000000000000000000000000000","scenario_id":"start_new_work","run_id":"20260209T000000Z-sample","agent":"codex_cli","model":"unknown","reasoning_effort":"unknown","metrics":{"docs":[],"unique_docs_opened":0,"chars_read":0,"tok_est":0,"max_doc_chars":0,"fallback_count":0,"clarifying_questions":0,"violations":[]}}

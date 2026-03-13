@@ -1,0 +1,42 @@
+{
+  "description": "Synthetic raw-text fixtures with expected weight extraction",
+  "version": "2026-03-06",
+  "cases": [
+    {
+      "id": "multi_visit_two_weights_latest_should_win",
+      "scenario": "multi-visit-latest-chronological",
+      "expected_weight": "8.5 kg",
+      "text": "Visita 15/01/2026: Peso: 8.2 kg. Evolucion favorable. Visita 22/01/2026: Peso: 8.5 kg. Continuar control."
+    },
+    {
+      "id": "global_header_only_weight",
+      "scenario": "global-only-header",
+      "expected_weight": "12 kg",
+      "text": "Paciente: Nala. Especie: Canina. Peso: 12 kg. Vacunacion al dia."
+    },
+    {
+      "id": "multi_visit_signos_vitales_and_labeled_weight",
+      "scenario": "multi-visit-signos-vitales",
+      "expected_weight": "26 kg",
+      "text": "Consulta 10/02/2026. Signos vitales: FC 110 lpm, FR 24 rpm, 25.5 kg. Consulta 03/03/2026. Peso: 26 kg."
+    },
+    {
+      "id": "dose_mlkg_should_not_override_weight",
+      "scenario": "dose-guard-with-mlkg",
+      "expected_weight": "4.2 kg",
+      "text": "Dosis: 0.5 ml/kg cada 12h. Visita 01/01/2026: Peso: 4.2 kg."
+    },
+    {
+      "id": "multi_visit_without_weight",
+      "scenario": "no-weight-two-visits",
+      "expected_weight": null,
+      "text": "Visita 11/01/2026: Diagnostico de gastritis. Visita 18/01/2026: Control clinico, sin datos de peso."
+    },
+    {
+      "id": "one_visit_with_weight_other_without",
+      "scenario": "one-visit-weight-one-visit-missing",
+      "expected_weight": "9.1 kg",
+      "text": "Visita 08/02/2026: Diagnostico de dermatitis. Visita 20/02/2026: Peso: 9.1 kg."
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Detect changed paths ──────────────────────────────────
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'requirements*.txt'
+              - 'pyproject.toml'
+              - 'pytest.ini'
+            frontend:
+              - 'frontend/**'
+
+  frontend_test_build:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if npm --prefix frontend ci --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000; then
+              exit 0
+            fi
+            echo "npm ci failed (attempt $attempt/3), retrying..."
+            sleep 5
+          done
+          echo "npm ci failed after 3 attempts"
+          exit 1
+      - name: Run ESLint
+        run: npm --prefix frontend run lint
+      - name: Check Prettier formatting
+        run: npm --prefix frontend run format:check
+      - name: Run frontend tests with coverage
+        run: npm --prefix frontend run test:coverage
+      - name: Run frontend build
+        run: npm --prefix frontend run build
+      - name: Security audit (npm audit)
+        run: npm --prefix frontend audit --audit-level=high
+
+  frontend_design_system_guard:
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if npm --prefix frontend ci --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000; then
+              exit 0
+            fi
+            echo "npm ci failed (attempt $attempt/3), retrying..."
+            sleep 5
+          done
+          echo "npm ci failed after 3 attempts"
+          exit 1
+      - name: Run design system guard
+        run: npm --prefix frontend run check:design-system
+
+  quality:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-dev.txt', 'backend/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run Ruff
+        run: ruff check .
+      - name: Check Ruff formatting
+        run: ruff format --check .
+      - name: Run Pytest with coverage
+        run: pytest -x --tb=short --cov=backend/app --cov-report=term-missing
+      - name: Security audit (pip-audit)
+        run: >
+          pip-audit --requirement backend/requirements.txt --strict
+
+  complexity_gate:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-dev.txt', 'backend/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run complexity gate
+        run: |
+          python scripts/quality/architecture_metrics.py --check --base-ref "${{ github.event.pull_request.base.sha }}" --warn-cc 11 --max-cc 30 --max-loc 500
+
+  docker_packaging_guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Detect Docker packaging-related changes
+        id: packaging_changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker_packaging:
+              - ".dockerignore"
+              - ".env.example"
+              - "Dockerfile.backend"
+              - "Dockerfile.frontend"
+              - "docker-compose.yml"
+              - "docker-compose.dev.yml"
+              - ".github/workflows/ci.yml"
+              - "shared/**"
+              - "backend/**"
+              - "frontend/**"
+      - name: Build backend image
+        if: steps.packaging_changes.outputs.docker_packaging == 'true'
+        run: docker build -f Dockerfile.backend -t vetrecords-backend:ci .
+      - name: Assert shared contract exists in backend image (no shell dependency)
+        if: steps.packaging_changes.outputs.docker_packaging == 'true'
+        run: |
+          set -euo pipefail
+          cid="$(docker create vetrecords-backend:ci)"
+          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          docker cp "$cid:/app/shared/global_schema_contract.json" /tmp/backend_global_schema_contract.json
+          test -f /tmp/backend_global_schema_contract.json
+      - name: Build frontend image
+        if: steps.packaging_changes.outputs.docker_packaging == 'true'
+        run: docker build -f Dockerfile.frontend -t vetrecords-frontend:ci .
+      - name: Assert shared contract exists in frontend image (no shell dependency)
+        if: steps.packaging_changes.outputs.docker_packaging == 'true'
+        run: |
+          set -euo pipefail
+          cid="$(docker create vetrecords-frontend:ci)"
+          trap 'docker rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          docker cp "$cid:/app/shared/global_schema_contract.json" /tmp/frontend_global_schema_contract.json
+          test -f /tmp/frontend_global_schema_contract.json
+      - name: Docker packaging guard skipped (no relevant changes)
+        if: steps.packaging_changes.outputs.docker_packaging != 'true'
+        run: echo "No Docker packaging-relevant changes detected; skipping Docker image guard."
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [changes, docker_packaging_guard]
+    if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') && (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if npm --prefix frontend ci --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000; then
+              exit 0
+            fi
+            echo "npm ci failed (attempt $attempt/3), retrying..."
+            sleep 5
+          done
+          echo "npm ci failed after 3 attempts"
+          exit 1
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Start Docker stack for E2E
+        env:
+          FRONTEND_PORT: "5173"
+          BACKEND_DATA_DIR: /tmp/vet-backend-data
+          BACKEND_STORAGE_DIR: /tmp/vet-backend-storage
+        run: |
+          mkdir -p "$BACKEND_DATA_DIR" "$BACKEND_STORAGE_DIR"
+          chmod -R 777 "$BACKEND_DATA_DIR" "$BACKEND_STORAGE_DIR"
+          docker compose up -d --wait
+      - name: Dump Docker logs on startup failure
+        if: failure()
+        run: docker compose logs --tail 200
+      - name: Run Playwright E2E suite
+        env:
+          PLAYWRIGHT_EXTERNAL_SERVERS: "1"
+          PLAYWRIGHT_BASE_URL: "http://127.0.0.1:5173"
+          PLAYWRIGHT_CI_WORKERS: "12"
+        run: npm --prefix frontend run test:e2e
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          if-no-files-found: ignore
+      - name: Upload Playwright test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: frontend/test-results/
+          if-no-files-found: ignore

@@ -1,0 +1,96 @@
+{
+  "description": "Synthetic raw-text fixtures with expected clinic_address extraction",
+  "version": "2026-03-03",
+  "cases": [
+    {
+      "id": "addr_label_direccion_single_line",
+      "text": "Clínica Veterinaria Norte\nDirección: Av. Norte 99, 28001 Madrid\nPaciente: Luna",
+      "expected_clinic_address": "Av. Norte 99, 28001 Madrid"
+    },
+    {
+      "id": "addr_label_domicilio_single_line",
+      "text": "Centro Veterinario Sol\nDomicilio: Calle Alcalá 120, 28009 Madrid\nTel: 910000000",
+      "expected_clinic_address": "Calle Alcalá 120, 28009 Madrid"
+    },
+    {
+      "id": "addr_label_dir_abbrev",
+      "text": "Hospital Veterinario del Sur\nDir.: C/ Mayor 45, 46001 Valencia\nNHC: 12345",
+      "expected_clinic_address": "C/ Mayor 45, 46001 Valencia"
+    },
+    {
+      "id": "addr_label_multiline_cp_city_next_line",
+      "text": "Clínica: VetCare Centro\nDirección:\nCalle del Prado 18\n28014 Madrid\nPaciente: Kira",
+      "expected_clinic_address": "Calle del Prado 18 28014 Madrid"
+    },
+    {
+      "id": "addr_label_multiline_with_floor",
+      "text": "Centro Veterinario Mirasierra\nDirección:\nAvda. de la Ilustración 22, 1º B\n28029 Madrid",
+      "expected_clinic_address": "Avda. de la Ilustración 22, 1º B 28029 Madrid"
+    },
+    {
+      "id": "addr_unlabeled_header_then_address",
+      "text": "CLINICA SAN JORGE\nCalle Real 12, 09003 Burgos\nPaciente: Rocky",
+      "expected_clinic_address": "Calle Real 12, 09003 Burgos"
+    },
+    {
+      "id": "addr_unlabeled_with_avenida",
+      "text": "Hospital Animalia\nAvenida de Europa 101, 28922 Alcorcón\nVeterinario: Dr. Ruiz",
+      "expected_clinic_address": "Avenida de Europa 101, 28922 Alcorcón"
+    },
+    {
+      "id": "addr_abbrev_ctra",
+      "text": "Centro Vet Campo\nDirección: Ctra. de Toledo km 7, 45008 Toledo\nPaciente: Nilo",
+      "expected_clinic_address": "Ctra. de Toledo km 7, 45008 Toledo"
+    },
+    {
+      "id": "addr_abbrev_pza_numero",
+      "text": "Clínica Felina Plaza\nDir.: Pza. España Nº 3, 1A, 41013 Sevilla",
+      "expected_clinic_address": "Pza. España Nº 3, 1A, 41013 Sevilla"
+    },
+    {
+      "id": "addr_with_camino",
+      "text": "Hospital Vet Sierra\nDomicilio: Camino Viejo de Leganés 8, 28911 Leganés",
+      "expected_clinic_address": "Camino Viejo de Leganés 8, 28911 Leganés"
+    },
+    {
+      "id": "addr_owner_address_should_not_be_clinic",
+      "text": "Propietario: Ana Pérez\nDirección del propietario: C/ Luna 5, 28080 Madrid\nClínica: Centro Vet Norte\nDirección de la clínica: Av. Moratalaz 10, 28030 Madrid",
+      "expected_clinic_address": "Av. Moratalaz 10, 28030 Madrid"
+    },
+    {
+      "id": "addr_owner_only_should_be_null",
+      "text": "Propietario: Luis García\nDirección: C/ Falsa 123, 28080 Madrid\nPaciente: Toby\nEspecie: Canina",
+      "expected_clinic_address": null
+    },
+    {
+      "id": "addr_null_no_address_present",
+      "text": "Paciente: Mía\nEspecie: Felina\nRaza: Europeo\nVet: Dra. López",
+      "expected_clinic_address": null
+    },
+    {
+      "id": "addr_null_phone_and_email_only",
+      "text": "Clínica Vet Mar\nTeléfono: 934001122\nEmail: contacto@vetmar.es\nPaciente: Thor",
+      "expected_clinic_address": null
+    },
+    {
+      "id": "addr_multiline_with_postal_code_prefix",
+      "text": "Centro Veterinario Costa\nDirección:\nPaseo Marítimo 77\nCP 29640 Fuengirola",
+      "expected_clinic_address": "Paseo Marítimo 77 CP 29640 Fuengirola"
+    },
+    {
+      "id": "addr_unlabeled_ocrish_spacing",
+      "text": "HOSPITAL VETERINARIO AGORA\nC/   SAN   VICENTE   24 ,  03004   ALICANTE\nChip: 941000024967769",
+      "expected_clinic_address": "C/ SAN VICENTE 24, 03004 ALICANTE"
+    },
+    {
+      "id": "addr_combined_clinic_direction_label",
+      "text": "Centro Veterinario / Dirección: C/ Mayor 45, 46001 Valencia\nPaciente: Nilo",
+      "expected_clinic_address": "C/ Mayor 45, 46001 Valencia"
+    },
+    {
+      "id": "addr_header_block_with_postal_line",
+      "text": "PARQUE OESTE\nAVDA EUROPA\nLinea 4\n28922 ALCORCÓN\nDatos de la Mascota\nPaciente: Marley",
+      "expected_clinic_address": "AVDA EUROPA Linea 4 28922 ALCORCÓN"
+    }
+  ]
+}

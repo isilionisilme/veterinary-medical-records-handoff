@@ -1,0 +1,86 @@
+{
+  "description": "Synthetic raw-text fixtures with expected pet_name extraction",
+  "version": "2026-03-02",
+  "cases": [
+    {
+      "id": "labeled_paciente_basic",
+      "expected_pet_name": "Luna",
+      "text": "Paciente: Luna\nEspecie: Canina\nRaza: Mestiza"
+    },
+    {
+      "id": "labeled_nombre_del_paciente",
+      "expected_pet_name": "Rex",
+      "text": "Nombre del paciente: Rex\nSexo: Macho\nPeso: 22 kg"
+    },
+    {
+      "id": "labeled_patient_en",
+      "expected_pet_name": "Buddy",
+      "text": "Patient: Buddy\nSpecies: Canine\nWeight: 18 kg"
+    },
+    {
+      "id": "labeled_with_trailing_birth",
+      "expected_pet_name": "Alya",
+      "text": "Paciente: ALYA - Nacimiento: 05/07/2018\nChip:\n00023035139"
+    },
+    {
+      "id": "unlabeled_uppercase_before_chip",
+      "expected_pet_name": "LUNA",
+      "text": "LUNA\nNº Chip\n941000024967769\nEspecie: Canina"
+    },
+    {
+      "id": "unlabeled_mixed_case_before_species",
+      "expected_pet_name": "Luna Bella",
+      "text": "Luna Bella\nEspecie/Raza: CANINA - YORKSHIRE TERRIER\nSexo: Hembra"
+    },
+    {
+      "id": "animal_label",
+      "expected_pet_name": "Kira",
+      "text": "Animal: Kira\nMotivo de visita: Vómitos"
+    },
+    {
+      "id": "mascota_label",
+      "expected_pet_name": "Nilo",
+      "text": "Mascota: Nilo\nEdad: 5 años\nPeso: 12,3 kg"
+    },
+    {
+      "id": "tabular_line",
+      "expected_pet_name": "Thor",
+      "text": "Paciente | Thor | Canino\nRaza | Labrador"
+    },
+    {
+      "id": "diacritics_name",
+      "expected_pet_name": "Ñoño",
+      "text": "Paciente: Ñoño\nEspecie: Felina"
+    },
+    {
+      "id": "roman_suffix",
+      "expected_pet_name": "Rex III",
+      "text": "Paciente: Rex III\nEspecie: Canina"
+    },
+    {
+      "id": "negative_numeric_only",
+      "expected_pet_name": null,
+      "text": "Paciente: 12345\nEspecie: Canina\nPeso: 8 kg"
+    },
+    {
+      "id": "negative_empty_label",
+      "expected_pet_name": null,
+      "text": "Paciente:\nEspecie: Canina\nRaza: Beagle"
+    },
+    {
+      "id": "negative_header_word_only",
+      "expected_pet_name": null,
+      "text": "NOMBRE\nEspecie: Canina\nRaza: Mestiza"
+    },
+    {
+      "id": "negative_paciente_multiline_bullet_treatment",
+      "expected_pet_name": null,
+      "text": "PACIENTE:\n- STEROVET A VELOCIDAD DE MANTENIMIENTO\nTratamiento: Prednicortone"
+    },
+    {
+      "id": "negative_no_pet_name_present",
+      "expected_pet_name": null,
+      "text": "Fecha: 04/10/19\nNº Chip\n941000024967769\nC/ CALLE DEMO 1 PORTAL 3 1F\nVet gastril 6ml cada 24h"
+    }
+  ]
+}

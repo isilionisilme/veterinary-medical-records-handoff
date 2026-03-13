@@ -1,0 +1,51 @@
+FROM python:3.11-slim AS prod
+
+ARG APP_VERSION=dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV APP_VERSION=${APP_VERSION}
+ENV GIT_COMMIT=${GIT_COMMIT}
+ENV BUILD_DATE=${BUILD_DATE}
+
+WORKDIR /app
+
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
+
+COPY backend /app/backend
+COPY shared /app/shared
+RUN rm -rf /app/backend/tests
+
+RUN adduser --disabled-password --no-create-home appuser \
+    && mkdir -p /app/backend/data /app/backend/storage \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8000
+
+ENV VET_RECORDS_DB_PATH=/app/backend/data/documents.db
+ENV VET_RECORDS_STORAGE_PATH=/app/backend/storage
+
+STOPSIGNAL SIGTERM
+CMD ["python", "-m", "uvicorn", "backend.app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--timeout-graceful-shutdown", "30"]
+
+FROM prod AS test
+
+USER root
+
+COPY backend/tests /app/backend/tests
+COPY requirements-dev.txt /app/requirements-dev.txt
+COPY scripts /app/scripts
+COPY docs /app/docs
+COPY .github/workflows/ci.yml /app/.github/workflows/ci.yml
+COPY metrics/llm_benchmarks/SCENARIOS.md /app/metrics/llm_benchmarks/SCENARIOS.md
+COPY Dockerfile.backend /app/Dockerfile.backend
+COPY Dockerfile.frontend /app/Dockerfile.frontend
+COPY frontend/src/lib/globalSchema.ts /app/frontend/src/lib/globalSchema.ts
+RUN pip install --no-cache-dir -r /app/requirements-dev.txt
+
+USER appuser
