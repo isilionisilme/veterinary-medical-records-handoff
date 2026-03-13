@@ -1,12 +1,12 @@
 ---
-title: "Delivery Summary — improvement/refactor"
+title: "Delivery Summary"
 type: reference
 status: active
 audience: all
 last-updated: 2026-03-02
 ---
 
-# Delivery Summary — `improvement/refactor`
+# Delivery Summary
 
 
 **Breadcrumbs:** [Docs](../../../README.md) / [Projects](../../README.md) / veterinary-medical-records / 04-delivery
