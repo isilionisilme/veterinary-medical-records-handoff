@@ -12,7 +12,8 @@ import {
 } from "../ui/dialog";
 import { type ProcessingHistoryRun } from "../../types/appWorkspace";
 import { type VisitScopingMetricsResponse } from "../../types/appWorkspace";
-import { ProcessingHistorySection } from "./ProcessingHistorySection";
+import { RawTextTab } from "./RawTextTab";
+import { TechnicalTab } from "./TechnicalTab";
 import { UploadPanel } from "./UploadPanel";
 
 const PdfViewer = lazy(() =>
@@ -295,225 +296,51 @@ export function PdfViewerPanel({
               </>
             )}
           {activeViewerTab === "raw_text" && (
-            <div className="flex h-full flex-col rounded-card border border-borderSubtle bg-surface p-4">
-              <div className="rounded-control border border-borderSubtle bg-surface px-2 py-2">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-1">{viewerModeToolbarIcons}</div>
-                  <div className="flex items-center gap-1">{viewerDownloadIcon}</div>
-                </div>
-              </div>
-              <div className="rounded-card border border-borderSubtle bg-surface p-3">
-                <div className="flex flex-col gap-2 text-xs text-ink">
-                  <span className="text-textSecondary">
-                    ¿El texto no es correcto? Puedes reprocesarlo para regenerar la extracción.
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      type="button"
-                      disabled={!activeId || isActiveDocumentProcessing || reprocessPending}
-                      onClick={onOpenRetryModal}
-                    >
-                      {reprocessPending ||
-                      (Boolean(activeId) &&
-                        reprocessingDocumentId === activeId &&
-                        (!hasObservedProcessingAfterReprocess || isActiveDocumentProcessing))
-                        ? "Reprocesando..."
-                        : isActiveDocumentProcessing
-                          ? "Procesando..."
-                          : "Reprocesar"}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  data-testid="raw-text-search-input"
-                  className="w-full rounded-control border border-borderSubtle bg-surface px-3 py-2 text-xs text-text outline-none placeholder:text-textSecondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:w-64"
-                  placeholder="Buscar en el texto"
-                  value={rawSearch}
-                  disabled={!canSearchRawText}
-                  onChange={(event) => setRawSearch(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      onRawSearch();
-                    }
-                  }}
-                />
-                <Button type="button" disabled={!canSearchRawText} onClick={onRawSearch}>
-                  Buscar
-                </Button>
-                <Button
-                  data-testid="raw-text-copy"
-                  type="button"
-                  disabled={!canCopyRawText || isCopyingRawText}
-                  onClick={() => {
-                    void onCopyRawText();
-                  }}
-                >
-                  {isCopyingRawText
-                    ? "Copiando..."
-                    : copyFeedback === "Texto copiado."
-                      ? "Copiado"
-                      : "Copiar todo"}
-                </Button>
-                <Button
-                  data-testid="raw-text-download"
-                  type="button"
-                  disabled={!rawTextContent}
-                  onClick={onDownloadRawText}
-                >
-                  Descargar texto (.txt)
-                </Button>
-              </div>
-              {copyFeedback && (
-                <p className="mt-2 text-xs text-textSecondary" role="status" aria-live="polite">
-                  {copyFeedback}
-                </p>
-              )}
-              {hasRawText && rawSearchNotice && (
-                <p className="mt-2 text-xs text-textSecondary">{rawSearchNotice}</p>
-              )}
-              {isRawTextLoading && (
-                <p className="mt-2 text-xs text-textSecondary">Cargando texto extraído...</p>
-              )}
-              {rawTextErrorMessage && (
-                <p className="mt-2 text-xs text-statusError">{rawTextErrorMessage}</p>
-              )}
-              <div className="mt-3 flex-1 overflow-y-auto rounded-card border border-borderSubtle bg-surface p-3 font-mono text-xs text-textSecondary">
-                {rawTextContent ? <pre>{rawTextContent}</pre> : "Sin texto extraído."}
-              </div>
-            </div>
+            <RawTextTab
+              viewerModeToolbarIcons={viewerModeToolbarIcons}
+              viewerDownloadIcon={viewerDownloadIcon}
+              activeId={activeId}
+              isActiveDocumentProcessing={isActiveDocumentProcessing}
+              reprocessPending={reprocessPending}
+              reprocessingDocumentId={reprocessingDocumentId}
+              hasObservedProcessingAfterReprocess={hasObservedProcessingAfterReprocess}
+              onOpenRetryModal={onOpenRetryModal}
+              rawSearch={rawSearch}
+              setRawSearch={setRawSearch}
+              canSearchRawText={canSearchRawText}
+              hasRawText={hasRawText}
+              rawSearchNotice={rawSearchNotice}
+              isRawTextLoading={isRawTextLoading}
+              rawTextErrorMessage={rawTextErrorMessage}
+              rawTextContent={rawTextContent}
+              onRawSearch={onRawSearch}
+              canCopyRawText={canCopyRawText}
+              isCopyingRawText={isCopyingRawText}
+              copyFeedback={copyFeedback}
+              onCopyRawText={onCopyRawText}
+              onDownloadRawText={onDownloadRawText}
+            />
           )}
           {activeViewerTab === "technical" && (
-            <div className="h-full overflow-y-auto rounded-card border border-borderSubtle bg-surface p-3">
-              <div className="rounded-control border border-borderSubtle bg-surface px-2 py-2">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-1">{viewerModeToolbarIcons}</div>
-                  <div className="flex items-center gap-1">{viewerDownloadIcon}</div>
-                </div>
-              </div>
-              <div className="mt-3 rounded-card border border-borderSubtle bg-surface p-3">
-                <ProcessingHistorySection
-                  activeId={activeId}
-                  isActiveDocumentProcessing={isActiveDocumentProcessing}
-                  reprocessPending={reprocessPending}
-                  onOpenRetryModal={onOpenRetryModal}
-                  processingHistoryIsLoading={processingHistoryIsLoading}
-                  processingHistoryIsError={processingHistoryIsError}
-                  processingHistoryErrorMessage={processingHistoryErrorMessage}
-                  processingHistoryRuns={processingHistoryRuns}
-                  expandedSteps={expandedSteps}
-                  onToggleStepDetails={onToggleStepDetails}
-                  formatRunHeader={formatRunHeader}
-                />
-              </div>
-              <div className="mt-3 rounded-card border border-borderSubtle bg-surface p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-                    Observabilidad de visitas
-                  </p>
-                  {visitScopingMetrics && (
-                    <span className="text-[11px] text-textSecondary">
-                      Document ID:{" "}
-                      <code className="rounded bg-surfaceMuted px-1 py-0.5 text-[11px]">
-                        {visitScopingMetrics.document_id}
-                      </code>
-                    </span>
-                  )}
-                </div>
-                {!activeId && (
-                  <p className="mt-2 text-xs text-muted">
-                    Selecciona un documento para ver métricas de visit-scoping.
-                  </p>
-                )}
-                {activeId && visitScopingIsLoading && (
-                  <p className="mt-2 text-xs text-muted">Cargando métricas de visit-scoping...</p>
-                )}
-                {activeId && visitScopingIsError && (
-                  <p className="mt-2 text-xs text-statusError">{visitScopingErrorMessage}</p>
-                )}
-                {activeId &&
-                  !visitScopingIsLoading &&
-                  !visitScopingIsError &&
-                  !visitScopingMetrics && (
-                    <p className="mt-2 text-xs text-muted">No hay métricas disponibles.</p>
-                  )}
-                {visitScopingMetrics && (
-                  <div className="mt-3 space-y-3">
-                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                      <div className="rounded-control border border-borderSubtle bg-surface p-2">
-                        <p className="text-[11px] text-muted">Visitas totales</p>
-                        <p className="text-sm font-semibold text-ink">
-                          {visitScopingMetrics.summary.total_visits}
-                        </p>
-                      </div>
-                      <div className="rounded-control border border-borderSubtle bg-surface p-2">
-                        <p className="text-[11px] text-muted">Visitas asignadas</p>
-                        <p className="text-sm font-semibold text-ink">
-                          {visitScopingMetrics.summary.assigned_visits}
-                        </p>
-                      </div>
-                      <div className="rounded-control border border-borderSubtle bg-surface p-2">
-                        <p className="text-[11px] text-muted">Visitas ancladas</p>
-                        <p className="text-sm font-semibold text-ink">
-                          {visitScopingMetrics.summary.anchored_visits}
-                        </p>
-                      </div>
-                      <div className="rounded-control border border-borderSubtle bg-surface p-2">
-                        <p className="text-[11px] text-muted">Campos sin asignar</p>
-                        <p className="text-sm font-semibold text-ink">
-                          {visitScopingMetrics.summary.unassigned_field_count}
-                        </p>
-                      </div>
-                      <div className="rounded-control border border-borderSubtle bg-surface p-2">
-                        <p className="text-[11px] text-muted">Raw text</p>
-                        <p className="text-sm font-semibold text-ink">
-                          {visitScopingMetrics.summary.raw_text_available
-                            ? "Disponible"
-                            : "No disponible"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="overflow-x-auto rounded-control border border-borderSubtle">
-                      <table className="min-w-full text-left text-xs">
-                        <thead className="bg-surfaceMuted text-textSecondary">
-                          <tr>
-                            <th className="px-2 py-1.5 font-medium">Visita</th>
-                            <th className="px-2 py-1.5 font-medium">Fecha</th>
-                            <th className="px-2 py-1.5 font-medium">Campos</th>
-                            <th className="px-2 py-1.5 font-medium">Anclada</th>
-                            <th className="px-2 py-1.5 font-medium">Chars contexto</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {visitScopingMetrics.visits.map((visit) => (
-                            <tr
-                              key={`visit-scoping-${visit.visit_index}-${visit.visit_id ?? "none"}`}
-                            >
-                              <td className="border-t border-borderSubtle px-2 py-1.5 text-ink">
-                                {visit.visit_id ?? `visit-${visit.visit_index}`}
-                              </td>
-                              <td className="border-t border-borderSubtle px-2 py-1.5 text-textSecondary">
-                                {visit.visit_date ?? "—"}
-                              </td>
-                              <td className="border-t border-borderSubtle px-2 py-1.5 text-textSecondary">
-                                {visit.field_count}
-                              </td>
-                              <td className="border-t border-borderSubtle px-2 py-1.5 text-textSecondary">
-                                {visit.anchored_in_raw_text ? "Sí" : "No"}
-                              </td>
-                              <td className="border-t border-borderSubtle px-2 py-1.5 text-textSecondary">
-                                {visit.raw_context_chars}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <TechnicalTab
+              viewerModeToolbarIcons={viewerModeToolbarIcons}
+              viewerDownloadIcon={viewerDownloadIcon}
+              activeId={activeId}
+              isActiveDocumentProcessing={isActiveDocumentProcessing}
+              reprocessPending={reprocessPending}
+              onOpenRetryModal={onOpenRetryModal}
+              processingHistoryIsLoading={processingHistoryIsLoading}
+              processingHistoryIsError={processingHistoryIsError}
+              processingHistoryErrorMessage={processingHistoryErrorMessage}
+              processingHistoryRuns={processingHistoryRuns}
+              expandedSteps={expandedSteps}
+              onToggleStepDetails={onToggleStepDetails}
+              formatRunHeader={formatRunHeader}
+              visitScopingMetrics={visitScopingMetrics}
+              visitScopingIsLoading={visitScopingIsLoading}
+              visitScopingIsError={visitScopingIsError}
+              visitScopingErrorMessage={visitScopingErrorMessage}
+            />
           )}
         </div>
       </div>
