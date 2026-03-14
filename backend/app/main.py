@@ -135,8 +135,10 @@ def create_app() -> FastAPI:
         app.state.scheduler = SchedulerLifecycle(scheduler_fn=processing_scheduler)
         if processing_enabled():
             await app.state.scheduler.start(repository=repository, storage=storage)
-        yield
-        await app.state.scheduler.stop()
+        try:
+            yield
+        finally:
+            await app.state.scheduler.stop()
 
     settings = get_settings()
 

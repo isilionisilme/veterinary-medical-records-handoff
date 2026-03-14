@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from backend.app.application.documents._edit_helpers import (
+    FieldChangeContext,
     _build_field_change_log,
     _build_global_schema_from_fields,
     _compose_field_mapping_confidence,
@@ -143,22 +144,24 @@ def test_sanitize_confidence_breakdown_removes_confidence_and_computes_mapping_c
 
 def test_build_field_change_log_contains_expected_contract_fields() -> None:
     event = _build_field_change_log(
-        document_id="doc-1",
-        run_id="run-1",
-        interpretation_id="interp-1",
-        base_version_number=1,
-        new_version_number=2,
+        ctx=FieldChangeContext(
+            document_id="doc-1",
+            run_id="run-1",
+            interpretation_id="interp-1",
+            base_version_number=1,
+            new_version_number=2,
+            created_at="2026-01-01T00:00:00+00:00",
+            occurred_at="2026-01-01T00:00:00+00:00",
+            context_key="ctx",
+            policy_version="v1",
+        ),
         field_id="field-1",
         field_key="pet_name",
         value_type="string",
         old_value="Luna",
         new_value="Luna II",
         change_type="updated",
-        created_at="2026-01-01T00:00:00+00:00",
-        occurred_at="2026-01-01T00:00:00+00:00",
-        context_key="ctx",
         mapping_id="map-1",
-        policy_version="v1",
     )
 
     assert event["event_type"] == "field_corrected"

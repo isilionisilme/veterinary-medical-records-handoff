@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from typing import Any
 from uuid import uuid4
 
@@ -161,34 +162,39 @@ def _sanitize_confidence_breakdown(field: dict[str, object]) -> dict[str, object
     return sanitized
 
 
+@dataclass(frozen=True, slots=True)
+class FieldChangeContext:
+    document_id: str
+    run_id: str
+    interpretation_id: str
+    base_version_number: int
+    new_version_number: int
+    created_at: str
+    occurred_at: str
+    context_key: str
+    policy_version: str
+
+
 def _build_field_change_log(
     *,
-    document_id: str,
-    run_id: str,
-    interpretation_id: str,
-    base_version_number: int,
-    new_version_number: int,
+    ctx: FieldChangeContext,
     field_id: str,
     field_key: str | None,
     value_type: str | None,
     old_value: object,
     new_value: object,
     change_type: str,
-    created_at: str,
-    occurred_at: str,
-    context_key: str,
     mapping_id: str | None,
-    policy_version: str,
 ) -> dict[str, object]:
     return {
         "event_type": "field_corrected",
         "source": "reviewer_edit",
-        "document_id": document_id,
-        "run_id": run_id,
+        "document_id": ctx.document_id,
+        "run_id": ctx.run_id,
         "change_id": str(uuid4()),
-        "interpretation_id": interpretation_id,
-        "base_version_number": base_version_number,
-        "new_version_number": new_version_number,
+        "interpretation_id": ctx.interpretation_id,
+        "base_version_number": ctx.base_version_number,
+        "new_version_number": ctx.new_version_number,
         "field_id": field_id,
         "field_key": field_key,
         "field_path": f"fields.{field_id}.value",
@@ -196,11 +202,11 @@ def _build_field_change_log(
         "old_value": old_value,
         "new_value": new_value,
         "change_type": change_type,
-        "created_at": created_at,
-        "occurred_at": occurred_at,
-        "context_key": context_key,
+        "created_at": ctx.created_at,
+        "occurred_at": ctx.occurred_at,
+        "context_key": ctx.context_key,
         "mapping_id": mapping_id,
-        "policy_version": policy_version,
+        "policy_version": ctx.policy_version,
     }
 
 

@@ -10,6 +10,7 @@ from backend.app.application.confidence_calibration import (
     resolve_calibration_policy_version,
 )
 from backend.app.application.documents._edit_helpers import (
+    FieldChangeContext,
     _build_field_change_log,
     _build_global_schema_from_fields,
     _compose_field_mapping_confidence,
@@ -280,24 +281,27 @@ def _apply_add_change(
     new_field_key = new_field.get("key")
     resolved_field_key = new_field_key if isinstance(new_field_key, str) else None
     updated_fields.append(new_field)
+    change_context = FieldChangeContext(
+        document_id=edit_context.document_id,
+        run_id=edit_context.run_id,
+        interpretation_id="",
+        base_version_number=edit_context.base_version_number,
+        new_version_number=edit_context.new_version_number,
+        created_at=edit_context.now_iso,
+        occurred_at=edit_context.occurred_at,
+        context_key=edit_context.context_key,
+        policy_version=edit_context.calibration_policy_version,
+    )
     field_change_logs.append(
         _build_field_change_log(
-            document_id=edit_context.document_id,
-            run_id=edit_context.run_id,
-            interpretation_id="",
-            base_version_number=edit_context.base_version_number,
-            new_version_number=edit_context.new_version_number,
+            ctx=change_context,
             field_id=new_field_id,
             field_key=resolved_field_key,
             value_type=value_type,
             old_value=None,
             new_value=change.get("value"),
             change_type="ADD",
-            created_at=edit_context.now_iso,
-            occurred_at=edit_context.occurred_at,
-            context_key=edit_context.context_key,
             mapping_id=None,
-            policy_version=edit_context.calibration_policy_version,
         )
     )
     return None
@@ -347,27 +351,30 @@ def _apply_existing_field_change(
     existing_value_type = existing_field.get("value_type")
     resolved_value_type = str(existing_value_type) if isinstance(existing_value_type, str) else None
     mapping_id = normalize_mapping_id(existing_field.get("mapping_id"))
+    change_context = FieldChangeContext(
+        document_id=edit_context.document_id,
+        run_id=edit_context.run_id,
+        interpretation_id="",
+        base_version_number=edit_context.base_version_number,
+        new_version_number=edit_context.new_version_number,
+        created_at=edit_context.now_iso,
+        occurred_at=edit_context.occurred_at,
+        context_key=edit_context.context_key,
+        policy_version=edit_context.calibration_policy_version,
+    )
 
     if op == "DELETE":
         updated_fields.pop(existing_index)
         field_change_logs.append(
             _build_field_change_log(
-                document_id=edit_context.document_id,
-                run_id=edit_context.run_id,
-                interpretation_id="",
-                base_version_number=edit_context.base_version_number,
-                new_version_number=edit_context.new_version_number,
+                ctx=change_context,
                 field_id=field_id,
                 field_key=resolved_field_key,
                 value_type=resolved_value_type,
                 old_value=old_value,
                 new_value=None,
                 change_type="DELETE",
-                created_at=edit_context.now_iso,
-                occurred_at=edit_context.occurred_at,
-                context_key=edit_context.context_key,
                 mapping_id=mapping_id,
-                policy_version=edit_context.calibration_policy_version,
             )
         )
         return None
@@ -411,22 +418,14 @@ def _apply_existing_field_change(
     }
     field_change_logs.append(
         _build_field_change_log(
-            document_id=edit_context.document_id,
-            run_id=edit_context.run_id,
-            interpretation_id="",
-            base_version_number=edit_context.base_version_number,
-            new_version_number=edit_context.new_version_number,
+            ctx=change_context,
             field_id=field_id,
             field_key=resolved_field_key,
             value_type=value_type,
             old_value=old_value,
             new_value=change.get("value"),
             change_type="UPDATE",
-            created_at=edit_context.now_iso,
-            occurred_at=edit_context.occurred_at,
-            context_key=edit_context.context_key,
             mapping_id=mapping_id,
-            policy_version=edit_context.calibration_policy_version,
         )
     )
     return None
