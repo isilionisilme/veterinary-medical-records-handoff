@@ -22,7 +22,10 @@ from backend.app.application.extraction_observability import (
 )
 from backend.app.config import extraction_observability_enabled
 
-from .routes_common import error_response, extraction_observability_disabled_response
+from .routes_common import (
+    error_response,
+    extraction_observability_disabled_response,
+)
 
 router = APIRouter(tags=["Calibration"])
 logger = logging.getLogger(__name__)
@@ -34,6 +37,12 @@ logger = logging.getLogger(__name__)
     status_code=status.HTTP_201_CREATED,
     summary="Persist extraction observability snapshot",
     description="Persist extraction run snapshot locally and log diff versus previous run.",
+    responses={
+        403: {"description": "Extraction observability disabled."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
+    },
 )
 def persist_debug_extraction_run(
     payload: ExtractionRunSnapshotRequest,

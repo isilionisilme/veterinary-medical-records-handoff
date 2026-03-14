@@ -124,6 +124,15 @@ def extraction_observability_enabled() -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def debug_endpoints_enabled() -> bool:
+    """Return whether review debug endpoints are enabled."""
+
+    raw = _current_settings().vet_records_debug_endpoints
+    if raw is None:
+        return False
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def auth_token() -> str | None:
     """Return optional API bearer token; empty values disable auth boundary."""
 

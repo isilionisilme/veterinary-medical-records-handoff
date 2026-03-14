@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import uuid4
 
+import pytest
+
 from backend.app.domain import models as app_models
 from backend.app.infra.file_storage import get_storage_root
 from backend.tests.integration.document_review_test_support import (
@@ -12,6 +14,11 @@ from backend.tests.integration.document_review_test_support import (
     _insert_structured_interpretation,
     _upload_sample_document,
 )
+
+
+@pytest.fixture(autouse=True)
+def _enable_review_debug_endpoints(monkeypatch) -> None:
+    monkeypatch.setenv("VET_RECORDS_DEBUG_ENDPOINTS", "1")
 
 
 def test_document_review_debug_visit_page_renders_html_with_raw_context(test_client):

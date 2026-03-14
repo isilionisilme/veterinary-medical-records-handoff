@@ -25,6 +25,7 @@ from backend.app.application.document_service import (
     mark_document_reviewed,
     reopen_document_review,
 )
+from backend.app.config import debug_endpoints_enabled
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
@@ -39,6 +40,14 @@ router = APIRouter(tags=["Review"])
 UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 DocumentIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
 RunIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
+
+
+def _debug_endpoints_disabled_response() -> JSONResponse:
+    return error_response(
+        status_code=status.HTTP_403_FORBIDDEN,
+        error_code="FORBIDDEN",
+        message="Debug endpoints are disabled.",
+    )
 
 
 def _resolve_review_context(
@@ -166,6 +175,7 @@ def get_document_review_context(
     summary="Debug visit context as HTML",
     description="Render a temporary HTML page with per-visit raw text context.",
     responses={
+        403: {"description": "Debug endpoints disabled (FORBIDDEN)."},
         404: {"description": "Document not found (NOT_FOUND)."},
         409: {"description": "No completed run available for review (CONFLICT)."},
     },
@@ -173,6 +183,9 @@ def get_document_review_context(
 def get_document_review_visit_debug_page(
     request: Request, document_id: DocumentIdPath
 ) -> HTMLResponse | JSONResponse:
+    if not debug_endpoints_enabled():
+        return _debug_endpoints_disabled_response()
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
@@ -201,6 +214,7 @@ def get_document_review_visit_debug_page(
     summary="Get visit scoping observability metrics",
     description="Return per-visit assignment and raw text anchoring coverage metrics.",
     responses={
+        403: {"description": "Debug endpoints disabled (FORBIDDEN)."},
         404: {"description": "Document not found (NOT_FOUND)."},
         409: {"description": "No completed run available for review (CONFLICT)."},
     },
@@ -208,6 +222,9 @@ def get_document_review_visit_debug_page(
 def get_document_review_visit_scoping_observability(
     request: Request, document_id: DocumentIdPath
 ) -> JSONResponse:
+    if not debug_endpoints_enabled():
+        return _debug_endpoints_disabled_response()
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
@@ -236,7 +253,12 @@ def get_document_review_visit_scoping_observability(
     status_code=status.HTTP_200_OK,
     summary="Mark a document as reviewed",
     description="Idempotently mark a document as reviewed.",
-    responses={404: {"description": "Document not found (NOT_FOUND)."}},
+    responses={
+        404: {"description": "Document not found (NOT_FOUND)."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
+    },
 )
 def mark_document_reviewed_route(
     request: Request,
@@ -296,6 +318,9 @@ def reopen_document_review_route(
         400: {"model": ErrorResponse, "description": "Invalid request payload (INVALID_REQUEST)."},
         422: {"model": ErrorResponse, "description": "Validation error (UNPROCESSABLE_ENTITY)."},
         404: {"description": "Processing run not found (NOT_FOUND)."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
         409: {"description": "Editing blocked by run/version constraints (CONFLICT)."},
     },
 )
