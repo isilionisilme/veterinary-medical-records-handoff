@@ -84,6 +84,24 @@ function Invoke-Step {
         [Parameter(Mandatory = $true)][scriptblock]$Action
     )
 
+    function Get-NormalizedTextHash {
+        param(
+            [Parameter(Mandatory = $true)][string]$Path
+        )
+
+        $content = [System.IO.File]::ReadAllText($Path)
+        $normalizedContent = $content.Replace("`r`n", "`n").Replace("`r", "`n")
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalizedContent)
+        $sha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $hashBytes = $sha256.ComputeHash($bytes)
+            return [System.BitConverter]::ToString($hashBytes).Replace("-", "")
+        }
+        finally {
+            $sha256.Dispose()
+        }
+    }
+
     function Compare-ConfigWithReference {
         $configMappings = @(
             @{ Source = "backend/requirements.txt"; Reference = "requirements.txt" },
@@ -116,8 +134,8 @@ function Invoke-Step {
                 continue
             }
 
-            $sourceHash = Get-FileHash $sourcePath | Select-Object -ExpandProperty Hash
-            $referenceHash = Get-FileHash $referencePath | Select-Object -ExpandProperty Hash
+            $sourceHash = Get-NormalizedTextHash -Path $sourcePath
+            $referenceHash = Get-NormalizedTextHash -Path $referencePath
             if ($sourceHash -ne $referenceHash) {
                 $differences += "$($mapping.Source) -> $($mapping.Reference)"
             }
