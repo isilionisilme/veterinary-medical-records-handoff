@@ -8,6 +8,7 @@ business logic lives in the application/domain layers.
 from __future__ import annotations
 
 import logging
+import re
 import signal
 import sys
 import threading
@@ -25,7 +26,9 @@ from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from starlette.datastructures import Headers
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from backend.app.api.routes import MAX_UPLOAD_SIZE as ROUTE_MAX_UPLOAD_SIZE
 from backend.app.api.routes import router as api_router
@@ -50,6 +53,9 @@ from backend.app.settings import clear_settings_cache, get_settings
 logger = logging.getLogger(__name__)
 startup_logger = logging.getLogger("uvicorn.error")
 _DEV_ENV_MARKERS = {"dev", "development", "local"}
+MAX_NON_UPLOAD_BODY_SIZE = 1 * 1024 * 1024
+_DOCUMENT_REVIEWED_PATH = re.compile(r"^/documents/[^/]+/reviewed$")
+_RUN_INTERPRETATIONS_PATH = re.compile(r"^/runs/[^/]+/interpretations$")
 
 
 def _in_main_thread() -> bool:
@@ -103,6 +109,94 @@ def _apply_security_headers(response) -> None:
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Content-Security-Policy", "default-src 'self'")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+
+
+def _normalized_api_path(path: str) -> str:
+    if path == "/api":
+        return "/"
+    if path.startswith("/api/"):
+        return path[4:]
+    return path
+
+
+def _non_upload_body_limit_for_request(method: str, path: str) -> int | None:
+    if method.upper() != "POST":
+        return None
+
+    normalized_path = _normalized_api_path(path)
+    if normalized_path == "/debug/extraction-runs":
+        return MAX_NON_UPLOAD_BODY_SIZE
+    if _DOCUMENT_REVIEWED_PATH.fullmatch(normalized_path):
+        return MAX_NON_UPLOAD_BODY_SIZE
+    if _RUN_INTERPRETATIONS_PATH.fullmatch(normalized_path):
+        return MAX_NON_UPLOAD_BODY_SIZE
+    return None
+
+
+def _request_body_too_large_response(max_bytes: int) -> JSONResponse:
+    return JSONResponse(
+        status_code=413,
+        content={
+            "error_code": "REQUEST_BODY_TOO_LARGE",
+            "message": "Request body exceeds the maximum allowed size of 1 MB.",
+            "details": {"max_bytes": max_bytes},
+        },
+    )
+
+
+class NonUploadBodyLimitMiddleware:
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        max_bytes = _non_upload_body_limit_for_request(
+            str(scope.get("method", "")), str(scope.get("path", ""))
+        )
+        if max_bytes is None:
+            await self.app(scope, receive, send)
+            return
+
+        content_length = Headers(scope=scope).get("content-length")
+        if content_length is not None:
+            try:
+                if int(content_length) > max_bytes:
+                    await _request_body_too_large_response(max_bytes)(scope, receive, send)
+                    return
+            except ValueError:
+                pass
+
+        buffered_messages: list[Message] = []
+        buffered_body = bytearray()
+        while True:
+            message = await receive()
+            buffered_messages.append(message)
+            if message["type"] != "http.request":
+                break
+            body = message.get("body", b"")
+            buffered_body.extend(body)
+            if len(buffered_body) > max_bytes:
+                await _request_body_too_large_response(max_bytes)(scope, receive, send)
+                return
+            if not message.get("more_body", False):
+                break
+
+        replay_messages: list[Message] = [
+            {"type": "http.request", "body": bytes(buffered_body), "more_body": False}
+        ]
+        replay_messages.extend(
+            message for message in buffered_messages if message["type"] != "http.request"
+        )
+
+        async def _replay_receive() -> Message:
+            if replay_messages:
+                return replay_messages.pop(0)
+            return {"type": "http.request", "body": b"", "more_body": False}
+
+        await self.app(scope, _replay_receive, send)
 
 
 def create_app() -> FastAPI:
@@ -222,6 +316,7 @@ def create_app() -> FastAPI:
     app.state.file_storage = LocalFileStorage()
     app.state.settings = settings
     app.state.auth_token = auth_token()
+    app.add_middleware(NonUploadBodyLimitMiddleware)
 
     @app.middleware("http")
     async def _optional_api_auth_middleware(request: Request, call_next):

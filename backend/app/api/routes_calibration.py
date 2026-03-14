@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Query, Request, status
+from fastapi import APIRouter, Query, status
 from fastapi.responses import JSONResponse
 
 from backend.app.api.schemas import (
@@ -23,14 +23,12 @@ from backend.app.application.extraction_observability import (
 from backend.app.config import extraction_observability_enabled
 
 from .routes_common import (
-    enforce_body_size_limit,
     error_response,
     extraction_observability_disabled_response,
 )
 
 router = APIRouter(tags=["Calibration"])
 logger = logging.getLogger(__name__)
-MAX_NON_UPLOAD_BODY_SIZE = 1 * 1024 * 1024
 
 
 @router.post(
@@ -39,21 +37,18 @@ MAX_NON_UPLOAD_BODY_SIZE = 1 * 1024 * 1024
     status_code=status.HTTP_201_CREATED,
     summary="Persist extraction observability snapshot",
     description="Persist extraction run snapshot locally and log diff versus previous run.",
+    responses={
+        403: {"description": "Extraction observability disabled."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
+    },
 )
 def persist_debug_extraction_run(
-    request: Request,
     payload: ExtractionRunSnapshotRequest,
 ) -> ExtractionRunPersistResponse | JSONResponse:
     if not extraction_observability_enabled():
         return extraction_observability_disabled_response()
-
-    body_too_large = enforce_body_size_limit(
-        request,
-        max_bytes=MAX_NON_UPLOAD_BODY_SIZE,
-        message="Request body exceeds the maximum allowed size of 1 MB.",
-    )
-    if body_too_large is not None:
-        return body_too_large
 
     try:
         result = persist_extraction_run_snapshot(payload.model_dump())

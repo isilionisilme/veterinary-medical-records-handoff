@@ -34,13 +34,12 @@ from .review_debug import (
     build_visit_scoping_metrics,
     render_visit_debug_html,
 )
-from .routes_common import enforce_body_size_limit, error_response, log_event
+from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Review"])
 UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 DocumentIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
 RunIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
-MAX_NON_UPLOAD_BODY_SIZE = 1 * 1024 * 1024
 
 
 def _debug_endpoints_disabled_response() -> JSONResponse:
@@ -48,14 +47,6 @@ def _debug_endpoints_disabled_response() -> JSONResponse:
         status_code=status.HTTP_403_FORBIDDEN,
         error_code="FORBIDDEN",
         message="Debug endpoints are disabled.",
-    )
-
-
-def _review_body_too_large_response(request: Request) -> JSONResponse | None:
-    return enforce_body_size_limit(
-        request,
-        max_bytes=MAX_NON_UPLOAD_BODY_SIZE,
-        message="Request body exceeds the maximum allowed size of 1 MB.",
     )
 
 
@@ -184,6 +175,7 @@ def get_document_review_context(
     summary="Debug visit context as HTML",
     description="Render a temporary HTML page with per-visit raw text context.",
     responses={
+        403: {"description": "Debug endpoints disabled (FORBIDDEN)."},
         404: {"description": "Document not found (NOT_FOUND)."},
         409: {"description": "No completed run available for review (CONFLICT)."},
     },
@@ -222,6 +214,7 @@ def get_document_review_visit_debug_page(
     summary="Get visit scoping observability metrics",
     description="Return per-visit assignment and raw text anchoring coverage metrics.",
     responses={
+        403: {"description": "Debug endpoints disabled (FORBIDDEN)."},
         404: {"description": "Document not found (NOT_FOUND)."},
         409: {"description": "No completed run available for review (CONFLICT)."},
     },
@@ -260,16 +253,17 @@ def get_document_review_visit_scoping_observability(
     status_code=status.HTTP_200_OK,
     summary="Mark a document as reviewed",
     description="Idempotently mark a document as reviewed.",
-    responses={404: {"description": "Document not found (NOT_FOUND)."}},
+    responses={
+        404: {"description": "Document not found (NOT_FOUND)."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
+    },
 )
 def mark_document_reviewed_route(
     request: Request,
     document_id: DocumentIdPath,
 ) -> ReviewStatusToggleResponse | JSONResponse:
-    body_too_large = _review_body_too_large_response(request)
-    if body_too_large is not None:
-        return body_too_large
-
     repository = cast(DocumentRepository, request.app.state.document_repository)
     result = mark_document_reviewed(document_id=document_id, repository=repository)
     if result is None:
@@ -324,6 +318,9 @@ def reopen_document_review_route(
         400: {"model": ErrorResponse, "description": "Invalid request payload (INVALID_REQUEST)."},
         422: {"model": ErrorResponse, "description": "Validation error (UNPROCESSABLE_ENTITY)."},
         404: {"description": "Processing run not found (NOT_FOUND)."},
+        413: {
+            "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."
+        },
         409: {"description": "Editing blocked by run/version constraints (CONFLICT)."},
     },
 )
@@ -332,10 +329,6 @@ def edit_run_interpretation(
     run_id: RunIdPath,
     payload: InterpretationEditRequest,
 ) -> InterpretationEditResponse | JSONResponse:
-    body_too_large = _review_body_too_large_response(request)
-    if body_too_large is not None:
-        return body_too_large
-
     repository = cast(DocumentRepository, request.app.state.document_repository)
     outcome = apply_interpretation_edits(
         run_id=run_id,

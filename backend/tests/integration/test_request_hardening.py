@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+import json
 from uuid import uuid4
 
 from backend.app.domain import models as app_models
@@ -9,6 +11,80 @@ from backend.tests.integration.document_review_test_support import (
     _insert_structured_interpretation,
     _upload_sample_document,
 )
+
+
+def _json_body_with_exact_size(template: dict[str, object], target_size: int) -> bytes:
+    payload = json.loads(json.dumps(template))
+    encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    if len(encoded) > target_size:
+        raise ValueError("Template already exceeds target size")
+
+    field_path = payload["changes"][0]
+    if not isinstance(field_path, dict):
+        raise ValueError("Unexpected payload structure")
+    field_path["value"] = "x" * (target_size - len(encoded))
+    encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    if len(encoded) != target_size:
+        raise ValueError("Failed to generate exact-size JSON payload")
+    return encoded
+
+
+def _send_raw_http_request(
+    app, *, path: str, body: bytes, chunk_size: int = 65536
+) -> tuple[int, bytes]:
+    headers = [
+        (b"host", b"testserver"),
+        (b"content-type", b"application/json"),
+    ]
+    chunks = [body[index : index + chunk_size] for index in range(0, len(body), chunk_size)]
+    if not chunks:
+        chunks = [b""]
+    messages = [
+        {
+            "type": "http.request",
+            "body": chunk,
+            "more_body": index < len(chunks) - 1,
+        }
+        for index, chunk in enumerate(chunks)
+    ]
+    sent_messages: list[dict[str, object]] = []
+
+    async def _receive() -> dict[str, object]:
+        if messages:
+            return messages.pop(0)
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def _send(message: dict[str, object]) -> None:
+        sent_messages.append(message)
+
+    scope = {
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": "POST",
+        "scheme": "http",
+        "path": path,
+        "raw_path": path.encode("utf-8"),
+        "query_string": b"",
+        "headers": headers,
+        "client": ("testclient", 50000),
+        "server": ("testserver", 80),
+        "state": {},
+    }
+
+    asyncio.run(app(scope, _receive, _send))
+
+    status_code = next(
+        int(message["status"])
+        for message in sent_messages
+        if message["type"] == "http.response.start"
+    )
+    response_body = b"".join(
+        message.get("body", b"")
+        for message in sent_messages
+        if message["type"] == "http.response.body"
+    )
+    return status_code, response_body
 
 
 def test_review_debug_endpoint_returns_403_when_flag_disabled(
@@ -124,6 +200,36 @@ def test_interpretation_edit_rejects_request_bodies_larger_than_1mb(
     assert response.json()["error_code"] == "REQUEST_BODY_TOO_LARGE"
 
 
+def test_interpretation_edit_accepts_request_body_at_exactly_1mb(
+    test_client_factory,
+) -> None:
+    client = test_client_factory()
+    payload = _json_body_with_exact_size(
+        {
+            "base_version_number": 1,
+            "changes": [
+                {
+                    "op": "ADD",
+                    "key": "notes",
+                    "value": "",
+                    "value_type": "string",
+                }
+            ],
+        },
+        1024 * 1024,
+    )
+
+    with client:
+        response = client.post(
+            f"/runs/{uuid4()}/interpretations",
+            content=payload,
+            headers={"content-type": "application/json"},
+        )
+
+    assert response.status_code == 404
+    assert response.json()["error_code"] == "NOT_FOUND"
+
+
 def test_extraction_debug_post_rejects_request_bodies_larger_than_1mb(
     test_client_factory,
 ) -> None:
@@ -160,3 +266,38 @@ def test_extraction_debug_post_rejects_request_bodies_larger_than_1mb(
 
     assert response.status_code == 413
     assert response.json()["error_code"] == "REQUEST_BODY_TOO_LARGE"
+
+
+def test_interpretation_edit_rejects_streamed_request_without_content_length(
+    monkeypatch,
+    db_path,
+    storage_path,
+) -> None:
+    monkeypatch.setenv("VET_RECORDS_DB_PATH", str(db_path))
+    monkeypatch.setenv("VET_RECORDS_STORAGE_PATH", str(storage_path))
+    monkeypatch.setenv("VET_RECORDS_DISABLE_PROCESSING", "true")
+
+    from backend.app.main import create_app
+
+    app = create_app()
+    payload = {
+        "base_version_number": 1,
+        "changes": [
+            {
+                "op": "ADD",
+                "key": "notes",
+                "value": "x" * (1024 * 1024 + 1),
+                "value_type": "string",
+            }
+        ],
+    }
+    body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+
+    status_code, response_body = _send_raw_http_request(
+        app,
+        path=f"/runs/{uuid4()}/interpretations",
+        body=body,
+    )
+
+    assert status_code == 413
+    assert json.loads(response_body)["error_code"] == "REQUEST_BODY_TOO_LARGE"

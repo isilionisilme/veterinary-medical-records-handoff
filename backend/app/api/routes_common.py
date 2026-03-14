@@ -68,22 +68,3 @@ def _request_content_length(request: Request) -> int | None:
         return int(content_length)
     except ValueError:
         return None
-
-
-def enforce_body_size_limit(
-    request: Request,
-    *,
-    max_bytes: int,
-    message: str,
-    error_code: str = "REQUEST_BODY_TOO_LARGE",
-) -> JSONResponse | None:
-    content_length = _request_content_length(request)
-    if content_length is None or content_length <= max_bytes:
-        return None
-
-    return error_response(
-        status_code=status.HTTP_413_CONTENT_TOO_LARGE,
-        error_code=error_code,
-        message=message,
-        details={"max_bytes": max_bytes},
-    )
