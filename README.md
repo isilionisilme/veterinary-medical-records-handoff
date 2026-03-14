@@ -35,6 +35,8 @@ Open:
 - OpenAPI docs: `http://localhost:8000/docs`
 - Wiki: `http://localhost:8081`
 
+The evaluator compose profile also serves the project wiki at `http://localhost:8081`.
+
 Stop:
 - `docker compose down`
 - `docker compose -f docker-compose.yml -f docker-compose.evaluators.yml down`
@@ -47,6 +49,18 @@ Note for macOS/Linux first run:
 
 Scope and sequencing source of truth:
 - [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md)
+
+---
+
+## Solution approach
+
+We approached this exercise as a document interpretation problem rather than a pure CRUD or claim-routing system. Veterinary medical records arrive in heterogeneous formats, contain partial or ambiguous signals, and require a workflow that helps a veterinarian understand, verify, and correct machine-produced interpretations safely.
+
+That is why the backend is a hexagonal modular monolith instead of a microservice split. The problem size does not justify distributed complexity yet, but it does require clear boundaries between application logic, persistence, processing, and reviewer workflows so the system can evolve without collapsing into a single tangled service.
+
+At the product level, the core loop is extraction, confidence scoring, human review, and calibration. The system captures the machine suggestion, exposes its evidence and confidence, lets a reviewer correct it in context, and preserves those corrections as explicit signals for later refinement rather than hiding them inside ad hoc state changes.
+
+The delivery strategy was iterative and evidence-driven. We used ADRs, local CI gates, backend and frontend automated tests, and end-to-end scenarios to keep the codebase reviewable while progressively improving architecture, quality, and evaluator-facing clarity.
 
 ---
 
@@ -142,9 +156,6 @@ Frontend implementation details (“how”).
 
 ### Shared engineering rules
 
-📄 **[`AGENTS.md`](AGENTS.md)**  
-Canonical AI assistant entrypoint for this repo.
-
 📄 **[`docs/shared/02-tech/coding-standards.md`](docs/shared/02-tech/coding-standards.md)**  
 Technical coding standards and architecture rules.
 
@@ -155,11 +166,6 @@ Workflow lifecycle and working agreements.
 Shared UX principles referenced by project UX design.
 
 ---
-
-### Optional / Repo internals
-
-- Operational router (AI assistants): `docs/agent_router/00_AUTHORITY.md`
-- Token optimization benchmarks: `metrics/llm_benchmarks/`
 
 ### Delivery evidence and audit trail
 
