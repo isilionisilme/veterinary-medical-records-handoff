@@ -8,7 +8,9 @@ business logic lives in the application/domain layers.
 from __future__ import annotations
 
 import logging
+import signal
 import sys
+import threading
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -50,6 +52,10 @@ startup_logger = logging.getLogger("uvicorn.error")
 _DEV_ENV_MARKERS = {"dev", "development", "local"}
 
 
+def _in_main_thread() -> bool:
+    return threading.current_thread() is threading.main_thread()
+
+
 def _is_dev_runtime() -> bool:
     clear_settings_cache()
     settings = get_settings()
@@ -89,6 +95,14 @@ def _load_backend_dotenv_for_dev(
 
 def _now_iso() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _apply_security_headers(response) -> None:
+    response.headers.setdefault("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Content-Security-Policy", "default-src 'self'")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
 
 
 def create_app() -> FastAPI:
@@ -133,11 +147,29 @@ def create_app() -> FastAPI:
         if recovered:
             logger.info("Recovered %s orphaned runs", recovered)
         app.state.scheduler = SchedulerLifecycle(scheduler_fn=processing_scheduler)
+        previous_sigterm_handler = None
+        if sys.platform != "win32" and _in_main_thread():
+            previous_sigterm_handler = signal.getsignal(signal.SIGTERM)
+
+            def _handle_sigterm(signum, frame) -> None:
+                startup_logger.warning("Received SIGTERM, shutting down gracefully.")
+                if callable(previous_sigterm_handler):
+                    previous_sigterm_handler(signum, frame)
+                    return
+                raise SystemExit(0)
+
+            signal.signal(signal.SIGTERM, _handle_sigterm)
         if processing_enabled():
             await app.state.scheduler.start(repository=repository, storage=storage)
         try:
             yield
         finally:
+            if (
+                previous_sigterm_handler is not None
+                and sys.platform != "win32"
+                and _in_main_thread()
+            ):
+                signal.signal(signal.SIGTERM, previous_sigterm_handler)
             await app.state.scheduler.stop()
 
     settings = get_settings()
@@ -213,6 +245,12 @@ def create_app() -> FastAPI:
             )
 
         return await call_next(request)
+
+    @app.middleware("http")
+    async def _security_headers_middleware(request: Request, call_next):
+        response = await call_next(request)
+        _apply_security_headers(response)
+        return response
 
     app.add_middleware(CorrelationIdMiddleware)
 

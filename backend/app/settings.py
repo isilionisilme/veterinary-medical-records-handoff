@@ -30,6 +30,7 @@ class Settings:
     vet_records_storage_path: str
     vet_records_disable_processing: str | None
     vet_records_extraction_obs: str | None
+    vet_records_debug_endpoints: str | None
     vet_records_confidence_policy_version: str | None
     vet_records_confidence_low_max: str | None
     vet_records_confidence_mid_max: str | None
@@ -75,6 +76,7 @@ def get_settings() -> Settings:
         vet_records_storage_path=_getenv("VET_RECORDS_STORAGE_PATH") or str(DEFAULT_STORAGE_PATH),
         vet_records_disable_processing=_getenv("VET_RECORDS_DISABLE_PROCESSING"),
         vet_records_extraction_obs=_getenv("VET_RECORDS_EXTRACTION_OBS"),
+        vet_records_debug_endpoints=_getenv("VET_RECORDS_DEBUG_ENDPOINTS"),
         vet_records_confidence_policy_version=_getenv("VET_RECORDS_CONFIDENCE_POLICY_VERSION"),
         vet_records_confidence_low_max=_getenv("VET_RECORDS_CONFIDENCE_LOW_MAX"),
         vet_records_confidence_mid_max=_getenv("VET_RECORDS_CONFIDENCE_MID_MAX"),

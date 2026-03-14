@@ -25,6 +25,7 @@ from backend.app.application.document_service import (
     mark_document_reviewed,
     reopen_document_review,
 )
+from backend.app.config import debug_endpoints_enabled
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
@@ -33,12 +34,29 @@ from .review_debug import (
     build_visit_scoping_metrics,
     render_visit_debug_html,
 )
-from .routes_common import error_response, log_event
+from .routes_common import enforce_body_size_limit, error_response, log_event
 
 router = APIRouter(tags=["Review"])
 UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 DocumentIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
 RunIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
+MAX_NON_UPLOAD_BODY_SIZE = 1 * 1024 * 1024
+
+
+def _debug_endpoints_disabled_response() -> JSONResponse:
+    return error_response(
+        status_code=status.HTTP_403_FORBIDDEN,
+        error_code="FORBIDDEN",
+        message="Debug endpoints are disabled.",
+    )
+
+
+def _review_body_too_large_response(request: Request) -> JSONResponse | None:
+    return enforce_body_size_limit(
+        request,
+        max_bytes=MAX_NON_UPLOAD_BODY_SIZE,
+        message="Request body exceeds the maximum allowed size of 1 MB.",
+    )
 
 
 def _resolve_review_context(
@@ -173,6 +191,9 @@ def get_document_review_context(
 def get_document_review_visit_debug_page(
     request: Request, document_id: DocumentIdPath
 ) -> HTMLResponse | JSONResponse:
+    if not debug_endpoints_enabled():
+        return _debug_endpoints_disabled_response()
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
@@ -208,6 +229,9 @@ def get_document_review_visit_debug_page(
 def get_document_review_visit_scoping_observability(
     request: Request, document_id: DocumentIdPath
 ) -> JSONResponse:
+    if not debug_endpoints_enabled():
+        return _debug_endpoints_disabled_response()
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
@@ -242,6 +266,10 @@ def mark_document_reviewed_route(
     request: Request,
     document_id: DocumentIdPath,
 ) -> ReviewStatusToggleResponse | JSONResponse:
+    body_too_large = _review_body_too_large_response(request)
+    if body_too_large is not None:
+        return body_too_large
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     result = mark_document_reviewed(document_id=document_id, repository=repository)
     if result is None:
@@ -304,6 +332,10 @@ def edit_run_interpretation(
     run_id: RunIdPath,
     payload: InterpretationEditRequest,
 ) -> InterpretationEditResponse | JSONResponse:
+    body_too_large = _review_body_too_large_response(request)
+    if body_too_large is not None:
+        return body_too_large
+
     repository = cast(DocumentRepository, request.app.state.document_repository)
     outcome = apply_interpretation_edits(
         run_id=run_id,
