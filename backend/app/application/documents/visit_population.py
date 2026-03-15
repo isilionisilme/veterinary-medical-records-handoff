@@ -107,6 +107,86 @@ def populate_missing_reason_for_visit_from_segments(
             visit["reason_for_visit"] = extracted_reason
 
 
+def _select_best_candidate_for_key(
+    candidate_key: str,
+    key_candidates: list[object],
+) -> dict[str, object] | None:
+    """Select the best candidate for a given field key from mined candidates."""
+    if not key_candidates:
+        return None
+
+    selected = key_candidates[0]
+    if candidate_key == "weight":
+        weighted = [c for c in key_candidates if isinstance(c, dict)]
+        if weighted:
+            selected = max(
+                weighted,
+                key=lambda candidate: (
+                    float(candidate.get("evidence", {}).get("offset"))
+                    if isinstance(candidate.get("evidence"), dict)
+                    and isinstance(candidate.get("evidence", {}).get("offset"), int | float)
+                    else -1.0
+                ),
+            )
+
+    if not isinstance(selected, dict):
+        return None
+
+    candidate_value = selected.get("value")
+    if not isinstance(candidate_value, str) or not candidate_value.strip():
+        return None
+
+    return selected
+
+
+def _build_derived_visit_field(
+    candidate_key: str,
+    visit_id: str,
+    selected_candidate: dict[str, object],
+) -> dict[str, object]:
+    """Build a derived visit field dict from a selected candidate."""
+    evidence = selected_candidate.get("evidence")
+    return {
+        "field_id": f"derived-{candidate_key}-{visit_id}",
+        "key": candidate_key,
+        "value": selected_candidate.get("value"),
+        "value_type": "string",
+        "scope": "visit",
+        "section": "visits",
+        "classification": "medical_record",
+        "origin": "derived",
+        "evidence": evidence if isinstance(evidence, dict) else None,
+    }
+
+
+def _prepare_visit_for_population(
+    visit: dict[str, object],
+    visit_segments_by_id: dict[str, str],
+) -> tuple[str, list[object], set[str], dict[str, list[object]]] | None:
+    """Validate a visit and return (visit_id, fields, existing_keys, mined_candidates) or None."""
+    visit_id = visit.get("visit_id")
+    if not isinstance(visit_id, str) or not visit_id:
+        return None
+
+    segment_text = visit_segments_by_id.get(visit_id)
+    if not isinstance(segment_text, str) or not segment_text.strip():
+        return None
+
+    visit_fields = visit.get("fields")
+    if not isinstance(visit_fields, list):
+        visit_fields = []
+        visit["fields"] = visit_fields
+
+    existing_keys = {
+        field.get("key")
+        for field in visit_fields
+        if isinstance(field, dict) and isinstance(field.get("key"), str)
+    }
+
+    mined_candidates = _mine_interpretation_candidates(segment_text)
+    return visit_id, visit_fields, existing_keys, mined_candidates
+
+
 def populate_visit_scoped_fields_from_segment_candidates(
     *,
     assigned_visits: list[dict[str, object]],
@@ -114,26 +194,11 @@ def populate_visit_scoped_fields_from_segment_candidates(
     candidate_keys: tuple[str, ...],
 ) -> None:
     for visit in assigned_visits:
-        visit_id = visit.get("visit_id")
-        if not isinstance(visit_id, str) or not visit_id:
+        prepared = _prepare_visit_for_population(visit, visit_segments_by_id)
+        if prepared is None:
             continue
 
-        segment_text = visit_segments_by_id.get(visit_id)
-        if not isinstance(segment_text, str) or not segment_text.strip():
-            continue
-
-        visit_fields = visit.get("fields")
-        if not isinstance(visit_fields, list):
-            visit_fields = []
-            visit["fields"] = visit_fields
-
-        existing_keys = {
-            field.get("key")
-            for field in visit_fields
-            if isinstance(field, dict) and isinstance(field.get("key"), str)
-        }
-
-        mined_candidates = _mine_interpretation_candidates(segment_text)
+        visit_id, visit_fields, existing_keys, mined_candidates = prepared
         for candidate_key in candidate_keys:
             if candidate_key in existing_keys:
                 continue
@@ -142,41 +207,11 @@ def populate_visit_scoped_fields_from_segment_candidates(
             if not isinstance(key_candidates, list) or not key_candidates:
                 continue
 
-            selected_candidate = key_candidates[0]
-            if candidate_key == "weight":
-                weighted_candidates = [c for c in key_candidates if isinstance(c, dict)]
-                if weighted_candidates:
-                    selected_candidate = max(
-                        weighted_candidates,
-                        key=lambda candidate: (
-                            float(candidate.get("evidence", {}).get("offset"))
-                            if isinstance(candidate.get("evidence"), dict)
-                            and isinstance(candidate.get("evidence", {}).get("offset"), int | float)
-                            else -1.0
-                        ),
-                    )
-
-            if not isinstance(selected_candidate, dict):
+            selected = _select_best_candidate_for_key(candidate_key, key_candidates)
+            if selected is None:
                 continue
 
-            candidate_value = selected_candidate.get("value")
-            if not isinstance(candidate_value, str) or not candidate_value.strip():
-                continue
-
-            evidence = selected_candidate.get("evidence")
-            visit_fields.append(
-                {
-                    "field_id": f"derived-{candidate_key}-{visit_id}",
-                    "key": candidate_key,
-                    "value": candidate_value,
-                    "value_type": "string",
-                    "scope": "visit",
-                    "section": "visits",
-                    "classification": "medical_record",
-                    "origin": "derived",
-                    "evidence": evidence if isinstance(evidence, dict) else None,
-                }
-            )
+            visit_fields.append(_build_derived_visit_field(candidate_key, visit_id, selected))
             existing_keys.add(candidate_key)
 
 

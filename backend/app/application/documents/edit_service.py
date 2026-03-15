@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import NamedTuple
 from uuid import uuid4
 
 from backend.app.application.confidence_calibration import (
@@ -65,16 +66,28 @@ class _EditMutationContext:
     occurred_at: str
 
 
-def apply_interpretation_edits(
+class _EditPreconditionContext(NamedTuple):
+    """Validated precondition context for interpretation edits."""
+
+    run: object
+    active_payload: dict[str, object]
+    active_version_number: int
+    active_data: dict[str, object]
+    active_fields: list[dict[str, object]]
+    context_key: str
+
+
+def _validate_edit_preconditions(
     *,
     run_id: str,
     base_version_number: int,
-    changes: list[dict[str, object]],
     repository: DocumentRepository,
-    now_provider: Callable[[], str] = _default_now_iso,
-) -> InterpretationEditOutcome | None:
-    """Apply veterinarian edits and append a new active interpretation version."""
+) -> _EditPreconditionContext | InterpretationEditOutcome | None:
+    """Validate all preconditions for applying edits.
 
+    Returns ``_EditPreconditionContext`` on success, ``InterpretationEditOutcome``
+    for conflict/error, or ``None`` when the run is not found.
+    """
     run = repository.get_run(run_id)
     if run is None:
         return None
@@ -113,10 +126,42 @@ def apply_interpretation_edits(
     active_data = dict(active_data_raw) if isinstance(active_data_raw, dict) else {}
     active_fields = _coerce_interpretation_fields(active_data.get("fields"))
     context_key = _resolve_context_key_for_edit_scopes(active_data, active_fields)
+
+    return _EditPreconditionContext(
+        run=run,
+        active_payload=active_payload,
+        active_version_number=active_version_number,
+        active_data=active_data,
+        active_fields=active_fields,
+        context_key=context_key,
+    )
+
+
+def apply_interpretation_edits(
+    *,
+    run_id: str,
+    base_version_number: int,
+    changes: list[dict[str, object]],
+    repository: DocumentRepository,
+    now_provider: Callable[[], str] = _default_now_iso,
+) -> InterpretationEditOutcome | None:
+    """Apply veterinarian edits and append a new active interpretation version."""
+
+    precondition = _validate_edit_preconditions(
+        run_id=run_id,
+        base_version_number=base_version_number,
+        repository=repository,
+    )
+    if not isinstance(precondition, _EditPreconditionContext):
+        return precondition
+
+    run = precondition.run
+    active_data = precondition.active_data
+    active_version_number = precondition.active_version_number
     calibration_policy_version = resolve_calibration_policy_version()
     neutral_candidate_confidence = human_edit_neutral_candidate_confidence()
 
-    updated_fields = [dict(field) for field in active_fields]
+    updated_fields = [dict(field) for field in precondition.active_fields]
     field_change_logs: list[dict[str, object]] = []
     now_iso = now_provider()
     occurred_at = _to_utc_z(now_iso)
@@ -125,7 +170,7 @@ def apply_interpretation_edits(
         run_id=run_id,
         base_version_number=base_version_number,
         new_version_number=active_version_number + 1,
-        context_key=context_key,
+        context_key=precondition.context_key,
         calibration_policy_version=calibration_policy_version,
         neutral_candidate_confidence=neutral_candidate_confidence,
         now_iso=now_iso,
@@ -133,44 +178,15 @@ def apply_interpretation_edits(
     )
 
     for index, change in enumerate(changes):
-        op_raw = change.get("op")
-        op = str(op_raw).upper() if isinstance(op_raw, str) else ""
-        if op not in {"ADD", "UPDATE", "DELETE"}:
-            return InterpretationEditOutcome(result=None, invalid_reason=f"changes[{index}].op")
-
-        if op == "ADD":
-            add_outcome = _apply_add_change(
-                change=change,
-                index=index,
-                updated_fields=updated_fields,
-                field_change_logs=field_change_logs,
-                edit_context=edit_context,
-            )
-            if add_outcome is not None:
-                return add_outcome
-            continue
-
-        existing_field_state = _resolve_existing_field_state(
+        change_error = _apply_single_change(
             change=change,
             index=index,
-            updated_fields=updated_fields,
-        )
-        if isinstance(existing_field_state, InterpretationEditOutcome):
-            return existing_field_state
-
-        existing_index, existing_field = existing_field_state
-        existing_change_outcome = _apply_existing_field_change(
-            op=op,
-            change=change,
-            index=index,
-            existing_index=existing_index,
-            existing_field=existing_field,
             updated_fields=updated_fields,
             field_change_logs=field_change_logs,
             edit_context=edit_context,
         )
-        if existing_change_outcome is not None:
-            return existing_change_outcome
+        if change_error is not None:
+            return change_error
 
     new_interpretation_id = str(uuid4())
     for log in field_change_logs:
@@ -224,6 +240,50 @@ def _coerce_interpretation_fields(raw_fields: object) -> list[dict[str, object]]
         if isinstance(item, dict):
             fields.append(dict(item))
     return fields
+
+
+def _apply_single_change(
+    *,
+    change: dict[str, object],
+    index: int,
+    updated_fields: list[dict[str, object]],
+    field_change_logs: list[dict[str, object]],
+    edit_context: _EditMutationContext,
+) -> InterpretationEditOutcome | None:
+    """Dispatch a single change operation (ADD/UPDATE/DELETE)."""
+    op_raw = change.get("op")
+    op = str(op_raw).upper() if isinstance(op_raw, str) else ""
+    if op not in {"ADD", "UPDATE", "DELETE"}:
+        return InterpretationEditOutcome(result=None, invalid_reason=f"changes[{index}].op")
+
+    if op == "ADD":
+        return _apply_add_change(
+            change=change,
+            index=index,
+            updated_fields=updated_fields,
+            field_change_logs=field_change_logs,
+            edit_context=edit_context,
+        )
+
+    existing_field_state = _resolve_existing_field_state(
+        change=change,
+        index=index,
+        updated_fields=updated_fields,
+    )
+    if isinstance(existing_field_state, InterpretationEditOutcome):
+        return existing_field_state
+
+    existing_index, existing_field = existing_field_state
+    return _apply_existing_field_change(
+        op=op,
+        change=change,
+        index=index,
+        existing_index=existing_index,
+        existing_field=existing_field,
+        updated_fields=updated_fields,
+        field_change_logs=field_change_logs,
+        edit_context=edit_context,
+    )
 
 
 def _resolve_context_key_for_edit_scopes(
