@@ -87,9 +87,6 @@ _OWNER_ADDRESS_RESIDUAL_LABEL = re.compile(
 def normalize_canonical_fields(
     values: Mapping[str, object],
     evidence_map: Mapping[str, list[dict[str, object]]] | None = None,
-    *,
-    visits: Sequence[object] | None = None,
-    derive_age: bool = False,
 ) -> dict[str, object]:
     """Normalize selected canonical fields without changing semantics."""
 
@@ -114,13 +111,10 @@ def normalize_canonical_fields(
     normalized["admission_date"] = _normalize_date_value(normalized.get("admission_date"))
     normalized["discharge_date"] = _normalize_date_value(normalized.get("discharge_date"))
 
-    if derive_age:
-        normalized = _derive_age_from_dob(normalized, visits=visits)
-
     return normalized
 
 
-def _derive_age_from_dob(
+def derive_age_from_dob(
     values: dict[str, object],
     *,
     visits: Sequence[object] | None,

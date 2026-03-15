@@ -6,6 +6,7 @@ import pytest
 
 from backend.app.application.field_normalizers import (
     _normalize_date_value,
+    derive_age_from_dob,
     normalize_canonical_fields,
 )
 
@@ -156,13 +157,13 @@ def test_normalize_canonical_fields_derives_age_from_latest_visit_when_enabled()
         "document_date": "01/02/2026",
     }
 
-    normalized = normalize_canonical_fields(
-        raw_fields,
+    normalized = normalize_canonical_fields(raw_fields)
+    normalized = derive_age_from_dob(
+        normalized,
         visits=[
             {"visit_date": "01/02/2026"},
             {"visit_date": "14/03/2026"},
         ],
-        derive_age=True,
     )
 
     assert normalized["age"] == "7"
@@ -176,10 +177,10 @@ def test_normalize_canonical_fields_does_not_overwrite_existing_age_when_enabled
         "document_date": "01/02/2026",
     }
 
-    normalized = normalize_canonical_fields(
-        raw_fields,
+    normalized = normalize_canonical_fields(raw_fields)
+    normalized = derive_age_from_dob(
+        normalized,
         visits=[{"visit_date": "14/03/2026"}],
-        derive_age=True,
     )
 
     assert normalized["age"] == "99"
@@ -189,8 +190,10 @@ def test_normalize_canonical_fields_does_not_overwrite_existing_age_when_enabled
 def test_normalize_canonical_fields_keeps_age_empty_when_dob_is_invalid() -> None:
     normalized = normalize_canonical_fields(
         {"dob": "31/02/2018", "age": "", "document_date": "14/03/2026"},
+    )
+    normalized = derive_age_from_dob(
+        normalized,
         visits=[{"visit_date": "14/03/2026"}],
-        derive_age=True,
     )
 
     assert normalized["age"] == ""
@@ -200,8 +203,10 @@ def test_normalize_canonical_fields_keeps_age_empty_when_dob_is_invalid() -> Non
 def test_normalize_canonical_fields_keeps_age_empty_when_dob_is_in_future() -> None:
     normalized = normalize_canonical_fields(
         {"dob": "15/03/2027", "age": "", "document_date": "14/03/2026"},
+    )
+    normalized = derive_age_from_dob(
+        normalized,
         visits=[{"visit_date": "14/03/2026"}],
-        derive_age=True,
     )
 
     assert normalized["age"] == ""

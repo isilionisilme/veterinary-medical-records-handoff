@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 
 from .constants import (
     _ADDRESS_LIKE_PATTERN,
@@ -108,33 +109,32 @@ def _normalize_person_fragment(fragment: str) -> str | None:
 def extract_labeled_person_candidates(raw_text: str, confidence: float) -> list[dict[str, object]]:
     payloads: list[dict[str, object]] = []
     payloads.extend(
-        _extract_labeled_person_candidates_by_pattern(
+        _extract_labeled_person_candidates_core(
             raw_text=raw_text,
             key="vet_name",
             pattern=_VET_LABEL_LINE_PATTERN,
             confidence=confidence,
-            owner_mode=False,
         )
     )
     payloads.extend(
-        _extract_labeled_person_candidates_by_pattern(
+        _extract_labeled_person_candidates_core(
             raw_text=raw_text,
             key="owner_name",
             pattern=_OWNER_LABEL_LINE_PATTERN,
             confidence=confidence,
-            owner_mode=True,
+            post_process_candidate=_split_owner_before_address_tokens,
         )
     )
     return payloads
 
 
-def _extract_labeled_person_candidates_by_pattern(
+def _extract_labeled_person_candidates_core(
     *,
     raw_text: str,
     key: str,
     pattern: re.Pattern[str],
     confidence: float,
-    owner_mode: bool = False,
+    post_process_candidate: Callable[[str], str] | None = None,
 ) -> list[dict[str, object]]:
     payloads: list[dict[str, object]] = []
     raw_lines = raw_text.splitlines()
@@ -158,8 +158,8 @@ def _extract_labeled_person_candidates_by_pattern(
 
         if not candidate_source:
             continue
-        if owner_mode:
-            candidate_source = _split_owner_before_address_tokens(candidate_source)
+        if post_process_candidate is not None:
+            candidate_source = post_process_candidate(candidate_source)
 
         normalized = _normalize_person_fragment(candidate_source)
         if normalized is None:
