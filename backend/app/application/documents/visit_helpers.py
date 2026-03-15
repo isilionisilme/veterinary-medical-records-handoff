@@ -291,6 +291,143 @@ def build_visit_segment_text_by_visit_id(
 # Weight post-processing (phase helper used by the orchestrator)
 # ---------------------------------------------------------------------------
 
+# Weight candidate: (date, evidence_offset, visit_index, field_index, field_dict)
+_WeightCandidate = tuple[str, float, int, int, dict[str, object]]
+
+
+def _collect_unassigned_weight_candidates(
+    *,
+    unassigned_visit: dict[str, object] | None,
+    fields_to_keep: list[object],
+) -> list[dict[str, object]]:
+    """Move weight fields from *unassigned_visit* into *fields_to_keep* as document-scoped.
+
+    Returns the restored weight fields for later date-based candidacy.
+    Mutates *fields_to_keep* (appends) and *unassigned_visit* (removes weight fields).
+    """
+    if unassigned_visit is None:
+        return []
+    raw_fields = unassigned_visit.get("fields")
+    if not isinstance(raw_fields, list):
+        return []
+
+    weight_fields = [f for f in raw_fields if isinstance(f, dict) and f.get("key") == "weight"]
+    if not weight_fields:
+        return []
+
+    restored: list[dict[str, object]] = []
+    for wf in weight_fields:
+        entry = dict(wf)
+        entry["scope"] = "document"
+        entry["section"] = "patient"
+        raw_val = entry.get("value")
+        normalized_val = _normalize_weight(raw_val)
+        if normalized_val:
+            entry["value"] = normalized_val
+        fields_to_keep.append(entry)
+        restored.append(entry)
+
+    unassigned_visit["fields"] = [
+        f for f in raw_fields if not (isinstance(f, dict) and f.get("key") == "weight")
+    ]
+    return restored
+
+
+def _collect_assigned_visit_weight_candidates(
+    *,
+    assigned_visits: list[dict[str, object]],
+) -> list[_WeightCandidate]:
+    """Build weight candidates from assigned visits that have a resolvable date."""
+    candidates: list[_WeightCandidate] = []
+    for visit_index, visit in enumerate(assigned_visits):
+        vf = visit.get("fields")
+        if not isinstance(vf, list):
+            continue
+        for field_index, field in enumerate(vf):
+            if not (isinstance(field, dict) and field.get("key") == "weight"):
+                continue
+            effective_date = _weight_effective_visit_date(visit=visit, weight_field=field)
+            if effective_date is None:
+                continue
+            candidates.append(
+                (effective_date, _weight_evidence_offset(field), visit_index, field_index, field)
+            )
+    return candidates
+
+
+def _collect_unassigned_date_weight_candidates(
+    *,
+    unassigned_weight_fields: list[dict[str, object]],
+    assigned_visit_count: int,
+) -> list[_WeightCandidate]:
+    """Build weight candidates for unassigned fields that have date evidence."""
+    candidates: list[_WeightCandidate] = []
+    for index, field in enumerate(unassigned_weight_fields):
+        effective_date = _normalize_visit_date_candidate(_extract_evidence_snippet(field))
+        if effective_date is None:
+            continue
+        candidates.append(
+            (effective_date, _weight_evidence_offset(field), assigned_visit_count, index, field)
+        )
+    return candidates
+
+
+def _build_raw_text_weight_candidate(
+    *,
+    raw_text: str | None,
+    base_index: int,
+) -> _WeightCandidate | None:
+    """Extract weight from raw text and build a single candidate, if possible."""
+    extracted = _extract_latest_visit_weight_from_raw_text(raw_text)
+    if extracted is None:
+        return None
+    return (
+        str(extracted["date"]),
+        -1.0,
+        base_index,
+        0,
+        {
+            "value": extracted["value"],
+            "value_type": "string",
+            "classification": "medical_record",
+            "evidence": extracted["evidence"],
+        },
+    )
+
+
+def _select_and_derive_weight(
+    *,
+    visit_weights: list[_WeightCandidate],
+    fields_to_keep: list[object],
+) -> list[object]:
+    """Select the most-recent weight candidate and derive a document-level weight field."""
+    if not visit_weights:
+        return fields_to_keep
+
+    visit_weights.sort(key=lambda entry: (entry[0], entry[1], entry[2], entry[3]))
+    most_recent = visit_weights[-1][4]
+
+    fields_to_keep = [
+        f for f in fields_to_keep if not (isinstance(f, dict) and f.get("key") == "weight")
+    ]
+
+    raw_val = most_recent.get("value")
+    normalized_val = _normalize_weight(raw_val)
+    fields_to_keep.append(
+        {
+            "field_id": "derived-weight-current",
+            "key": "weight",
+            "value": normalized_val if normalized_val else raw_val,
+            "value_type": most_recent.get("value_type", "string"),
+            "scope": "document",
+            "section": "patient",
+            "classification": most_recent.get("classification", "medical_record"),
+            "origin": "derived",
+            "evidence": most_recent.get("evidence"),
+        }
+    )
+    return fields_to_keep
+
 
 def postprocess_weights(
     *,
@@ -300,106 +437,29 @@ def postprocess_weights(
     raw_text: str | None,
 ) -> list[object]:
     """Phase 7: Derive document-level weight from most-recent visit weight."""
-    unassigned_weight_fields_for_derivation: list[dict[str, object]] = []
-    if unassigned_visit is not None:
-        raw_unassigned_fields = unassigned_visit.get("fields")
-        if isinstance(raw_unassigned_fields, list):
-            weight_fields_in_unassigned = [
-                f for f in raw_unassigned_fields if isinstance(f, dict) and f.get("key") == "weight"
-            ]
-            if weight_fields_in_unassigned:
-                for wf in weight_fields_in_unassigned:
-                    restored = dict(wf)
-                    restored["scope"] = "document"
-                    restored["section"] = "patient"
-                    raw_val = restored.get("value")
-                    normalized_val = _normalize_weight(raw_val)
-                    if normalized_val:
-                        restored["value"] = normalized_val
-                    fields_to_keep.append(restored)
-                    unassigned_weight_fields_for_derivation.append(restored)
-                unassigned_visit["fields"] = [
-                    f
-                    for f in raw_unassigned_fields
-                    if not (isinstance(f, dict) and f.get("key") == "weight")
-                ]
+    unassigned_fields = _collect_unassigned_weight_candidates(
+        unassigned_visit=unassigned_visit,
+        fields_to_keep=fields_to_keep,
+    )
 
-    visit_weights: list[tuple[str, float, int, int, dict[str, object]]] = []
-    for visit_index, visit in enumerate(assigned_visits):
-        vf = visit.get("fields")
-        if not isinstance(vf, list):
-            continue
-        for field_index, field in enumerate(vf):
-            if isinstance(field, dict) and field.get("key") == "weight":
-                effective_visit_date = _weight_effective_visit_date(
-                    visit=visit,
-                    weight_field=field,
-                )
-                if effective_visit_date is None:
-                    continue
-                visit_weights.append(
-                    (
-                        effective_visit_date,
-                        _weight_evidence_offset(field),
-                        visit_index,
-                        field_index,
-                        field,
-                    )
-                )
-
-    for unassigned_index, unassigned_weight in enumerate(unassigned_weight_fields_for_derivation):
-        effective_date = _normalize_visit_date_candidate(
-            _extract_evidence_snippet(unassigned_weight)
+    visit_weights: list[_WeightCandidate] = _collect_assigned_visit_weight_candidates(
+        assigned_visits=assigned_visits,
+    )
+    visit_weights.extend(
+        _collect_unassigned_date_weight_candidates(
+            unassigned_weight_fields=unassigned_fields,
+            assigned_visit_count=len(assigned_visits),
         )
-        if effective_date is None:
-            continue
-        visit_weights.append(
-            (
-                effective_date,
-                _weight_evidence_offset(unassigned_weight),
-                len(assigned_visits),
-                unassigned_index,
-                unassigned_weight,
-            )
-        )
+    )
 
-    latest_weight_from_raw = _extract_latest_visit_weight_from_raw_text(raw_text)
-    if latest_weight_from_raw is not None:
-        visit_weights.append(
-            (
-                str(latest_weight_from_raw["date"]),
-                -1.0,
-                len(assigned_visits) + 1,
-                0,
-                {
-                    "value": latest_weight_from_raw["value"],
-                    "value_type": "string",
-                    "classification": "medical_record",
-                    "evidence": latest_weight_from_raw["evidence"],
-                },
-            )
-        )
+    raw_candidate = _build_raw_text_weight_candidate(
+        raw_text=raw_text,
+        base_index=len(assigned_visits) + 1,
+    )
+    if raw_candidate is not None:
+        visit_weights.append(raw_candidate)
 
-    if visit_weights:
-        visit_weights.sort(key=lambda entry: (entry[0], entry[1], entry[2], entry[3]))
-        most_recent_weight = visit_weights[-1][4]
-        fields_to_keep = [
-            f for f in fields_to_keep if not (isinstance(f, dict) and f.get("key") == "weight")
-        ]
-        raw_derived_val = most_recent_weight.get("value")
-        normalized_derived_val = _normalize_weight(raw_derived_val)
-        fields_to_keep.append(
-            {
-                "field_id": "derived-weight-current",
-                "key": "weight",
-                "value": normalized_derived_val if normalized_derived_val else raw_derived_val,
-                "value_type": most_recent_weight.get("value_type", "string"),
-                "scope": "document",
-                "section": "patient",
-                "classification": most_recent_weight.get("classification", "medical_record"),
-                "origin": "derived",
-                "evidence": most_recent_weight.get("evidence"),
-            }
-        )
-
-    return fields_to_keep
+    return _select_and_derive_weight(
+        visit_weights=visit_weights,
+        fields_to_keep=fields_to_keep,
+    )
