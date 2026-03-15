@@ -3,9 +3,73 @@
 from __future__ import annotations
 
 from backend.app.application.documents.visit_scoping import (
+    _classify_fields_into_scopes,
     _generate_missing_visits,
     _parse_existing_visits,
+    _should_scope_weight_as_visit,
 )
+
+
+class TestShouldScopeWeightAsVisit:
+    def test_returns_true_for_explicit_visit_scope(self) -> None:
+        cache: dict[str, list[str]] = {}
+
+        assert _should_scope_weight_as_visit(
+            {"key": "weight", "scope": "visit", "section": "patient"},
+            snippet_date_cache=cache,
+        )
+
+    def test_returns_true_for_weight_with_date_evidence(self) -> None:
+        cache: dict[str, list[str]] = {}
+
+        assert _should_scope_weight_as_visit(
+            {
+                "key": "weight",
+                "value": "7.2 kg",
+                "evidence": {"snippet": "Consulta 10/03/2025: Peso 7.2 kg"},
+            },
+            snippet_date_cache=cache,
+        )
+
+    def test_returns_false_for_document_weight_without_visit_context(self) -> None:
+        cache: dict[str, list[str]] = {}
+
+        assert not _should_scope_weight_as_visit(
+            {
+                "key": "weight",
+                "value": "7.2 kg",
+                "evidence": {"snippet": "Paciente estable. Peso actual: 7.2 kg"},
+            },
+            snippet_date_cache=cache,
+        )
+
+
+class TestClassifyFieldsIntoScopes:
+    def test_keeps_global_weight_document_scoped(self) -> None:
+        result = _classify_fields_into_scopes(
+            [{"key": "weight", "value": "7.2 kg", "evidence": {"snippet": "Peso actual: 7.2 kg"}}],
+            raw_text_detected_visit_dates=[],
+        )
+
+        assert len(result.fields_to_keep) == 1
+        assert result.visit_scoped_fields == []
+
+    def test_promotes_weight_with_visit_date_evidence(self) -> None:
+        result = _classify_fields_into_scopes(
+            [
+                {
+                    "key": "weight",
+                    "value": "7.2 kg",
+                    "evidence": {"snippet": "Consulta 10/03/2025: Peso 7.2 kg"},
+                }
+            ],
+            raw_text_detected_visit_dates=[],
+        )
+
+        assert result.fields_to_keep == []
+        assert len(result.visit_scoped_fields) == 1
+        assert result.visit_scoped_fields[0]["scope"] == "visit"
+        assert result.detected_visit_dates == ["2025-03-10"]
 
 
 class TestParseExistingVisits:

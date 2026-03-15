@@ -1,8 +1,4 @@
-"""Visit scoping orchestration: field classification, visit roster, assignment.
-
-Extracted from review_service.py (ARCH-01) to isolate the visit-scoping
-orchestration from the review lifecycle API.
-"""
+"""Visit scoping orchestration: field classification, visit roster, assignment."""
 
 from __future__ import annotations
 
@@ -43,6 +39,38 @@ class FieldClassificationResult(NamedTuple):
     seen_detected_visit_dates: set[str]
 
 
+def _extract_detected_visit_dates(
+    item: dict[str, object],
+    *,
+    snippet_date_cache: dict[str, list[str]],
+) -> list[str]:
+    """Return normalized visit dates referenced by a field evidence snippet."""
+    evidence_snippet = _extract_evidence_snippet(item)
+    cached = snippet_date_cache.get(evidence_snippet)
+    if cached is not None:
+        return cached
+    dates = list(_extract_visit_date_candidates_from_text(text=evidence_snippet))
+    snippet_date_cache[evidence_snippet] = dates
+    return dates
+
+
+def _should_scope_weight_as_visit(
+    item: dict[str, object],
+    *,
+    snippet_date_cache: dict[str, list[str]],
+) -> bool:
+    """Return True when a weight field clearly belongs to a visit."""
+    field_scope = item.get("scope")
+    field_section = item.get("section")
+    is_explicit_visit_scoped = (
+        isinstance(field_scope, str) and field_scope.strip().casefold() == "visit"
+    ) or (isinstance(field_section, str) and field_section.strip().casefold() == "visits")
+    if is_explicit_visit_scoped:
+        return True
+
+    return bool(_extract_detected_visit_dates(item, snippet_date_cache=snippet_date_cache))
+
+
 def _classify_fields_into_scopes(
     raw_fields: list[object],
     *,
@@ -54,6 +82,7 @@ def _classify_fields_into_scopes(
     visit_group_metadata: dict[str, list[object]] = {}
     detected_visit_dates: list[str] = []
     seen_detected_visit_dates: set[str] = set()
+    snippet_date_cache: dict[str, list[str]] = {}
 
     for item in raw_fields:
         if not isinstance(item, dict):
@@ -76,29 +105,19 @@ def _classify_fields_into_scopes(
             continue
 
         if key in _VISIT_SCOPED_KEY_SET:
-            if key == "weight":
-                field_scope = item.get("scope")
-                field_section = item.get("section")
-                is_explicit_visit_scoped = (
-                    isinstance(field_scope, str) and field_scope.strip().casefold() == "visit"
-                ) or (
-                    isinstance(field_section, str) and field_section.strip().casefold() == "visits"
-                )
-                evidence_snippet = _extract_evidence_snippet(item)
-                has_visit_date_evidence = bool(
-                    _extract_visit_date_candidates_from_text(text=evidence_snippet)
-                )
-                if not is_explicit_visit_scoped and not has_visit_date_evidence:
-                    fields_to_keep.append(item)
-                    continue
+            if key == "weight" and not _should_scope_weight_as_visit(
+                item, snippet_date_cache=snippet_date_cache
+            ):
+                fields_to_keep.append(item)
+                continue
 
             visit_field = dict(item)
             visit_field["scope"] = "visit"
             visit_field["section"] = "visits"
             visit_scoped_fields.append(visit_field)
-            evidence_snippet = _extract_evidence_snippet(visit_field)
-            for normalized_visit_date in _extract_visit_date_candidates_from_text(
-                text=evidence_snippet
+            for normalized_visit_date in _extract_detected_visit_dates(
+                visit_field,
+                snippet_date_cache=snippet_date_cache,
             ):
                 if normalized_visit_date in seen_detected_visit_dates:
                     continue
@@ -135,11 +154,9 @@ def _parse_existing_visits(
     dict[str, object] | None,
 ]:
     raw_visits = projected.get("visits")
-    visits: list[dict[str, object]] = []
-    if isinstance(raw_visits, list):
-        for visit in raw_visits:
-            if isinstance(visit, dict):
-                visits.append(dict(visit))
+    visits: list[dict[str, object]] = [
+        dict(v) for v in (raw_visits if isinstance(raw_visits, list) else []) if isinstance(v, dict)
+    ]
 
     unassigned_visit: dict[str, object] | None = None
     assigned_visits: list[dict[str, object]] = []
@@ -184,9 +201,8 @@ def _generate_missing_visits(
     for visit_date in raw_text_detected_visit_dates:
         raw_visit_occurrence_counts[visit_date] = raw_visit_occurrence_counts.get(visit_date, 0) + 1
     for visit_date, count in raw_visit_occurrence_counts.items():
-        extra_occurrences = max(0, count - 1)
-        if extra_occurrences > 0:
-            required_visit_sequence.extend([visit_date] * extra_occurrences)
+        if count > 1:
+            required_visit_sequence.extend([visit_date] * (count - 1))
 
     generated_visit_counter = len(assigned_visits) + 1
     seen_required_occurrences: dict[str, int] = {}
@@ -232,7 +248,6 @@ def _build_visit_roster(
             seen_detected_visit_dates=seen_detected_visit_dates,
         )
     )
-
     _generate_missing_visits(
         assigned_visits=assigned_visits,
         visit_by_date=visit_by_date,
@@ -392,11 +407,6 @@ def _finalize_visit_list(
     return normalized_visits
 
 
-# ---------------------------------------------------------------------------
-# Main visit scoping orchestrator
-# ---------------------------------------------------------------------------
-
-
 def normalize_canonical_review_scoping(
     data: dict[str, object], *, raw_text: str | None = None
 ) -> dict[str, object]:
@@ -409,8 +419,8 @@ def normalize_canonical_review_scoping(
     raw_text_detected_visit_dates = _detect_visit_dates_from_raw_text(raw_text=raw_text)
     raw_text_date_occurrences = _locate_visit_date_occurrences_from_raw_text(raw_text=raw_text)
     raw_text_offsets_by_date: dict[str, list[int]] = {}
-    for normalized_date, offset in raw_text_date_occurrences:
-        raw_text_offsets_by_date.setdefault(normalized_date, []).append(offset)
+    for norm_date, offset in raw_text_date_occurrences:
+        raw_text_offsets_by_date.setdefault(norm_date, []).append(offset)
     visit_boundary_offsets = _locate_visit_boundary_offsets_from_raw_text(raw_text=raw_text)
 
     (

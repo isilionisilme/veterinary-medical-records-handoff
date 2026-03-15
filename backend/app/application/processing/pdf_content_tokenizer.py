@@ -8,6 +8,20 @@ from . import pdf_fallback_shared as shared
 
 _HEX_STRING_PATTERN = re.compile(rb"<([0-9A-Fa-f\s]+)>")
 _WHITESPACE_BYTES_PATTERN = re.compile(rb"\s+")
+_ESCAPE_MAP: dict[int, int] = {110: 10, 114: 13, 116: 9, 98: 8, 102: 12}
+
+
+def _consume_octal_digits(blob: bytes, index: int, first_digit: int) -> tuple[int, int]:
+    """Parse a PDF octal escape starting from the first consumed digit."""
+    oct_digits = bytearray([first_digit])
+    length = len(blob)
+    for _ in range(2):
+        if index < length and 48 <= blob[index] <= 55:
+            oct_digits.append(blob[index])
+            index += 1
+            continue
+        break
+    return int(oct_digits.decode("ascii"), 8), index
 
 
 def _decode_hex_string(content: bytes, start: int) -> tuple[bytes | None, int]:
@@ -128,30 +142,13 @@ def _parse_pdf_literal_string_bytes(blob: bytes, index: int) -> tuple[bytes, int
             if escaped in (40, 41, 92):
                 result.append(escaped)
                 continue
-            if escaped == 110:
-                result.append(10)
-                continue
-            if escaped == 114:
-                result.append(13)
-                continue
-            if escaped == 116:
-                result.append(9)
-                continue
-            if escaped == 98:
-                result.append(8)
-                continue
-            if escaped == 102:
-                result.append(12)
+            mapped_escape = _ESCAPE_MAP.get(escaped)
+            if mapped_escape is not None:
+                result.append(mapped_escape)
                 continue
             if 48 <= escaped <= 55:
-                oct_digits = bytearray([escaped])
-                for _ in range(2):
-                    if index < length and 48 <= blob[index] <= 55:
-                        oct_digits.append(blob[index])
-                        index += 1
-                    else:
-                        break
-                result.append(int(oct_digits.decode("ascii"), 8))
+                octal_value, index = _consume_octal_digits(blob, index, escaped)
+                result.append(octal_value)
                 continue
             result.append(escaped)
             continue
