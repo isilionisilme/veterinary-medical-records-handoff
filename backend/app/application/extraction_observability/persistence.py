@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -55,7 +56,17 @@ def _read_runs(path: Path) -> list[dict[str, Any]]:
 
 def _write_runs(path: Path, runs: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(runs, ensure_ascii=False, indent=2), encoding="utf-8")
+    payload = json.dumps(runs, ensure_ascii=False, indent=2)
+    temp_path = path.with_suffix(".json.tmp")
+    try:
+        with open(temp_path, "w", encoding="utf-8") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, path)
+    finally:
+        if temp_path.exists():
+            temp_path.unlink(missing_ok=True)
 
 
 def _count_deltas(previous: dict[str, Any] | None, current: dict[str, Any]) -> list[str]:

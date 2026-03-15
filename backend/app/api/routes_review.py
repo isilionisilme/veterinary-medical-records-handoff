@@ -33,7 +33,14 @@ from .review_debug import (
     build_visit_scoping_metrics,
     render_visit_debug_html,
 )
-from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath, RunIdPath
+from .route_constants import (
+    DOCUMENT_NOT_FOUND_MSG,
+    ERROR_CONFLICT,
+    ERROR_INTERNAL,
+    ERROR_NOT_FOUND,
+    DocumentIdPath,
+    RunIdPath,
+)
 from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Review"])
@@ -76,20 +83,21 @@ def _resolve_review_context(
         )
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message=message,
             details={"reason": reason},
         )
 
     raw_text: str | None = None
     run_id = review.review.latest_completed_run.run_id
-    if storage.exists_raw_text(document_id=document_id, run_id=run_id):
-        try:
-            raw_text = storage.resolve_raw_text(document_id=document_id, run_id=run_id).read_text(
-                encoding="utf-8"
-            )
-        except OSError:
-            raw_text = None
+    try:
+        raw_text = storage.resolve_raw_text(document_id=document_id, run_id=run_id).read_text(
+            encoding="utf-8"
+        )
+    except FileNotFoundError:
+        raw_text = None
+    except OSError:
+        raw_text = None
     return review.review, raw_text
 
 
@@ -114,7 +122,7 @@ def get_document_review_context(
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
@@ -126,7 +134,7 @@ def get_document_review_context(
     if review is None:
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message="Review context is not available.",
             details={"reason": "NO_COMPLETED_RUN"},
         )
@@ -139,7 +147,7 @@ def get_document_review_context(
         )
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message=message,
             details={"reason": reason},
         )
@@ -197,7 +205,7 @@ def get_document_review_visit_debug_page(
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
@@ -236,7 +244,7 @@ def get_document_review_visit_scoping_observability(
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
@@ -274,7 +282,7 @@ def mark_document_reviewed_route(
     if result is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
     return _build_review_status_toggle_response(result)
@@ -296,7 +304,7 @@ def reopen_document_review_route(
     if result is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
     return _build_review_status_toggle_response(result)
@@ -332,7 +340,7 @@ def edit_run_interpretation(
     if outcome is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message="Processing run not found.",
         )
 
@@ -358,7 +366,7 @@ def edit_run_interpretation(
         }.get(reason, "Interpretation editing is not available.")
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message=message,
             details={"reason": reason},
         )
@@ -366,7 +374,7 @@ def edit_run_interpretation(
     if outcome.result is None:  # pragma: no cover - defensive
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while editing interpretation.",
         )
 

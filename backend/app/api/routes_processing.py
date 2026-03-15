@@ -17,7 +17,15 @@ from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
 from .deps import get_repository, get_storage
-from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath, RunIdPath
+from .route_constants import (
+    DOCUMENT_NOT_FOUND_MSG,
+    ERROR_ARTIFACT_MISSING,
+    ERROR_CONFLICT,
+    ERROR_INTERNAL,
+    ERROR_NOT_FOUND,
+    DocumentIdPath,
+    RunIdPath,
+)
 from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Processing"])
@@ -40,14 +48,14 @@ def reprocess_document(
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     if not processing_enabled():
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message="Processing is disabled.",
         )
 
@@ -86,14 +94,14 @@ def get_raw_text_artifact(
     if run is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message="Processing run not found.",
         )
 
     if run.state in {ProcessingRunState.QUEUED, ProcessingRunState.RUNNING}:
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message="Raw text is not ready yet.",
             details={"reason": "RAW_TEXT_NOT_READY"},
         )
@@ -101,21 +109,20 @@ def get_raw_text_artifact(
     if run.state in {ProcessingRunState.FAILED, ProcessingRunState.TIMED_OUT}:
         return error_response(
             status_code=status.HTTP_409_CONFLICT,
-            error_code="CONFLICT",
+            error_code=ERROR_CONFLICT,
             message="Raw text is not available for this run.",
             details={"reason": "RAW_TEXT_NOT_AVAILABLE"},
-        )
-
-    if not storage.exists_raw_text(document_id=run.document_id, run_id=run.run_id):
-        return error_response(
-            status_code=status.HTTP_410_GONE,
-            error_code="ARTIFACT_MISSING",
-            message="Raw text artifact is missing.",
         )
 
     try:
         text = storage.resolve_raw_text(document_id=run.document_id, run_id=run.run_id).read_text(
             encoding="utf-8"
+        )
+    except FileNotFoundError:
+        return error_response(
+            status_code=status.HTTP_410_GONE,
+            error_code=ERROR_ARTIFACT_MISSING,
+            message="Raw text artifact is missing.",
         )
     except Exception as exc:  # pragma: no cover - defensive
         log_event(
@@ -126,7 +133,7 @@ def get_raw_text_artifact(
         )
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while accessing raw text.",
         )
 

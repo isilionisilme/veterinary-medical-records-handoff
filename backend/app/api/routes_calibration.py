@@ -22,7 +22,7 @@ from backend.app.application.extraction_observability import (
 )
 from backend.app.config import extraction_observability_enabled
 
-from .route_constants import DebugDocumentIdPath
+from .route_constants import ERROR_INTERNAL, ERROR_NOT_FOUND, DebugDocumentIdPath
 from .routes_common import (
     error_response,
     extraction_observability_disabled_response,
@@ -63,7 +63,7 @@ def persist_debug_extraction_run(
         logger.exception("Failed to persist extraction observability snapshot")
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while persisting extraction snapshot.",
             details={"reason": str(exc)},
         )
@@ -117,7 +117,7 @@ def get_debug_extraction_run_triage(
     if triage is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message="No extraction snapshots found for this document.",
         )
 
@@ -152,7 +152,7 @@ def get_debug_extraction_run_summary(
     if summary is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message="No extraction snapshots found for this document.",
         )
 
