@@ -1,7 +1,7 @@
-type ClassValue = string | false | null | undefined;
+import { clsx, type ClassValue } from "clsx";
 
 export function cn(...classes: ClassValue[]): string {
-  return classes.filter(Boolean).join(" ");
+  return clsx(classes);
 }
 
 export type ApiError = {
