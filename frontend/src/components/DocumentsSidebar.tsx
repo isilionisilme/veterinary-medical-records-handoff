@@ -1,86 +1,45 @@
-import { type ChangeEvent, type DragEvent, type MouseEvent, type RefObject } from "react";
+import { type RefObject } from "react";
 import { CircleHelp, FileText, Pin, PinOff, RefreshCw } from "lucide-react";
 
+import { useWorkspace } from "../context/WorkspaceContext";
 import { DocumentStatusChip } from "./app/DocumentStatusCluster";
 import { IconButton } from "./app/IconButton";
 import { UploadDropzone } from "./UploadDropzone";
 import { Tooltip } from "./ui/tooltip";
-import { type DocumentStatusClusterModel } from "../lib/documentStatus";
 
-type DocumentsSidebarItem = {
-  document_id: string;
-  original_filename: string;
-  created_at: string;
-  status: string;
-  failure_type: string | null;
-  review_status?: string;
-  reviewed_at?: string | null;
-  reviewed_by?: string | null;
-};
+export function DocumentsSidebar() {
+  const ws = useWorkspace();
 
-type DocumentsSidebarProps = {
-  panelHeightClass: string;
-  shouldUseHoverDocsSidebar: boolean;
-  isDocsSidebarExpanded: boolean;
-  isDocsSidebarPinned: boolean;
-  isRefreshingDocuments: boolean;
-  isUploadPending: boolean;
-  isDragOverSidebarUpload: boolean;
-  isDocumentListLoading: boolean;
-  isDocumentListError: boolean;
-  isListRefreshing: boolean;
-  documentListErrorMessage: string | null;
-  documents: DocumentsSidebarItem[];
-  activeId: string | null;
-  uploadPanelRef: RefObject<HTMLDivElement>;
-  fileInputRef: RefObject<HTMLInputElement>;
-  formatTimestamp: (value: string | null | undefined) => string;
-  isProcessingTooLong: (createdAt: string, status: string) => boolean;
-  mapDocumentStatus: (item: DocumentsSidebarItem) => DocumentStatusClusterModel;
-  onSidebarMouseEnter: (event: MouseEvent<HTMLElement>) => void;
-  onSidebarMouseLeave: () => void;
-  onTogglePin: () => void;
-  onRefresh: () => void;
-  onOpenUploadArea: (event?: { preventDefault?: () => void; stopPropagation?: () => void }) => void;
-  onSidebarUploadDragEnter: (event: DragEvent<HTMLDivElement>) => void;
-  onSidebarUploadDragOver: (event: DragEvent<HTMLDivElement>) => void;
-  onSidebarUploadDragLeave: (event: DragEvent<HTMLDivElement>) => void;
-  onSidebarUploadDrop: (event: DragEvent<HTMLDivElement>) => void;
-  onSidebarFileInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onSelectDocument: (documentId: string) => void;
-};
-
-export function DocumentsSidebar({
-  panelHeightClass,
-  shouldUseHoverDocsSidebar,
-  isDocsSidebarExpanded,
-  isDocsSidebarPinned,
-  isRefreshingDocuments,
-  isUploadPending,
-  isDragOverSidebarUpload,
-  isDocumentListLoading,
-  isDocumentListError,
-  isListRefreshing,
-  documentListErrorMessage,
-  documents,
-  activeId,
-  uploadPanelRef,
-  fileInputRef,
-  formatTimestamp,
-  isProcessingTooLong,
-  mapDocumentStatus,
-  onSidebarMouseEnter,
-  onSidebarMouseLeave,
-  onTogglePin,
-  onRefresh,
-  onOpenUploadArea,
-  onSidebarUploadDragEnter,
-  onSidebarUploadDragOver,
-  onSidebarUploadDragLeave,
-  onSidebarUploadDrop,
-  onSidebarFileInputChange,
-  onSelectDocument,
-}: DocumentsSidebarProps) {
+  // Aliases matching original prop names to minimise JSX churn
+  const panelHeightClass = ws.panelHeightClass;
+  const shouldUseHoverDocsSidebar = ws.shouldUseHoverDocsSidebar;
+  const isDocsSidebarExpanded = ws.isDocsSidebarExpanded;
+  const isDocsSidebarPinned = ws.isDocsSidebarPinned;
+  const isRefreshingDocuments = ws.isRefreshingDocuments;
+  const isUploadPending = ws.uploadMutation.isPending;
+  const isDragOverSidebarUpload = ws.isDragOverSidebarUpload;
+  const isDocumentListLoading = ws.documentList.isLoading;
+  const isDocumentListError = ws.isDocumentListErrorVisible;
+  const isListRefreshing = ws.isListRefreshing;
+  const documentListErrorMessage = ws.documentListErrorMessage;
+  const documents = ws.sortedDocuments;
+  const activeId = ws.activeId;
+  const uploadPanelRef = ws.uploadPanelRef as RefObject<HTMLDivElement>;
+  const fileInputRef = ws.fileInputRef as RefObject<HTMLInputElement>;
+  const formatTimestamp = ws.formatTimestamp;
+  const isProcessingTooLong = ws.isProcessingTooLong;
+  const mapDocumentStatus = ws.mapDocumentStatus;
+  const onSidebarMouseEnter = ws.handleDocsSidebarMouseEnter;
+  const onSidebarMouseLeave = ws.handleDocsSidebarMouseLeave;
+  const onTogglePin = ws.handleToggleDocsSidebarPin;
+  const onRefresh = ws.handleRefresh;
+  const onOpenUploadArea = ws.handleOpenUploadArea;
+  const onSidebarUploadDragEnter = ws.handleSidebarUploadDragEnter;
+  const onSidebarUploadDragOver = ws.handleSidebarUploadDragOver;
+  const onSidebarUploadDragLeave = ws.handleSidebarUploadDragLeave;
+  const onSidebarUploadDrop = ws.handleSidebarUploadDrop;
+  const onSidebarFileInputChange = ws.handleSidebarFileInputChange;
+  const onSelectDocument = ws.handleSelectDocument;
   const toReviewDocuments = documents.filter((item) => item.review_status !== "REVIEWED");
   const reviewedDocuments = documents.filter((item) => item.review_status === "REVIEWED");
   const groupedDocuments = [
