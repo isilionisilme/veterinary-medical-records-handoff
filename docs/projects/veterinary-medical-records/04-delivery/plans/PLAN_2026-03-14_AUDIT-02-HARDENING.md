@@ -65,8 +65,8 @@ Merge strategy: Sequential.
 
 | PR | Branch | Scope | Depends on | Status | URL |
 |---|---|---|---|---|---|
-| PR-1 | `fix/security-lifecycle-hardening` | Security headers + SIGTERM handler + debug endpoint gate + POST body limits | None | In progress | — |
-| PR-2 | `chore/remove-processing-runner-shim` | Remove `processing_runner.py`, redirect 15 test imports | PR-1 | Not started | — |
+| PR-1 | `fix/security-lifecycle-hardening` | Security headers + SIGTERM handler + debug endpoint gate + POST body limits | None | Merged | https://github.com/isilionisilme/veterinary-medical-records-handoff/pull/23 |
+| PR-2 | `chore/remove-processing-runner-shim` | Remove `processing_runner.py`, redirect 15 test imports | PR-1 | In progress | — |
 
 ### Partition gate evidence
 
@@ -137,13 +137,13 @@ PR-2 exceeds the file count threshold by 1. All 15 test file changes are single-
 
 ### Phase 6 — Remove processing_runner.py shim [PR-2]
 
-- [ ] **[PR-2] P6-A:** Redirect the 15 test imports to direct `processing.*` modules.
-- [ ] **[PR-2] P6-B:** Delete `backend/app/application/processing_runner.py`.
-- [ ] **[PR-2] P6-C:** Run full test suite (`pytest`, `vitest`) to confirm zero breakage.
+- [x] **[PR-2] P6-A:** Redirect the 15 test imports to direct `processing.*` modules.
+- [x] **[PR-2] P6-B:** Delete `backend/app/application/processing_runner.py`.
+- [x] **[PR-2] P6-C:** Run full test suite (`pytest`, `vitest`) to confirm zero breakage.
 
 ### Phase 7 — Documentation task [PR-2]
 
-- [ ] **[PR-2] P7-A:** Verify whether wiki or doc updates are needed for PR-2 changes.
+- [x] **[PR-2] P7-A:** Verify whether wiki or doc updates are needed for PR-2 changes. Result: `no-doc-needed` — PR-2 only removes a backend compatibility shim and redirects test imports with no runtime/API/operator-facing behavior changes.
 
 ---
 
@@ -187,4 +187,4 @@ pytest backend/tests -q
 
 ## Active Prompt
 
-Execute PR-1 Phases 1-4 from the dedicated worktree.
+Execute PR-2 Phase 7 (documentation verification) from the dedicated worktree.

@@ -3,9 +3,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from backend.app.application.processing_runner import (
+from backend.app.application.processing.candidate_mining import _mine_interpretation_candidates
+from backend.app.application.processing.interpretation import (
     _build_interpretation_artifact,
-    _mine_interpretation_candidates,
 )
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "raw_text"

@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from backend.app.application.processing_runner import _build_interpretation_artifact
+from backend.app.application.processing.interpretation import _build_interpretation_artifact
 
 # ---------------------------------------------------------------------------
 # Fixtures dir & loader

@@ -9,7 +9,10 @@ from pathlib import Path
 import pytest
 
 from backend.app.application.extraction_quality import is_usable_extracted_text
-from backend.app.application.processing_runner import PDF_EXTRACTOR_FORCE_ENV, extract_pdf_text
+from backend.app.application.processing.pdf_extraction import (
+    PDF_EXTRACTOR_FORCE_ENV,
+    extract_pdf_text,
+)
 
 FIXTURES_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "pdfs"
 HAS_FITZ = importlib.util.find_spec("fitz") is not None
