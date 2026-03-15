@@ -5,7 +5,25 @@ from __future__ import annotations
 import re
 
 from backend.app.application.extraction_constants import (
+    ALL_CAPS_MAX_SAMPLE,
+    ALL_CAPS_RATIO_MAX,
+    HUMAN_READABLE_LETTER_RATIO,
+    HUMAN_READABLE_MIN_LENGTH,
+    HUMAN_READABLE_PRINTABLE_RATIO,
+    HUMAN_READABLE_STRANGE_CHAR_RATIO,
+    LINEBREAK_MIN_TEXT_LENGTH,
+    LINEBREAK_RATIO_MIN,
+    LONG_TOKEN_MIN_LENGTH,
+    LONG_TOKEN_MIN_SAMPLE,
+    LONG_TOKEN_RATIO_MAX,
+    PUNCTUATION_RATIO_MAX,
+    QUALITY_MIN_TEXT_LENGTH,
+    QUALITY_MIN_WORD_TOKENS,
     QUALITY_SCORE_THRESHOLD,
+    SINGLE_LETTER_MIN_SAMPLE,
+    SINGLE_LETTER_RATIO_MAX,
+    VOWEL_RATIO_MIN,
+    WHITESPACE_RATIO_MIN,
 )
 
 SUSPICIOUS_SUBSTITUTIONS = (
@@ -21,21 +39,21 @@ def normalize_candidate_text(text: str) -> str:
 
 
 def looks_human_readable_text(text: str) -> bool:
-    if not text or len(text) < 3:
+    if not text or len(text) < HUMAN_READABLE_MIN_LENGTH:
         return False
     printable = sum(char.isprintable() for char in text)
-    if printable / len(text) < 0.9:
+    if printable / len(text) < HUMAN_READABLE_PRINTABLE_RATIO:
         return False
     letters = sum(char.isalpha() for char in text)
     if letters == 0:
         return False
-    if letters / len(text) < 0.35:
+    if letters / len(text) < HUMAN_READABLE_LETTER_RATIO:
         return False
     strange = sum(
         not (char.isalnum() or char.isspace() or char in ".,;:!?()[]{}'\"-_/\\%&+*#@")
         for char in text
     )
-    return strange / len(text) < 0.15
+    return strange / len(text) < HUMAN_READABLE_STRANGE_CHAR_RATIO
 
 
 def is_usable_extracted_text(text: str) -> bool:
@@ -57,14 +75,14 @@ def evaluate_extracted_text_quality(text: str) -> tuple[float, bool, list[str]]:
 
 
 def _evaluate_quality_prerequisites(normalized: str) -> tuple[float, bool, list[str]] | None:
-    if len(normalized) < 20:
+    if len(normalized) < QUALITY_MIN_TEXT_LENGTH:
         return 0.0, False, ["TOO_SHORT"]
 
     if not looks_human_readable_text(normalized):
         return 0.0, False, ["NOT_HUMAN_READABLE"]
 
     word_like_tokens = re.findall(r"[A-Za-zÀ-ÿ]{3,}", normalized)
-    if len(word_like_tokens) < 3:
+    if len(word_like_tokens) < QUALITY_MIN_WORD_TOKENS:
         return 0.0, False, ["TOO_FEW_WORDS"]
 
     letters = [char.lower() for char in normalized if char.isalpha()]
@@ -80,7 +98,7 @@ def _build_quality_metrics(*, text: str, normalized: str) -> dict[str, object]:
     punctuation = sum((not char.isalnum()) and (not char.isspace()) for char in normalized)
     tokens = re.findall(r"\b\w+\b", normalized)
     alpha_tokens = [token for token in tokens if any(char.isalpha() for char in token)]
-    long_alpha_tokens = [token for token in alpha_tokens if len(token) >= 12]
+    long_alpha_tokens = [token for token in alpha_tokens if len(token) >= LONG_TOKEN_MIN_LENGTH]
     single_alpha_tokens = [token for token in alpha_tokens if len(token) == 1 and token.isalpha()]
     uppercase_letters = sum(char.isupper() for char in normalized if char.isalpha())
     lowered_text = normalized.lower()
@@ -111,26 +129,30 @@ def _score_quality_metrics(
     suspicious_hits = metrics["suspicious_hits"]
 
     rules = (
-        (metrics["vowel_ratio"] < 0.30, 0.20, "LOW_VOWEL_RATIO"),
-        (metrics["punctuation_ratio"] > 0.25, 0.25, "HIGH_PUNCTUATION_RATIO"),
-        (metrics["whitespace_ratio"] < 0.10, 0.20, "LOW_WHITESPACE_STRUCTURE"),
+        (metrics["vowel_ratio"] < VOWEL_RATIO_MIN, 0.20, "LOW_VOWEL_RATIO"),
+        (metrics["punctuation_ratio"] > PUNCTUATION_RATIO_MAX, 0.25, "HIGH_PUNCTUATION_RATIO"),
+        (metrics["whitespace_ratio"] < WHITESPACE_RATIO_MIN, 0.20, "LOW_WHITESPACE_STRUCTURE"),
         (
-            metrics["newline_ratio"] < 0.0005 and len(normalized) > 800,
+            metrics["newline_ratio"] < LINEBREAK_RATIO_MIN
+            and len(normalized) > LINEBREAK_MIN_TEXT_LENGTH,
             0.10,
             "LOW_LINEBREAK_STRUCTURE",
         ),
         (
-            metrics["long_alpha_ratio"] > 0.20 and len(alpha_tokens) >= 80,
+            metrics["long_alpha_ratio"] > LONG_TOKEN_RATIO_MAX
+            and len(alpha_tokens) >= LONG_TOKEN_MIN_SAMPLE,
             0.35,
             "EXCESS_LONG_TOKENS",
         ),
         (
-            metrics["single_alpha_ratio"] > 0.045 and len(alpha_tokens) > 120,
+            metrics["single_alpha_ratio"] > SINGLE_LETTER_RATIO_MAX
+            and len(alpha_tokens) > SINGLE_LETTER_MIN_SAMPLE,
             0.35,
             "EXCESS_SINGLE_LETTER_TOKENS",
         ),
         (
-            metrics["uppercase_ratio"] > 0.80 and len(alpha_tokens) < 250,
+            metrics["uppercase_ratio"] > ALL_CAPS_RATIO_MAX
+            and len(alpha_tokens) < ALL_CAPS_MAX_SAMPLE,
             0.20,
             "SUSPICIOUS_ALL_CAPS_DENSITY",
         ),

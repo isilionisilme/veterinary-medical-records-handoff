@@ -204,73 +204,79 @@ def extract_reason_for_visit_from_segment(*, segment_text: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 
+def _build_classification_signals(
+    *, normalized_clause: str, raw_clause: str, has_actions: bool
+) -> dict[str, bool]:
+    """Pre-compute all regex signals used by the classification rules."""
+    return {
+        "anamnesis": _ANAMNESIS_INTENT_RE.search(normalized_clause) is not None,
+        "performed": _PERFORMED_ACTION_RE.search(normalized_clause) is not None,
+        "obs_header": _OBSERVATION_HEADER_RE.search(normalized_clause) is not None,
+        "treatment": _TREATMENT_LABEL_RE.search(raw_clause) is not None,
+        "dosage": _DOSAGE_INSTRUCTION_RE.search(normalized_clause) is not None,
+        "obs_finding": _OBSERVATION_FINDING_RE.search(normalized_clause) is not None,
+        "home_status": _HOME_STATUS_OBSERVATION_RE.search(normalized_clause) is not None,
+        "admin_action": _ADMIN_ACTION_RE.search(normalized_clause) is not None,
+        "admin_cont": _ADMIN_ACTION_CONTINUATION_RE.search(normalized_clause) is not None,
+        "action_cont": _ACTION_CONTINUATION_RE.search(normalized_clause) is not None,
+        "therapeutic": _THERAPEUTIC_ACTION_RE.search(normalized_clause) is not None,
+        "imp_dar": _IMPERATIVE_DAR_RE.search(raw_clause) is not None,
+        "imp_seguir": _IMPERATIVE_SEGUIR_RE.search(raw_clause) is not None,
+        "plan_rec": _PLAN_RECOMMENDATION_RE.search(normalized_clause) is not None,
+        "diagnostic": _DIAGNOSTIC_CONTEXT_RE.search(normalized_clause) is not None,
+        "generic_action": _ACTION_VERB_RE.search(normalized_clause) is not None,
+        "has_actions": has_actions,
+    }
+
+
+# Each rule is (predicate, result). First matching rule wins.
+# True = observation, False = action.
+_CLASSIFICATION_RULES: tuple[tuple[object, bool], ...] = (
+    (lambda s: s["anamnesis"] and not s["performed"], True),
+    (lambda s: s["obs_header"] and not s["treatment"], True),
+    (lambda s: s["obs_finding"] and not s["treatment"] and not s["dosage"], True),
+    (lambda s: s["home_status"], True),
+    (lambda s: s["admin_action"], False),
+    (lambda s: s["admin_cont"] and s["has_actions"], False),
+    (lambda s: s["action_cont"] and s["has_actions"], False),
+    (
+        lambda s: (
+            s["treatment"]
+            or s["imp_dar"]
+            or s["imp_seguir"]
+            or s["dosage"]
+            or s["plan_rec"]
+            or s["therapeutic"]
+        ),
+        False,
+    ),
+    (
+        lambda s: (
+            s["diagnostic"]
+            and not s["treatment"]
+            and not s["imp_dar"]
+            and not s["imp_seguir"]
+            and not s["therapeutic"]
+            and not s["generic_action"]
+        ),
+        True,
+    ),
+    (lambda s: s["generic_action"], False),
+)
+
+
 def _classify_as_observation(
     *, normalized_clause: str, raw_clause: str, actions: list[str]
 ) -> bool | None:
     """Return True if observation, False if action, None if undecided."""
-    has_anamnesis_intent = _ANAMNESIS_INTENT_RE.search(normalized_clause) is not None
-    has_performed_action = _PERFORMED_ACTION_RE.search(normalized_clause) is not None
-
-    if has_anamnesis_intent and not has_performed_action:
-        return True
-
-    has_treatment_label = _TREATMENT_LABEL_RE.search(raw_clause) is not None
-    has_dosage_instruction = _DOSAGE_INSTRUCTION_RE.search(normalized_clause) is not None
-
-    if _OBSERVATION_HEADER_RE.search(normalized_clause) is not None and not has_treatment_label:
-        return True
-
-    if (
-        _OBSERVATION_FINDING_RE.search(normalized_clause) is not None
-        and not has_treatment_label
-        and not has_dosage_instruction
-    ):
-        return True
-
-    if _HOME_STATUS_OBSERVATION_RE.search(normalized_clause) is not None:
-        return True
-
-    if _ADMIN_ACTION_RE.search(normalized_clause) is not None:
-        return False
-
-    if _ADMIN_ACTION_CONTINUATION_RE.search(normalized_clause) is not None and actions:
-        return False
-
-    if _ACTION_CONTINUATION_RE.search(normalized_clause) is not None and actions:
-        return False
-
-    is_therapeutic_action = _THERAPEUTIC_ACTION_RE.search(normalized_clause) is not None
-    has_imperative_dar = _IMPERATIVE_DAR_RE.search(raw_clause) is not None
-    has_imperative_seguir = _IMPERATIVE_SEGUIR_RE.search(raw_clause) is not None
-    has_plan_recommendation = _PLAN_RECOMMENDATION_RE.search(normalized_clause) is not None
-
-    if (
-        has_treatment_label
-        or has_imperative_dar
-        or has_imperative_seguir
-        or has_dosage_instruction
-        or has_plan_recommendation
-        or is_therapeutic_action
-    ):
-        return False
-
-    is_diagnostic_context = _DIAGNOSTIC_CONTEXT_RE.search(normalized_clause) is not None
-    is_generic_action = _ACTION_VERB_RE.search(normalized_clause) is not None
-
-    if (
-        is_diagnostic_context
-        and not has_treatment_label
-        and not has_imperative_dar
-        and not has_imperative_seguir
-        and not is_therapeutic_action
-        and not is_generic_action
-    ):
-        return True
-
-    if is_generic_action:
-        return False
-
-    # Default: observation
+    signals = _build_classification_signals(
+        normalized_clause=normalized_clause,
+        raw_clause=raw_clause,
+        has_actions=bool(actions),
+    )
+    for predicate, result in _CLASSIFICATION_RULES:
+        if predicate(signals):
+            return result
     return None
 
 

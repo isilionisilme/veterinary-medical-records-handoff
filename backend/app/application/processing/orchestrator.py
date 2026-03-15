@@ -140,47 +140,115 @@ def _persist_observability_snapshot_for_completed_run(
         )
 
 
-async def _process_document(
+def _record_step_failure(
+    *,
+    repository: DocumentRepository,
+    run_id: str,
+    step_name: StepName,
+    started_at: str,
+    error_code: str,
+) -> None:
+    """Record a FAILED step status — used by step functions for early exits."""
+    _append_step_status(
+        repository=repository,
+        run_id=run_id,
+        step_name=step_name,
+        step_status=StepStatus.FAILED,
+        attempt=1,
+        started_at=started_at,
+        ended_at=_default_now_iso(),
+        error_code=error_code,
+    )
+
+
+async def _run_step(
+    *,
+    repository: DocumentRepository,
+    run_id: str,
+    step_name: StepName,
+    step_fn,
+    failure_type: str,
+):
+    """Execute a processing step with lifecycle tracking (RUNNING -> SUCCEEDED/FAILED)."""
+    started_at = _default_now_iso()
+    _append_step_status(
+        repository=repository,
+        run_id=run_id,
+        step_name=step_name,
+        step_status=StepStatus.RUNNING,
+        attempt=1,
+        started_at=started_at,
+        ended_at=None,
+        error_code=None,
+    )
+    try:
+        result = await step_fn(started_at)
+    except ProcessingError:
+        raise
+    except InterpretationBuildError as exc:
+        _append_step_status(
+            repository=repository,
+            run_id=run_id,
+            step_name=step_name,
+            step_status=StepStatus.FAILED,
+            attempt=1,
+            started_at=started_at,
+            ended_at=_default_now_iso(),
+            error_code=exc.error_code,
+            details=exc.details,
+        )
+        raise ProcessingError(failure_type) from exc
+    except Exception as exc:
+        _append_step_status(
+            repository=repository,
+            run_id=run_id,
+            step_name=step_name,
+            step_status=StepStatus.FAILED,
+            attempt=1,
+            started_at=started_at,
+            ended_at=_default_now_iso(),
+            error_code=failure_type,
+        )
+        raise ProcessingError(failure_type) from exc
+    else:
+        _append_step_status(
+            repository=repository,
+            run_id=run_id,
+            step_name=step_name,
+            step_status=StepStatus.SUCCEEDED,
+            attempt=1,
+            started_at=started_at,
+            ended_at=_default_now_iso(),
+            error_code=None,
+        )
+        return result
+
+
+async def _extraction_step(
+    started_at: str,
     *,
     run_id: str,
     document_id: str,
     repository: DocumentRepository,
     storage: FileStorage,
-) -> None:
-    extraction_started_at = _default_now_iso()
-    _append_step_status(
-        repository=repository,
-        run_id=run_id,
-        step_name=StepName.EXTRACTION,
-        step_status=StepStatus.RUNNING,
-        attempt=1,
-        started_at=extraction_started_at,
-        ended_at=None,
-        error_code=None,
-    )
-
+) -> str:
+    """Extract text from PDF: validate inputs, run extractor, check quality, persist."""
     document = repository.get(document_id)
     if document is None:
-        _append_step_status(
+        _record_step_failure(
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=extraction_started_at,
-            ended_at=_default_now_iso(),
+            started_at=started_at,
             error_code="EXTRACTION_FAILED",
         )
         raise ProcessingError("EXTRACTION_FAILED")
     if not storage.exists(storage_path=document.storage_path):
-        _append_step_status(
+        _record_step_failure(
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=extraction_started_at,
-            ended_at=_default_now_iso(),
+            started_at=started_at,
             error_code="EXTRACTION_FAILED",
         )
         raise ProcessingError("EXTRACTION_FAILED")
@@ -188,14 +256,11 @@ async def _process_document(
     file_path = storage.resolve(storage_path=document.storage_path)
     file_size = await asyncio.to_thread(lambda: file_path.stat().st_size)
     if file_size == 0:
-        _append_step_status(
+        _record_step_failure(
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=extraction_started_at,
-            ended_at=_default_now_iso(),
+            started_at=started_at,
             error_code="EXTRACTION_FAILED",
         )
         raise ProcessingError("EXTRACTION_FAILED")
@@ -218,14 +283,11 @@ async def _process_document(
         quality_reasons,
     )
     if not quality_pass:
-        _append_step_status(
+        _record_step_failure(
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=extraction_started_at,
-            ended_at=_default_now_iso(),
+            started_at=started_at,
             error_code="EXTRACTION_LOW_QUALITY",
         )
         raise ProcessingError("EXTRACTION_LOW_QUALITY")
@@ -233,90 +295,74 @@ async def _process_document(
     try:
         storage.save_raw_text(document_id=document_id, run_id=run_id, text=raw_text)
     except Exception as exc:
-        _append_step_status(
+        _record_step_failure(
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=extraction_started_at,
-            ended_at=_default_now_iso(),
+            started_at=started_at,
             error_code="EXTRACTION_FAILED",
         )
         raise ProcessingError("EXTRACTION_FAILED") from exc
 
-    _append_step_status(
+    return raw_text
+
+
+async def _interpretation_step(
+    started_at: str,
+    *,
+    run_id: str,
+    document_id: str,
+    raw_text: str,
+    repository: DocumentRepository,
+) -> None:
+    """Build structured interpretation from extracted text and persist artifact."""
+    interpretation_payload = _build_interpretation_artifact(
+        document_id=document_id,
+        run_id=run_id,
+        raw_text=raw_text,
+        repository=repository,
+    )
+    repository.append_artifact(
+        run_id=run_id,
+        artifact_type="STRUCTURED_INTERPRETATION",
+        payload=interpretation_payload,
+        created_at=_default_now_iso(),
+    )
+    await asyncio.sleep(0.05)
+
+
+async def _process_document(
+    *,
+    run_id: str,
+    document_id: str,
+    repository: DocumentRepository,
+    storage: FileStorage,
+) -> None:
+    raw_text = await _run_step(
         repository=repository,
         run_id=run_id,
         step_name=StepName.EXTRACTION,
-        step_status=StepStatus.SUCCEEDED,
-        attempt=1,
-        started_at=extraction_started_at,
-        ended_at=_default_now_iso(),
-        error_code=None,
+        step_fn=lambda started_at: _extraction_step(
+            started_at,
+            run_id=run_id,
+            document_id=document_id,
+            repository=repository,
+            storage=storage,
+        ),
+        failure_type="EXTRACTION_FAILED",
     )
-
-    interpretation_started_at = _default_now_iso()
-    _append_step_status(
+    await _run_step(
         repository=repository,
         run_id=run_id,
         step_name=StepName.INTERPRETATION,
-        step_status=StepStatus.RUNNING,
-        attempt=1,
-        started_at=interpretation_started_at,
-        ended_at=None,
-        error_code=None,
-    )
-    try:
-        interpretation_payload = _build_interpretation_artifact(
-            document_id=document_id,
+        step_fn=lambda started_at: _interpretation_step(
+            started_at,
             run_id=run_id,
+            document_id=document_id,
             raw_text=raw_text,
             repository=repository,
-        )
-        repository.append_artifact(
-            run_id=run_id,
-            artifact_type="STRUCTURED_INTERPRETATION",
-            payload=interpretation_payload,
-            created_at=_default_now_iso(),
-        )
-    except InterpretationBuildError as exc:
-        _append_step_status(
-            repository=repository,
-            run_id=run_id,
-            step_name=StepName.INTERPRETATION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=interpretation_started_at,
-            ended_at=_default_now_iso(),
-            error_code=exc.error_code,
-            details=exc.details,
-        )
-        raise ProcessingError("INTERPRETATION_FAILED") from exc
-    except Exception as exc:
-        _append_step_status(
-            repository=repository,
-            run_id=run_id,
-            step_name=StepName.INTERPRETATION,
-            step_status=StepStatus.FAILED,
-            attempt=1,
-            started_at=interpretation_started_at,
-            ended_at=_default_now_iso(),
-            error_code="INTERPRETATION_FAILED",
-            details=None,
-        )
-        raise ProcessingError("INTERPRETATION_FAILED") from exc
-
-    await asyncio.sleep(0.05)
-    _append_step_status(
-        repository=repository,
-        run_id=run_id,
-        step_name=StepName.INTERPRETATION,
-        step_status=StepStatus.SUCCEEDED,
-        attempt=1,
-        started_at=interpretation_started_at,
-        ended_at=_default_now_iso(),
-        error_code=None,
+        ),
+        failure_type="INTERPRETATION_FAILED",
     )
 
 
