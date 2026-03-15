@@ -28,6 +28,8 @@ from backend.app.application.documents.visit_population import (
     populate_visit_scoped_fields_from_segment_candidates,
 )
 
+_UNASSIGNED_VISIT_SORT_DATE = "9999-12-31"
+
 
 class FieldClassificationResult(NamedTuple):
     """Result of classifying raw fields into scopes."""
@@ -387,7 +389,7 @@ def _finalize_visit_list(
     """Phase 8: Sort visits and append unassigned bucket if non-empty."""
     assigned_visits.sort(
         key=lambda visit: (
-            str(visit.get("visit_date") or "9999-12-31"),
+            str(visit.get("visit_date") or _UNASSIGNED_VISIT_SORT_DATE),
             str(visit.get("visit_id") or ""),
         )
     )
