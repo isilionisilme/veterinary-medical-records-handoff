@@ -26,7 +26,11 @@ def get_storage_root() -> Path:
 
 
 class LocalFileStorage(FileStorage):
-    """Filesystem-backed storage adapter."""
+    """Filesystem-backed storage adapter.
+
+    Instances are stateless, so sync file operations can be dispatched from
+    worker threads via asyncio.to_thread() without shared-state concerns.
+    """
 
     def save(self, *, document_id: str, content: bytes) -> StoredFile:
         """Persist a document file using an atomic write."""

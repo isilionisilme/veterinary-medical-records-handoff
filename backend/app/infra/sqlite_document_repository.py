@@ -28,7 +28,11 @@ from backend.app.infra.sqlite_run_repo import SqliteRunRepo
 
 
 class SqliteDocumentRepository:
-    """Facade implementing the unified repository contract."""
+    """Facade implementing the unified repository contract.
+
+    The delegate repositories open SQLite connections per method call, so this
+    facade is safe to invoke from worker threads via asyncio.to_thread().
+    """
 
     def __init__(self) -> None:
         self._documents = SqliteDocumentRepo()
