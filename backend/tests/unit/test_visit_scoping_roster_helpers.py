@@ -6,7 +6,9 @@ from backend.app.application.documents.visit_scoping import (
     _classify_fields_into_scopes,
     _generate_missing_visits,
     _parse_existing_visits,
-    _should_scope_weight_as_visit,
+)
+from backend.app.application.documents.visit_scoping_helpers import (
+    should_scope_weight_as_visit as _should_scope_weight_as_visit,
 )
 
 
