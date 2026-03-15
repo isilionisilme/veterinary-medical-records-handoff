@@ -18,6 +18,18 @@ from backend.app.domain.models import (
 from backend.app.infra import database
 
 
+def _row_to_run_details(row: object) -> ProcessingRunDetails:
+    return ProcessingRunDetails(
+        run_id=row["run_id"],
+        document_id=row["document_id"],
+        state=ProcessingRunState(row["state"]),
+        created_at=row["created_at"],
+        started_at=row["started_at"],
+        completed_at=row["completed_at"],
+        failure_type=row["failure_type"],
+    )
+
+
 class SqliteRunRepo:
     """SQLite-backed repository for processing runs and artifacts."""
 
@@ -67,15 +79,7 @@ class SqliteRunRepo:
         if row is None:
             return None
 
-        return ProcessingRunDetails(
-            run_id=row["run_id"],
-            document_id=row["document_id"],
-            state=ProcessingRunState(row["state"]),
-            created_at=row["created_at"],
-            started_at=row["started_at"],
-            completed_at=row["completed_at"],
-            failure_type=row["failure_type"],
-        )
+        return _row_to_run_details(row)
 
     def get_latest_completed_run(self, document_id: str) -> ProcessingRunDetails | None:
         with database.get_connection() as conn:
@@ -100,15 +104,7 @@ class SqliteRunRepo:
         if row is None:
             return None
 
-        return ProcessingRunDetails(
-            run_id=row["run_id"],
-            document_id=row["document_id"],
-            state=ProcessingRunState(row["state"]),
-            created_at=row["created_at"],
-            started_at=row["started_at"],
-            completed_at=row["completed_at"],
-            failure_type=row["failure_type"],
-        )
+        return _row_to_run_details(row)
 
     def create_processing_run(
         self,

@@ -15,6 +15,22 @@ from backend.app.domain.models import (
 from backend.app.infra import database
 
 
+def _row_to_document(row: object) -> Document:
+    return Document(
+        document_id=row["document_id"],
+        original_filename=row["original_filename"],
+        content_type=row["content_type"],
+        file_size=row["file_size"],
+        storage_path=row["storage_path"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+        review_status=ReviewStatus(row["review_status"]),
+        reviewed_at=row["reviewed_at"],
+        reviewed_by=row["reviewed_by"],
+        reviewed_run_id=row["reviewed_run_id"],
+    )
+
+
 class SqliteDocumentRepo:
     """SQLite-backed repository for document CRUD and review metadata."""
 
@@ -85,19 +101,7 @@ class SqliteDocumentRepo:
         if row is None:
             return None
 
-        return Document(
-            document_id=row["document_id"],
-            original_filename=row["original_filename"],
-            content_type=row["content_type"],
-            file_size=row["file_size"],
-            storage_path=row["storage_path"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-            review_status=ReviewStatus(row["review_status"]),
-            reviewed_at=row["reviewed_at"],
-            reviewed_by=row["reviewed_by"],
-            reviewed_run_id=row["reviewed_run_id"],
-        )
+        return _row_to_document(row)
 
     def list_documents(self, *, limit: int, offset: int) -> list[DocumentWithLatestRun]:
         with database.get_connection() as conn:
@@ -135,19 +139,7 @@ class SqliteDocumentRepo:
 
         results: list[DocumentWithLatestRun] = []
         for row in rows:
-            document = Document(
-                document_id=row["document_id"],
-                original_filename=row["original_filename"],
-                content_type=row["content_type"],
-                file_size=row["file_size"],
-                storage_path=row["storage_path"],
-                created_at=row["created_at"],
-                updated_at=row["updated_at"],
-                review_status=ReviewStatus(row["review_status"]),
-                reviewed_at=row["reviewed_at"],
-                reviewed_by=row["reviewed_by"],
-                reviewed_run_id=row["reviewed_run_id"],
-            )
+            document = _row_to_document(row)
             latest_run = None
             if row["latest_run_id"] is not None:
                 latest_run = ProcessingRunSummary(
