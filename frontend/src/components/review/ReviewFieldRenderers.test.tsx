@@ -5,7 +5,7 @@ import {
   createReviewFieldRenderers,
   type ReviewFieldRenderersContext,
 } from "./ReviewFieldRenderers";
-import type { ReviewDisplayField, ReviewSelectableField } from "../../types/appWorkspace";
+import type { ReviewDisplayField, ReviewSelectableField } from "../../types";
 
 function createSelectableField(overrides?: Partial<ReviewSelectableField>): ReviewSelectableField {
   return {

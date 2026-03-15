@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { type ProcessingHistoryRun } from "../../types/appWorkspace";
-import { type VisitScopingMetricsResponse } from "../../types/appWorkspace";
+import { type ProcessingHistoryRun } from "../../types";
+import { type VisitScopingMetricsResponse } from "../../types";
 import { RawTextTab } from "./RawTextTab";
 import { TechnicalTab } from "./TechnicalTab";
 import { UploadPanel } from "./UploadPanel";

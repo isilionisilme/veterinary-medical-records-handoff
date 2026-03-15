@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { triggerReprocess } from "../api/documentApi";
 import { type ActionFeedback } from "../components/toast/toast-types";
 import { getTechnicalDetails, getUserErrorMessage } from "../lib/appWorkspaceUtils";
-import { type DocumentDetailResponse, type DocumentListResponse } from "../types/appWorkspace";
+import { type DocumentDetailResponse, type DocumentListResponse } from "../types";
 
 type UseReprocessingParams = {
   activeId: string | null;

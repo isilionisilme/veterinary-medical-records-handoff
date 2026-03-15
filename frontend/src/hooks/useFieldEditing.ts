@@ -2,10 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { type ActionFeedback } from "../components/toast/toast-types";
 import { resolveCandidateSuggestionSections } from "../extraction/candidateSuggestions";
 import { getControlledVocabOptionValues, validateFieldValue } from "../extraction/fieldValidators";
-import {
-  type InterpretationChangePayload,
-  type ReviewSelectableField,
-} from "../types/appWorkspace";
+import { type InterpretationChangePayload, type ReviewSelectableField } from "../types";
 type UseFieldEditingParams = {
   onSubmitInterpretationChanges: (
     changes: InterpretationChangePayload[],

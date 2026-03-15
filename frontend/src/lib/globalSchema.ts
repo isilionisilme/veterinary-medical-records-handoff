@@ -23,7 +23,3 @@ export const GLOBAL_SCHEMA: GlobalSchemaField[] = parsedContract.fields.map((fie
   ...field,
   order: index + 1,
 }));
-
-export const GLOBAL_SCHEMA_SECTION_ORDER: string[] = [
-  ...new Set(GLOBAL_SCHEMA.map((field) => field.section)),
-];

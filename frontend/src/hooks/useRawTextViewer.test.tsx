@@ -4,7 +4,7 @@ import { type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { fetchRawText } from "../api/documentApi";
-import { ApiResponseError } from "../types/appWorkspace";
+import { ApiResponseError } from "../types";
 import { useRawTextViewer } from "./useRawTextViewer";
 
 vi.mock("../api/documentApi", () => ({

@@ -2,7 +2,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import * as workspaceUtils from "../lib/appWorkspaceUtils";
-import type { StructuredInterpretationData } from "../types/appWorkspace";
+import type { StructuredInterpretationData } from "../types";
 import { useConfidenceDiagnostics } from "./useConfidenceDiagnostics";
 
 function buildInterpretationData(

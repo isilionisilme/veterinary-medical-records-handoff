@@ -8,7 +8,7 @@ import {
   type DocumentDetailResponse,
   type DocumentListResponse,
   type DocumentReviewResponse,
-} from "../types/appWorkspace";
+} from "../types";
 
 type UseReviewToggleParams = {
   onActionFeedback: Dispatch<SetStateAction<ActionFeedback | null>>;

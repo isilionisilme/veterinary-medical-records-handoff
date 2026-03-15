@@ -17,7 +17,7 @@ import type {
   ReviewSelectableField,
   ReviewVisitGroup,
   StructuredInterpretationData,
-} from "../types/appWorkspace";
+} from "../types";
 
 type UseFieldExtractionParams = {
   documentReview: {

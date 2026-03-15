@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchDocuments, uploadDocument } from "../api/documentApi";
 import { type UploadFeedback } from "../components/toast/toast-types";
 import { getTechnicalDetails, getUserErrorMessage } from "../lib/appWorkspaceUtils";
-import { type DocumentListResponse } from "../types/appWorkspace";
+import { type DocumentListResponse } from "../types";
 
 type UseDocumentUploadParams = {
   requestPdfLoad: (documentId: string) => void;

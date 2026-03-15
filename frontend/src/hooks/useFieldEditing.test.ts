@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { type ReviewSelectableField } from "../types/appWorkspace";
+import { type ReviewSelectableField } from "../types";
 import { useFieldEditing } from "./useFieldEditing";
 
 function buildSelectableField(

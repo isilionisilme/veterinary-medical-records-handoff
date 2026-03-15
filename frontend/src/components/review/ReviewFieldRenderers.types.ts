@@ -1,5 +1,5 @@
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
-import type { ConfidencePolicyConfig, ReviewSelectableField } from "../../types/appWorkspace";
+import type { ConfidencePolicyConfig, ReviewSelectableField } from "../../types";
 
 export type ReviewFieldRenderersContext = {
   activeConfidencePolicy: ConfidencePolicyConfig | null;

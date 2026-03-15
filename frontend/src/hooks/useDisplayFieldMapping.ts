@@ -27,7 +27,7 @@ import type {
   ReviewField,
   ReviewSelectableField,
   StructuredInterpretationData,
-} from "../types/appWorkspace";
+} from "../types";
 import type { BuildSelectableFieldFn } from "./useFieldExtraction";
 
 type UseDisplayFieldMappingParams = {

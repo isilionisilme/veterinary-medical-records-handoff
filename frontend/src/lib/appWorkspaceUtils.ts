@@ -30,7 +30,7 @@ import type {
   ReviewVisitGroup,
   StructuredInterpretationData,
   UiError,
-} from "../types/appWorkspace";
+} from "../types";
 
 export function isLongTextFieldKey(fieldKey: string): boolean {
   return LONG_TEXT_FIELD_KEYS.has(fieldKey);

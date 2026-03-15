@@ -10,7 +10,7 @@ import type {
   ReviewField,
   ReviewSelectableField,
   ReviewVisitGroup,
-} from "../../types/appWorkspace";
+} from "../../types";
 
 function createReviewField(overrides?: Partial<ReviewField>): ReviewField {
   return {

@@ -46,7 +46,7 @@ import {
   isProcessingTooLong,
 } from "./lib/appWorkspaceUtils";
 import { mapDocumentStatus } from "./lib/documentStatus";
-import { type ReviewSelectableField, type ReviewVisitGroup } from "./types/appWorkspace";
+import { type ReviewSelectableField, type ReviewVisitGroup } from "./types";
 export {
   MIN_PDF_PANEL_WIDTH_PX,
   REVIEW_SPLIT_MIN_WIDTH_PX,

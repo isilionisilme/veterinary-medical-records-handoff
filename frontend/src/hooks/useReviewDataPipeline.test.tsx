@@ -5,7 +5,7 @@ import type {
   ConfidencePolicyConfig,
   DocumentReviewResponse,
   StructuredInterpretationData,
-} from "../types/appWorkspace";
+} from "../types";
 import { useReviewDataPipeline } from "./useReviewDataPipeline";
 
 function buildInterpretationData(

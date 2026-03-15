@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { DocumentReviewResponse, StructuredInterpretationData } from "../types/appWorkspace";
+import type { DocumentReviewResponse, StructuredInterpretationData } from "../types";
 import { useReviewPanelStatus } from "./useReviewPanelStatus";
 
 function buildInterpretationData(): StructuredInterpretationData {

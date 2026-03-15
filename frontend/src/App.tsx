@@ -1,4 +1,4 @@
-import { ReviewWorkspace } from "./components/ReviewWorkspace";
+import { App as ReviewWorkspace } from "./AppWorkspace";
 
 export {
   MIN_PDF_PANEL_WIDTH_PX,

@@ -5,7 +5,7 @@ import {
   formatSignedPercent,
   getConfidenceTone,
 } from "../../lib/appWorkspaceUtils";
-import type { ReviewSelectableField } from "../../types/appWorkspace";
+import type { ReviewSelectableField } from "../../types";
 import type { ReviewFieldRenderersContext } from "./ReviewFieldRenderers.types";
 
 export function buildFieldTooltip(
