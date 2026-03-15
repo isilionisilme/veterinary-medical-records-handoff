@@ -3,7 +3,7 @@
 > **Operational rules:** See [plan-execution-protocol.md](../../../03-ops/plan-execution-protocol.md) for agent execution protocol, scope boundary, and validation gates.
 
 **Branch pool:** `refactor/repo-dry-extraction`, `refactor/config-error-consolidation`, `fix/concurrency-toctou-atomic`
-**PR:** See ## PR Roadmap
+**PR:** [#37](https://github.com/isilionisilme/veterinary-medical-records-handoff/pull/37)
 **User Story:** N/A — audit-driven remediation (Audit-04)
 **Prerequisite:** `origin/main` @ `e87fbbf` (clean, all CI green)
 **Worktree:** `D:\Git\worktrees\repo-dry-extraction`
@@ -69,7 +69,7 @@ Merge strategy: PR-A and PR-B are parallel-safe; PR-C is sequenced after PR-B to
 
 | PR | Branch | Scope | Depends on | Execution | Review depth | Reviewer | Status |
 |---|---|---|---|---|---|---|---|
-| PR-A | `refactor/repo-dry-extraction` | Extract `_row_to_document()` + `_row_to_run_details()` helpers | None | GPT-5.4 | Light | GPT-5.4 | Not started |
+| PR-A | `refactor/repo-dry-extraction` | Extract `_row_to_document()` + `_row_to_run_details()` helpers | None | GPT-5.4 | Light | GPT-5.4 | Open ([#37](https://github.com/isilionisilme/veterinary-medical-records-handoff/pull/37)) |
 | PR-B | `refactor/config-error-consolidation` | `_read_env_bool()` + inline `_parse_bounded_float_strict` + sentinel constant | None | GPT-5.4 | Standard | GPT-5.4 | Not started |
 | PR-C | `fix/routes-hardening-and-atomic-write` | Route error code constants + TOCTOU try-except conversion + atomic write | PR-B | GPT-5.4 | Standard | GPT-5.4 | Not started |
 
