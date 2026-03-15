@@ -1,11 +1,10 @@
 """Document-related API routes."""
 
 from pathlib import Path
-from typing import Annotated, Any, cast
+from typing import Any, cast
 from urllib.parse import quote
 
 from fastapi import APIRouter, File, Query, Request, UploadFile, status
-from fastapi import Path as ParamPath
 from fastapi.responses import FileResponse, JSONResponse, Response
 
 from backend.app.api.schemas import (
@@ -13,7 +12,6 @@ from backend.app.api.schemas import (
     DocumentListResponse,
     DocumentResponse,
     DocumentUploadResponse,
-    ErrorResponse,
     LatestRunResponse,
     ProcessingHistoryResponse,
     ProcessingHistoryRunResponse,
@@ -33,6 +31,7 @@ from backend.app.infra.rate_limiter import limiter
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath
 from .routes_common import _request_content_length, error_response, log_event
 
 router = APIRouter(tags=["Documents"])
@@ -45,8 +44,6 @@ ALLOWED_CONTENT_TYPES = {
 }
 ALLOWED_EXTENSIONS = {".pdf"}
 DEFAULT_LIST_LIMIT = 50
-UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-DocumentIdPath = Annotated[str, ParamPath(..., pattern=UUID_PATH_PATTERN)]
 
 
 def _safe_content_disposition(disposition_type: str, filename: str) -> str:
@@ -159,7 +156,7 @@ def get_document_status(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     latest_run = None
@@ -212,7 +209,7 @@ def get_document_processing_history(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     log_event(
@@ -285,7 +282,7 @@ def get_document_original(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
     if not location.exists:
         log_event(
@@ -340,8 +337,8 @@ def get_document_original(
         "Release 1 stores the original PDF in filesystem storage."
     ),
     responses={
-        400: {"model": ErrorResponse, "description": "Invalid request (INVALID_REQUEST)."},
-        422: {"model": ErrorResponse, "description": "Validation error (UNPROCESSABLE_ENTITY)."},
+        400: {"description": "Invalid request (INVALID_REQUEST)."},
+        422: {"description": "Validation error (UNPROCESSABLE_ENTITY)."},
         413: {"description": "Uploaded file exceeds the maximum allowed size (FILE_TOO_LARGE)."},
         415: {"description": "Unsupported upload type (UNSUPPORTED_MEDIA_TYPE)."},
         500: {"description": "Unexpected storage or database failure (INTERNAL_ERROR)."},

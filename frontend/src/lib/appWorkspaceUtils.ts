@@ -403,7 +403,9 @@ export function emitConfidencePolicyDiagnosticEvent(event: ConfidencePolicyDiagn
     store.push(event);
     window.__confidencePolicyDiagnostics = store;
   }
-  console.warn("[confidence-policy]", event);
+  if (import.meta.env.DEV) {
+    console.warn("[confidence-policy]", event);
+  }
 }
 
 export function isFieldValueEmpty(value: unknown): boolean {

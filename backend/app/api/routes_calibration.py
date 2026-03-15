@@ -22,6 +22,7 @@ from backend.app.application.extraction_observability import (
 )
 from backend.app.config import extraction_observability_enabled
 
+from .route_constants import DebugDocumentIdPath
 from .routes_common import (
     error_response,
     extraction_observability_disabled_response,
@@ -89,7 +90,9 @@ def persist_debug_extraction_run(
     summary="Get persisted extraction observability snapshots",
     description="Return persisted extraction snapshots for a document (latest first).",
 )
-def list_debug_extraction_runs(document_id: str) -> ExtractionRunsListResponse | JSONResponse:
+def list_debug_extraction_runs(
+    document_id: DebugDocumentIdPath,
+) -> ExtractionRunsListResponse | JSONResponse:
     if not extraction_observability_enabled():
         return extraction_observability_disabled_response()
 
@@ -104,7 +107,9 @@ def list_debug_extraction_runs(document_id: str) -> ExtractionRunsListResponse |
     summary="Get extraction triage for latest persisted run",
     description="Return triage report for the latest persisted extraction snapshot.",
 )
-def get_debug_extraction_run_triage(document_id: str) -> ExtractionRunTriageResponse | JSONResponse:
+def get_debug_extraction_run_triage(
+    document_id: DebugDocumentIdPath,
+) -> ExtractionRunTriageResponse | JSONResponse:
     if not extraction_observability_enabled():
         return extraction_observability_disabled_response()
 
@@ -130,7 +135,7 @@ def get_debug_extraction_run_triage(document_id: str) -> ExtractionRunTriageResp
     ),
 )
 def get_debug_extraction_run_summary(
-    document_id: str,
+    document_id: DebugDocumentIdPath,
     limit: int = Query(20, ge=1, le=20, description="How many latest runs to aggregate."),
     run_id: str | None = Query(
         None,

@@ -57,7 +57,8 @@ def log_event(
         payload["access_type"] = access_type
     if count_returned is not None:
         payload["count_returned"] = count_returned
-    logger.info(json.dumps(payload))
+    level = logging.WARNING if error_code or failure_reason else logging.INFO
+    logger.log(level, json.dumps(payload))
 
 
 def _request_content_length(request: Request) -> int | None:

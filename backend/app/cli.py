@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
+import sys
 
 from backend.app.infra import database
+from backend.app.logging_config import configure_logging
 from backend.app.settings import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 def _mask_config(key: str, value: object) -> object:
@@ -21,7 +26,7 @@ def _mask_config(key: str, value: object) -> object:
 
 def command_db_schema() -> int:
     database.ensure_schema()
-    print("Schema ensured successfully.")
+    logger.info("Schema ensured successfully.")
     return 0
 
 
@@ -32,16 +37,17 @@ def command_db_check() -> int:
         table_count = conn.execute(
             "SELECT COUNT(*) FROM sqlite_master WHERE type='table'"
         ).fetchone()[0]
-    print(f"DB path: {path}")
-    print(f"Exists: {exists}")
-    print(f"Table count: {table_count}")
+    logger.info("DB path: %s", path)
+    logger.info("Exists: %s", exists)
+    logger.info("Table count: %s", table_count)
     return 0
 
 
 def command_config_check() -> int:
     settings = get_settings()
     payload = {key: _mask_config(key, value) for key, value in settings.__dict__.items()}
-    print(json.dumps(payload, indent=2, sort_keys=True))
+    logger.info("Resolved runtime configuration keys=%s", sorted(payload))
+    sys.stdout.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     return 0
 
 
@@ -57,6 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    configure_logging(getattr(get_settings(), "log_level", "INFO"))
     parser = build_parser()
     args = parser.parse_args()
 

@@ -18,6 +18,7 @@ from backend.app.domain.models import ProcessingRunState
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath, RunIdPath
 from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Processing"])
@@ -33,7 +34,7 @@ router = APIRouter(tags=["Processing"])
 )
 def reprocess_document(
     request: Request,
-    document_id: str,
+    document_id: DocumentIdPath,
 ) -> ProcessingRunResponse | JSONResponse:
     """Create a new queued processing run for an existing document."""
 
@@ -42,7 +43,7 @@ def reprocess_document(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     if not processing_enabled():
@@ -79,7 +80,7 @@ def reprocess_document(
 )
 def get_raw_text_artifact(
     request: Request,
-    run_id: str,
+    run_id: RunIdPath,
 ) -> RawTextArtifactResponse | JSONResponse:
     """Return extracted raw text for a processing run."""
 

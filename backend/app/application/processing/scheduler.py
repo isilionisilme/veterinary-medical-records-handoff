@@ -65,16 +65,27 @@ async def processing_scheduler(
     """Continuously start eligible queued runs and execute them."""
 
     while not stop_event.is_set():
-        await _process_queued_runs(repository=repository, storage=storage)
+        await _process_queued_runs(
+            repository=repository,
+            storage=storage,
+            stop_event=stop_event,
+        )
         try:
             await asyncio.wait_for(stop_event.wait(), timeout=tick_seconds)
         except TimeoutError:
             continue
 
 
-async def _process_queued_runs(*, repository: DocumentRepository, storage: FileStorage) -> None:
+async def _process_queued_runs(
+    *,
+    repository: DocumentRepository,
+    storage: FileStorage,
+    stop_event: asyncio.Event,
+) -> None:
     queued_runs = repository.list_queued_runs(limit=MAX_RUNS_PER_TICK)
     for run in queued_runs:
+        if stop_event.is_set():
+            return
         started = repository.try_start_run(
             run_id=run.run_id,
             document_id=run.document_id,

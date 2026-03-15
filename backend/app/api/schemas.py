@@ -13,10 +13,6 @@ class HealthResponse(BaseModel):
     storage: str = Field(description="File storage status")
 
 
-class ErrorResponse(BaseModel):
-    detail: str = Field(description="Human-readable error message")
-
-
 class DocumentUploadResponse(BaseModel):
     document_id: str = Field(..., description="Unique identifier of the document.")
     status: str = Field(..., description="Current processing status of the document.")
