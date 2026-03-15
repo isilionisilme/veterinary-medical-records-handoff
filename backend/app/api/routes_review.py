@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Annotated, cast
+from typing import cast
 
-from fastapi import APIRouter, Path, Request, status
+from fastapi import APIRouter, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from backend.app.api.schemas import (
     ActiveInterpretationReviewResponse,
     DocumentReviewResponse,
-    ErrorResponse,
     InterpretationEditRequest,
     InterpretationEditResponse,
     LatestCompletedRunReviewResponse,
@@ -25,6 +24,7 @@ from backend.app.application.document_service import (
     mark_document_reviewed,
     reopen_document_review,
 )
+from backend.app.application.documents.review_service import ReviewToggleResult
 from backend.app.config import debug_endpoints_enabled
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
@@ -34,12 +34,10 @@ from .review_debug import (
     build_visit_scoping_metrics,
     render_visit_debug_html,
 )
+from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath, RunIdPath
 from .routes_common import error_response, log_event
 
 router = APIRouter(tags=["Review"])
-UUID_PATH_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-DocumentIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
-RunIdPath = Annotated[str, Path(..., pattern=UUID_PATH_PATTERN)]
 
 
 def _debug_endpoints_disabled_response() -> JSONResponse:
@@ -47,6 +45,15 @@ def _debug_endpoints_disabled_response() -> JSONResponse:
         status_code=status.HTTP_403_FORBIDDEN,
         error_code="FORBIDDEN",
         message="Debug endpoints are disabled.",
+    )
+
+
+def _build_review_status_toggle_response(result: ReviewToggleResult) -> ReviewStatusToggleResponse:
+    return ReviewStatusToggleResponse(
+        document_id=result.document_id,
+        review_status=result.review_status,
+        reviewed_at=result.reviewed_at,
+        reviewed_by=result.reviewed_by,
     )
 
 
@@ -109,7 +116,7 @@ def get_document_review_context(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     review = get_document_review(
@@ -192,7 +199,7 @@ def get_document_review_visit_debug_page(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     resolved = _resolve_review_context(
@@ -231,7 +238,7 @@ def get_document_review_visit_scoping_observability(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
 
     resolved = _resolve_review_context(
@@ -270,14 +277,9 @@ def mark_document_reviewed_route(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
-    return ReviewStatusToggleResponse(
-        document_id=result.document_id,
-        review_status=result.review_status,
-        reviewed_at=result.reviewed_at,
-        reviewed_by=result.reviewed_by,
-    )
+    return _build_review_status_toggle_response(result)
 
 
 @router.delete(
@@ -298,14 +300,9 @@ def reopen_document_review_route(
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
             error_code="NOT_FOUND",
-            message="Document not found.",
+            message=DOCUMENT_NOT_FOUND_MSG,
         )
-    return ReviewStatusToggleResponse(
-        document_id=result.document_id,
-        review_status=result.review_status,
-        reviewed_at=result.reviewed_at,
-        reviewed_by=result.reviewed_by,
-    )
+    return _build_review_status_toggle_response(result)
 
 
 @router.post(
@@ -315,8 +312,8 @@ def reopen_document_review_route(
     summary="Create a new interpretation version for a run",
     description="Apply veterinarian edits by creating a new active interpretation version.",
     responses={
-        400: {"model": ErrorResponse, "description": "Invalid request payload (INVALID_REQUEST)."},
-        422: {"model": ErrorResponse, "description": "Validation error (UNPROCESSABLE_ENTITY)."},
+        400: {"description": "Invalid request payload (INVALID_REQUEST)."},
+        422: {"description": "Validation error (UNPROCESSABLE_ENTITY)."},
         404: {"description": "Processing run not found (NOT_FOUND)."},
         413: {
             "description": "Request body exceeds the maximum allowed size (REQUEST_BODY_TOO_LARGE)."

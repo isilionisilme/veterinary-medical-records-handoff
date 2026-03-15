@@ -7,6 +7,7 @@ business logic lives in the application/domain layers.
 
 from __future__ import annotations
 
+import hmac
 import logging
 import re
 import signal
@@ -265,6 +266,10 @@ def create_app() -> FastAPI:
             ):
                 signal.signal(signal.SIGTERM, previous_sigterm_handler)
             await app.state.scheduler.stop()
+            startup_logger.info(
+                "lifespan teardown completed scheduler_running=%s",
+                app.state.scheduler.is_running,
+            )
 
     settings = get_settings()
 
@@ -329,7 +334,7 @@ def create_app() -> FastAPI:
 
         auth_header = request.headers.get("authorization", "")
         scheme, _, credentials = auth_header.partition(" ")
-        if scheme.lower() != "bearer" or credentials != configured_token:
+        if scheme.lower() != "bearer" or not hmac.compare_digest(credentials, configured_token):
             return JSONResponse(
                 status_code=401,
                 content={
