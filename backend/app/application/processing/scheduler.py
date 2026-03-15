@@ -82,11 +82,12 @@ async def _process_queued_runs(
     storage: FileStorage,
     stop_event: asyncio.Event,
 ) -> None:
-    queued_runs = repository.list_queued_runs(limit=MAX_RUNS_PER_TICK)
+    queued_runs = await asyncio.to_thread(repository.list_queued_runs, limit=MAX_RUNS_PER_TICK)
     for run in queued_runs:
         if stop_event.is_set():
             return
-        started = repository.try_start_run(
+        started = await asyncio.to_thread(
+            repository.try_start_run,
             run_id=run.run_id,
             document_id=run.document_id,
             started_at=_default_now_iso(),

@@ -1,5 +1,6 @@
 """Document-related API routes."""
 
+import asyncio
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -413,7 +414,8 @@ async def upload_document(
         )
 
     try:
-        result = register_document_upload(
+        result = await asyncio.to_thread(
+            register_document_upload,
             filename=Path(file.filename).name,
             content_type=file.content_type or "",
             content=contents,
@@ -421,7 +423,8 @@ async def upload_document(
             storage=storage,
         )
         if processing_enabled():
-            enqueue_processing_run(
+            await asyncio.to_thread(
+                enqueue_processing_run,
                 document_id=result.document_id,
                 repository=repository,
             )

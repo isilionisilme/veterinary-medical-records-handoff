@@ -65,7 +65,8 @@ async def _execute_run(
             timeout=PROCESSING_TIMEOUT_SECONDS,
         )
     except TimeoutError:
-        repository.complete_run(
+        await asyncio.to_thread(
+            repository.complete_run,
             run_id=run.run_id,
             state=ProcessingRunState.TIMED_OUT,
             completed_at=_default_now_iso(),
@@ -73,7 +74,8 @@ async def _execute_run(
         )
         return
     except ProcessingError as exc:
-        repository.complete_run(
+        await asyncio.to_thread(
+            repository.complete_run,
             run_id=run.run_id,
             state=ProcessingRunState.FAILED,
             completed_at=_default_now_iso(),
@@ -82,7 +84,8 @@ async def _execute_run(
         return
     except Exception as exc:  # pragma: no cover - defensive
         logger.exception("Processing run failed: %s", exc)
-        repository.complete_run(
+        await asyncio.to_thread(
+            repository.complete_run,
             run_id=run.run_id,
             state=ProcessingRunState.FAILED,
             completed_at=_default_now_iso(),
@@ -91,13 +94,15 @@ async def _execute_run(
         return
 
     completed_at = _default_now_iso()
-    repository.complete_run(
+    await asyncio.to_thread(
+        repository.complete_run,
         run_id=run.run_id,
         state=ProcessingRunState.COMPLETED,
         completed_at=completed_at,
         failure_type=None,
     )
-    _persist_observability_snapshot_for_completed_run(
+    await asyncio.to_thread(
+        _persist_observability_snapshot_for_completed_run,
         repository=repository,
         document_id=run.document_id,
         run_id=run.run_id,
@@ -171,7 +176,8 @@ async def _run_step(
 ):
     """Execute a processing step with lifecycle tracking (RUNNING -> SUCCEEDED/FAILED)."""
     started_at = _default_now_iso()
-    _append_step_status(
+    await asyncio.to_thread(
+        _append_step_status,
         repository=repository,
         run_id=run_id,
         step_name=step_name,
@@ -186,7 +192,8 @@ async def _run_step(
     except ProcessingError:
         raise
     except InterpretationBuildError as exc:
-        _append_step_status(
+        await asyncio.to_thread(
+            _append_step_status,
             repository=repository,
             run_id=run_id,
             step_name=step_name,
@@ -199,7 +206,8 @@ async def _run_step(
         )
         raise ProcessingError(failure_type) from exc
     except Exception as exc:
-        _append_step_status(
+        await asyncio.to_thread(
+            _append_step_status,
             repository=repository,
             run_id=run_id,
             step_name=step_name,
@@ -211,7 +219,8 @@ async def _run_step(
         )
         raise ProcessingError(failure_type) from exc
     else:
-        _append_step_status(
+        await asyncio.to_thread(
+            _append_step_status,
             repository=repository,
             run_id=run_id,
             step_name=step_name,
@@ -233,9 +242,10 @@ async def _extraction_step(
     storage: FileStorage,
 ) -> str:
     """Extract text from PDF: validate inputs, run extractor, check quality, persist."""
-    document = repository.get(document_id)
+    document = await asyncio.to_thread(repository.get, document_id)
     if document is None:
-        _record_step_failure(
+        await asyncio.to_thread(
+            _record_step_failure,
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
@@ -243,8 +253,9 @@ async def _extraction_step(
             error_code="EXTRACTION_FAILED",
         )
         raise ProcessingError("EXTRACTION_FAILED")
-    if not storage.exists(storage_path=document.storage_path):
-        _record_step_failure(
+    if not await asyncio.to_thread(storage.exists, storage_path=document.storage_path):
+        await asyncio.to_thread(
+            _record_step_failure,
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
@@ -256,7 +267,8 @@ async def _extraction_step(
     file_path = storage.resolve(storage_path=document.storage_path)
     file_size = await asyncio.to_thread(lambda: file_path.stat().st_size)
     if file_size == 0:
-        _record_step_failure(
+        await asyncio.to_thread(
+            _record_step_failure,
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
@@ -283,7 +295,8 @@ async def _extraction_step(
         quality_reasons,
     )
     if not quality_pass:
-        _record_step_failure(
+        await asyncio.to_thread(
+            _record_step_failure,
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
@@ -293,9 +306,12 @@ async def _extraction_step(
         raise ProcessingError("EXTRACTION_LOW_QUALITY")
 
     try:
-        storage.save_raw_text(document_id=document_id, run_id=run_id, text=raw_text)
+        await asyncio.to_thread(
+            storage.save_raw_text, document_id=document_id, run_id=run_id, text=raw_text
+        )
     except Exception as exc:
-        _record_step_failure(
+        await asyncio.to_thread(
+            _record_step_failure,
             repository=repository,
             run_id=run_id,
             step_name=StepName.EXTRACTION,
@@ -316,13 +332,15 @@ async def _interpretation_step(
     repository: DocumentRepository,
 ) -> None:
     """Build structured interpretation from extracted text and persist artifact."""
-    interpretation_payload = _build_interpretation_artifact(
+    interpretation_payload = await asyncio.to_thread(
+        _build_interpretation_artifact,
         document_id=document_id,
         run_id=run_id,
         raw_text=raw_text,
         repository=repository,
     )
-    repository.append_artifact(
+    await asyncio.to_thread(
+        repository.append_artifact,
         run_id=run_id,
         artifact_type="STRUCTURED_INTERPRETATION",
         payload=interpretation_payload,
