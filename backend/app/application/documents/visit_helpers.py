@@ -133,28 +133,25 @@ def resolve_visit_from_anchor(
                 return target_visit
         return None
 
+    dates_to_check = candidate_dates if candidate_dates else list(raw_text_offsets_by_date.keys())
+    target_occurrences = [
+        (offset, candidate_date, occurrence_index)
+        for candidate_date in dates_to_check
+        for occurrence_index, offset in enumerate(raw_text_offsets_by_date.get(candidate_date, []))
+    ]
+
     def _find_nearest_target(
         *,
         lower_offset_inclusive: int | None,
         upper_offset_exclusive: int | None,
     ) -> tuple[int, str, int] | None:
-        nearest: tuple[int, str, int] | None = None
-        dates_to_check = (
-            candidate_dates if candidate_dates else list(raw_text_offsets_by_date.keys())
+        eligible_occurrences = (
+            (abs(offset - anchor_offset), candidate_date, occurrence_index)
+            for offset, candidate_date, occurrence_index in target_occurrences
+            if (lower_offset_inclusive is None or offset >= lower_offset_inclusive)
+            and (upper_offset_exclusive is None or offset < upper_offset_exclusive)
         )
-        for candidate_date in dates_to_check:
-            offsets = raw_text_offsets_by_date.get(candidate_date, [])
-            if not offsets:
-                continue
-            for occurrence_index, offset in enumerate(offsets):
-                if lower_offset_inclusive is not None and offset < lower_offset_inclusive:
-                    continue
-                if upper_offset_exclusive is not None and offset >= upper_offset_exclusive:
-                    continue
-                distance = abs(offset - anchor_offset)
-                if nearest is None or distance < nearest[0]:
-                    nearest = (distance, candidate_date, occurrence_index)
-        return nearest
+        return min(eligible_occurrences, default=None)
 
     nearest_target: tuple[int, str, int] | None = None
     if visit_boundary_offsets:

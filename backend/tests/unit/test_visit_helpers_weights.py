@@ -9,6 +9,7 @@ from backend.app.application.documents.visit_helpers import (
     _collect_unassigned_weight_candidates,
     _select_and_derive_weight,
     postprocess_weights,
+    resolve_visit_from_anchor,
 )
 
 # ---------------------------------------------------------------------------
@@ -183,6 +184,38 @@ class TestBuildRawTextWeightCandidate:
         assert field_dict["value"] == "5 kg"
         assert field_dict["value_type"] == "string"
         assert field_dict["classification"] == "medical_record"
+
+
+class TestResolveVisitFromAnchor:
+    def test_prefers_candidate_within_visit_boundaries(self) -> None:
+        visit_a = {"visit_id": "visit-001", "visit_date": "2025-03-10"}
+        visit_b = {"visit_id": "visit-002", "visit_date": "2025-03-12"}
+
+        resolved = resolve_visit_from_anchor(
+            candidate_dates=["2025-03-10", "2025-03-12"],
+            anchor_offset=140,
+            visit_by_date={"2025-03-10": visit_a, "2025-03-12": visit_b},
+            visit_occurrences_by_date={"2025-03-10": [visit_a], "2025-03-12": [visit_b]},
+            raw_text_offsets_by_date={"2025-03-10": [20], "2025-03-12": [150]},
+            visit_boundary_offsets=[0, 120, 220],
+        )
+
+        assert resolved is visit_b
+
+    def test_falls_back_to_nearest_offset_without_boundaries(self) -> None:
+        visit_a = {"visit_id": "visit-001", "visit_date": "2025-03-10"}
+        visit_b = {"visit_id": "visit-002", "visit_date": "2025-03-12"}
+
+        resolved = resolve_visit_from_anchor(
+            candidate_dates=["2025-03-10", "2025-03-12"],
+            anchor_offset=88,
+            visit_by_date={"2025-03-10": visit_a, "2025-03-12": visit_b},
+            visit_occurrences_by_date={"2025-03-10": [visit_a], "2025-03-12": [visit_b]},
+            raw_text_offsets_by_date={"2025-03-10": [15], "2025-03-12": [90]},
+            visit_boundary_offsets=[],
+        )
+
+        assert resolved is visit_b
 
 
 # ---------------------------------------------------------------------------

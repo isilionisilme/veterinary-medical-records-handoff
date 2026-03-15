@@ -149,6 +149,13 @@ def test_extract_pdf_text_tokens_collects_hex_and_literal_tokens() -> None:
     assert b"Mundo\nPDF" in values
 
 
+def test_parse_pdf_literal_string_bytes_supports_octal_escapes() -> None:
+    parsed, next_index = pdf_extraction.parse_pdf_literal_string_bytes(b"A\\101\\123B)", 0)
+
+    assert parsed == b"AASB"
+    assert next_index == len(b"A\\101\\123B)")
+
+
 def test_tokenize_pdf_content_parses_arrays_names_numbers_and_strings() -> None:
     content = b"BT /F1 12 Tf [(Hola) -250 <4D756E646F>] TJ ET"
 
