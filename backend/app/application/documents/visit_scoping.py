@@ -123,19 +123,17 @@ def _classify_fields_into_scopes(
     )
 
 
-def _build_visit_roster(
+def _parse_existing_visits(
     projected: dict[str, object],
     *,
     detected_visit_dates: list[str],
     seen_detected_visit_dates: set[str],
-    raw_text_detected_visit_dates: list[str],
 ) -> tuple[
     list[dict[str, object]],
     dict[str, dict[str, object]],
     dict[str, list[dict[str, object]]],
     dict[str, object] | None,
 ]:
-    """Phase 2+3: Parse existing visits and generate missing ones."""
     raw_visits = projected.get("visits")
     visits: list[dict[str, object]] = []
     if isinstance(raw_visits, list):
@@ -170,7 +168,17 @@ def _build_visit_roster(
 
         assigned_visits.append(visit)
 
-    # Phase 3 — generate missing visits from detected dates.
+    return assigned_visits, visit_by_date, visit_occurrences_by_date, unassigned_visit
+
+
+def _generate_missing_visits(
+    *,
+    assigned_visits: list[dict[str, object]],
+    visit_by_date: dict[str, dict[str, object]],
+    visit_occurrences_by_date: dict[str, list[dict[str, object]]],
+    detected_visit_dates: list[str],
+    raw_text_detected_visit_dates: list[str],
+) -> None:
     required_visit_sequence: list[str] = list(detected_visit_dates)
     raw_visit_occurrence_counts: dict[str, int] = {}
     for visit_date in raw_text_detected_visit_dates:
@@ -202,6 +210,36 @@ def _build_visit_roster(
         assigned_visits.append(generated_visit)
         visit_by_date.setdefault(visit_date, generated_visit)
         visit_occurrences_by_date.setdefault(visit_date, []).append(generated_visit)
+
+
+def _build_visit_roster(
+    projected: dict[str, object],
+    *,
+    detected_visit_dates: list[str],
+    seen_detected_visit_dates: set[str],
+    raw_text_detected_visit_dates: list[str],
+) -> tuple[
+    list[dict[str, object]],
+    dict[str, dict[str, object]],
+    dict[str, list[dict[str, object]]],
+    dict[str, object] | None,
+]:
+    """Phase 2+3: Parse existing visits and generate missing ones."""
+    assigned_visits, visit_by_date, visit_occurrences_by_date, unassigned_visit = (
+        _parse_existing_visits(
+            projected,
+            detected_visit_dates=detected_visit_dates,
+            seen_detected_visit_dates=seen_detected_visit_dates,
+        )
+    )
+
+    _generate_missing_visits(
+        assigned_visits=assigned_visits,
+        visit_by_date=visit_by_date,
+        visit_occurrences_by_date=visit_occurrences_by_date,
+        detected_visit_dates=detected_visit_dates,
+        raw_text_detected_visit_dates=raw_text_detected_visit_dates,
+    )
 
     for visit in assigned_visits:
         for metadata_key in _VISIT_GROUP_METADATA_KEYS:
