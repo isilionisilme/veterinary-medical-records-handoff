@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from backend.app.application.field_normalizers import normalize_canonical_fields
-from backend.app.application.processing_runner import _build_interpretation_artifact
+from backend.app.application.processing.interpretation import _build_interpretation_artifact
 
 _FIXTURES_PATH = (
     Path(__file__).resolve().parents[1]

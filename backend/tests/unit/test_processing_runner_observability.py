@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from backend.app.application import processing_runner
+from backend.app.application.processing.orchestrator import (
+    _persist_observability_snapshot_for_completed_run,
+)
 
 
 class _RepositoryStub:
@@ -38,7 +40,7 @@ def test_persist_observability_snapshot_for_completed_run_persists_when_enabled(
         lambda snapshot: captured_snapshots.append(snapshot),
     )
 
-    processing_runner._persist_observability_snapshot_for_completed_run(
+    _persist_observability_snapshot_for_completed_run(
         repository=repository,
         document_id="doc-123",
         run_id="run-123",
@@ -73,7 +75,7 @@ def test_persist_observability_snapshot_for_completed_run_skips_when_disabled(
         lambda snapshot: captured_snapshots.append(snapshot),
     )
 
-    processing_runner._persist_observability_snapshot_for_completed_run(
+    _persist_observability_snapshot_for_completed_run(
         repository=repository,
         document_id="doc-123",
         run_id="run-123",

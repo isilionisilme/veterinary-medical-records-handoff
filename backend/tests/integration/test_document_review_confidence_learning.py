@@ -9,7 +9,7 @@ from uuid import uuid4
 
 import pytest
 
-from backend.app.application.processing_runner import _build_interpretation_artifact
+from backend.app.application.processing.interpretation import _build_interpretation_artifact
 from backend.app.domain import models as app_models
 from backend.tests.integration.document_review_test_support import (
     _get_calibration_counts,

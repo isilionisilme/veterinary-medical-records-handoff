@@ -13,9 +13,9 @@ from backend.app.application.extraction_quality import (
     is_usable_extracted_text,
     looks_human_readable_text,
 )
-from backend.app.application.processing_runner import (
-    PDF_EXTRACTOR_FORCE_ENV,
-    _process_document,
+from backend.app.application.processing.constants import PDF_EXTRACTOR_FORCE_ENV
+from backend.app.application.processing.orchestrator import _process_document
+from backend.app.application.processing.pdf_extraction import (
     extract_pdf_text_with_extractor,
     extract_pdf_text_without_external_dependencies,
     parse_pdf_literal_string,

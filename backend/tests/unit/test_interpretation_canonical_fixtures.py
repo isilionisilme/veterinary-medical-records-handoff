@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from backend.app.application.processing_runner import _build_interpretation_artifact
+from backend.app.application.processing.interpretation import _build_interpretation_artifact
 
 FIXTURES_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "interpretation"
 

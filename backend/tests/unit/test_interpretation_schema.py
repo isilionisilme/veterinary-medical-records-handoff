@@ -8,9 +8,9 @@ from backend.app.application.global_schema import (
     REPEATABLE_KEYS,
     VALUE_TYPE_BY_KEY,
 )
-from backend.app.application.processing_runner import (
+from backend.app.application.processing.candidate_mining import _mine_interpretation_candidates
+from backend.app.application.processing.interpretation import (
     _build_interpretation_artifact,
-    _mine_interpretation_candidates,
 )
 
 _SHARED_CONTRACT_PATH = (
