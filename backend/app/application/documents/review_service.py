@@ -102,12 +102,11 @@ def get_document_review(
         document_id=latest_completed_run.document_id,
         run_id=latest_completed_run.run_id,
     )
-    if raw_text_path.exists():
-        try:
-            raw_text = raw_text_path.read_text(encoding="utf-8")
-        except OSError:
-            logger.warning("Failed to read raw_text file path=%s", raw_text_path)
-            raw_text = None
+    try:
+        raw_text = raw_text_path.read_text(encoding="utf-8")
+    except OSError:
+        logger.warning("Failed to read raw_text file path=%s", raw_text_path)
+        raw_text = None
 
     structured_data = review_payload_projector._normalize_review_interpretation_data(
         structured_data,

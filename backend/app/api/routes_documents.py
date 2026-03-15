@@ -33,7 +33,13 @@ from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
 from .deps import get_repository, get_storage
-from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath
+from .route_constants import (
+    DOCUMENT_NOT_FOUND_MSG,
+    ERROR_ARTIFACT_MISSING,
+    ERROR_INTERNAL,
+    ERROR_NOT_FOUND,
+    DocumentIdPath,
+)
 from .routes_common import _request_content_length, error_response, log_event
 
 router = APIRouter(tags=["Documents"])
@@ -102,7 +108,7 @@ def list_documents_route(
         )
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while listing documents.",
         )
 
@@ -154,7 +160,7 @@ def get_document_status(
     if details is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
@@ -206,7 +212,7 @@ def get_document_processing_history(
     if result is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
 
@@ -278,7 +284,7 @@ def get_document_original(
         )
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
-            error_code="NOT_FOUND",
+            error_code=ERROR_NOT_FOUND,
             message=DOCUMENT_NOT_FOUND_MSG,
         )
     if not location.exists:
@@ -289,7 +295,7 @@ def get_document_original(
         )
         return error_response(
             status_code=status.HTTP_410_GONE,
-            error_code="ARTIFACT_MISSING",
+            error_code=ERROR_ARTIFACT_MISSING,
             message="Original document file is missing.",
         )
 
@@ -319,7 +325,7 @@ def get_document_original(
         )
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while accessing the original document.",
         )
 
@@ -437,7 +443,7 @@ async def upload_document(
         )
         return error_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            error_code="INTERNAL_ERROR",
+            error_code=ERROR_INTERNAL,
             message="Unexpected error while storing the document.",
         )
 
