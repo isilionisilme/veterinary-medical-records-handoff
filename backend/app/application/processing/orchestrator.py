@@ -264,7 +264,7 @@ async def _extraction_step(
         )
         raise ProcessingError("EXTRACTION_FAILED")
 
-    file_path = storage.resolve(storage_path=document.storage_path)
+    file_path = await asyncio.to_thread(storage.resolve, storage_path=document.storage_path)
     file_size = await asyncio.to_thread(lambda: file_path.stat().st_size)
     if file_size == 0:
         await asyncio.to_thread(
