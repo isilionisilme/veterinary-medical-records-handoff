@@ -9,7 +9,7 @@ import {
   shouldShowDetails,
   statusIcon,
 } from "../../lib/processingHistoryView";
-import { ApiResponseError, type ProcessingHistoryRun } from "../../types/appWorkspace";
+import { ApiResponseError, type ProcessingHistoryRun } from "../../types";
 import { Button } from "../ui/button";
 
 type ProcessingHistorySectionProps = {

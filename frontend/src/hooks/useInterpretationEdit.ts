@@ -4,10 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editRunInterpretation } from "../api/documentApi";
 import { type ActionFeedback } from "../components/toast/toast-types";
 import { getTechnicalDetails, getUserErrorMessage } from "../lib/appWorkspaceUtils";
-import {
-  type DocumentReviewResponse,
-  type InterpretationChangePayload,
-} from "../types/appWorkspace";
+import { type DocumentReviewResponse, type InterpretationChangePayload } from "../types";
 
 type UseInterpretationEditParams = {
   activeId: string | null;

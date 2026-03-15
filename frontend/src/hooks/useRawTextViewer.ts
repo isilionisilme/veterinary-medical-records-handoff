@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchRawText } from "../api/documentApi";
 import { getUserErrorMessage } from "../lib/appWorkspaceUtils";
-import { ApiResponseError } from "../types/appWorkspace";
+import { ApiResponseError } from "../types";
 import { useRawTextActions } from "./useRawTextActions";
 
 type UseRawTextViewerParams = {

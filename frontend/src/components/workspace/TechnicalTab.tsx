@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ProcessingHistorySection } from "./ProcessingHistorySection";
-import type { ProcessingHistoryRun, VisitScopingMetricsResponse } from "../../types/appWorkspace";
+import type { ProcessingHistoryRun, VisitScopingMetricsResponse } from "../../types";
 
 type TechnicalTabProps = {
   viewerModeToolbarIcons: ReactNode;

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { renderConfidenceIndicator, renderEditableFieldValue } from "./ReviewFieldParts";
-import type { ReviewSelectableField } from "../../types/appWorkspace";
+import type { ReviewSelectableField } from "../../types";
 
 function createSelectableField(overrides?: Partial<ReviewSelectableField>): ReviewSelectableField {
   return {

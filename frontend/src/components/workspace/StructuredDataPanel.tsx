@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Tooltip } from "../ui/tooltip";
-import { type ReviewPanelState } from "../../types/appWorkspace";
+import { type ReviewPanelState } from "../../types";
 import { type ConfidenceBucket } from "../../lib/structuredDataFilters";
 
 type StructuredDataPanelProps<TSection> = {

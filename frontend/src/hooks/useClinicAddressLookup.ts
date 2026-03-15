@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { lookupClinicAddress, type ClinicAddressLookupResponse } from "../api/documentApi";
 import type { ActionFeedback } from "../components/toast/toast-types";
 import { getUserErrorMessage } from "../lib/appWorkspaceUtils";
-import type { InterpretationChangePayload, ReviewSelectableField } from "../types/appWorkspace";
+import type { InterpretationChangePayload, ReviewSelectableField } from "../types";
 
 type ClinicAddressLookupState = "idle" | "loading" | "found" | "not-found" | "error";
 

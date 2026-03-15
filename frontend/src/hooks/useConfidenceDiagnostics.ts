@@ -9,7 +9,7 @@ import {
   buildVisitGroupingDiagnostics,
   shouldEmitVisitGroupingDiagnostics,
 } from "../lib/visitGroupingObservability";
-import type { ReviewVisitGroup, StructuredInterpretationData } from "../types/appWorkspace";
+import type { ReviewVisitGroup, StructuredInterpretationData } from "../types";
 
 type UseConfidenceDiagnosticsParams = {
   interpretationData: StructuredInterpretationData | undefined;

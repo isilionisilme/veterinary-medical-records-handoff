@@ -4,7 +4,7 @@ import { Pencil } from "lucide-react";
 import { IconButton } from "../app/IconButton";
 import { ValueSurface } from "../app/Field";
 import { EMPTY_LIST_PLACEHOLDER, MISSING_VALUE_PLACEHOLDER } from "../../constants/appWorkspace";
-import type { ReviewSelectableField } from "../../types/appWorkspace";
+import type { ReviewSelectableField } from "../../types";
 import type { ReviewFieldRenderersContext } from "./ReviewFieldRenderers.types";
 
 export function renderConfidenceIndicator(

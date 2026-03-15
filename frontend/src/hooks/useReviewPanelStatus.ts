@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getReviewPanelMessage } from "../lib/appWorkspaceUtils";
-import {
-  ApiResponseError,
-  type DocumentReviewResponse,
-  type ReviewPanelState,
-} from "../types/appWorkspace";
+import { ApiResponseError, type DocumentReviewResponse, type ReviewPanelState } from "../types";
 
 type UseReviewPanelStatusParams = {
   activeId: string | null;

@@ -1,5 +1,5 @@
 import { GLOBAL_SCHEMA } from "../lib/globalSchema";
-import type { MedicalRecordSectionId } from "../types/appWorkspace";
+import type { MedicalRecordSectionId } from "../types";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 export const DEBUG_CONFIDENCE_POLICY = import.meta.env.VITE_DEBUG_CONFIDENCE === "true";

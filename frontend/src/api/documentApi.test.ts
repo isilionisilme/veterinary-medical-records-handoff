@@ -15,7 +15,7 @@ import {
   triggerReprocess,
   uploadDocument,
 } from "./documentApi";
-import { ApiResponseError, UiError } from "../types/appWorkspace";
+import { ApiResponseError, UiError } from "../types";
 
 function jsonResponse(payload: unknown, status = 200, headers?: HeadersInit): Response {
   return new Response(JSON.stringify(payload), {

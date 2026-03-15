@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fetchRawText } from "../../api/documentApi";
-import type { ProcessingHistoryRun } from "../../types/appWorkspace";
+import type { ProcessingHistoryRun } from "../../types";
 import { ProcessingHistorySection } from "./ProcessingHistorySection";
 
 vi.mock("../../api/documentApi", () => ({

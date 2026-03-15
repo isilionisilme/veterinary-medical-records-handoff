@@ -25,7 +25,7 @@ import type {
   ReviewField,
   ReviewVisitGroup,
   StructuredInterpretationData,
-} from "../types/appWorkspace";
+} from "../types";
 import { useDisplayFieldMapping } from "./useDisplayFieldMapping";
 import { useFieldExtraction } from "./useFieldExtraction";
 

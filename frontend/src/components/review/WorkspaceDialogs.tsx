@@ -1,7 +1,7 @@
 import { AddFieldDialog } from "../structured/AddFieldDialog";
 import { FieldEditDialog } from "../structured/FieldEditDialog";
 import { type CandidateSuggestionSections } from "../../extraction/candidateSuggestions";
-import { type ReviewSelectableField } from "../../types/appWorkspace";
+import { type ReviewSelectableField } from "../../types";
 
 type WorkspaceDialogsProps = {
   isInterpretationEditPending: boolean;

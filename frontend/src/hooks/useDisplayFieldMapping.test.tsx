@@ -1,11 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type {
-  ReviewField,
-  ReviewSelectableField,
-  StructuredInterpretationData,
-} from "../types/appWorkspace";
+import type { ReviewField, ReviewSelectableField, StructuredInterpretationData } from "../types";
 import { useDisplayFieldMapping } from "./useDisplayFieldMapping";
 
 type BuildSelectableFieldFn = (

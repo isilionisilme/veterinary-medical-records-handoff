@@ -5,7 +5,7 @@ import {
   type ReviewFieldRenderersContext,
 } from "../components/review/ReviewFieldRenderers";
 import { createReviewSectionLayoutRenderer } from "../components/review/ReviewSectionLayout";
-import type { ReviewField, ReviewSelectableField, ReviewVisitGroup } from "../types/appWorkspace";
+import type { ReviewField, ReviewSelectableField, ReviewVisitGroup } from "../types";
 
 type UseReviewRenderersParams = {
   activeConfidencePolicy: ReviewFieldRenderersContext["activeConfidencePolicy"];

@@ -15,7 +15,7 @@ import {
   shouldRenderLongTextValue,
   truncateText,
 } from "../../lib/appWorkspaceUtils";
-import type { ReviewDisplayField } from "../../types/appWorkspace";
+import type { ReviewDisplayField } from "../../types";
 import { buildFieldTooltip } from "./buildFieldTooltip";
 import { renderConfidenceIndicator, renderEditableFieldValue } from "./ReviewFieldParts";
 import type { ReviewFieldRenderersContext } from "./ReviewFieldRenderers.types";

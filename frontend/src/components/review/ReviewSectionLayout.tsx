@@ -28,7 +28,7 @@ import type {
   ReviewField,
   ReviewSelectableField,
   ReviewVisitGroup,
-} from "../../types/appWorkspace";
+} from "../../types";
 
 type BuildSelectableFieldFn = (
   base: Omit<

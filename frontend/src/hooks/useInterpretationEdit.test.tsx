@@ -4,7 +4,7 @@ import { type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { editRunInterpretation } from "../api/documentApi";
-import { type DocumentReviewResponse } from "../types/appWorkspace";
+import { type DocumentReviewResponse } from "../types";
 import { useInterpretationEdit } from "./useInterpretationEdit";
 
 vi.mock("../api/documentApi", () => ({

@@ -7,7 +7,7 @@ import {
   fetchProcessingHistory,
   fetchVisitScopingMetrics,
 } from "../api/documentApi";
-import { type DocumentListResponse } from "../types/appWorkspace";
+import { type DocumentListResponse } from "../types";
 
 type DocumentListQueryLike = {
   refetch: () => unknown;

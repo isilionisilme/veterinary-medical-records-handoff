@@ -313,12 +313,3 @@ export function resolveCandidateSuggestionSections(
 
   return { applicableSuggestions, detectedCandidates };
 }
-
-export function toApplicableCandidateSuggestions(
-  fieldKey: string,
-  rawSuggestions: unknown,
-  maxLength = 5,
-): CandidateSuggestion[] {
-  return resolveCandidateSuggestionSections(fieldKey, rawSuggestions, maxLength)
-    .applicableSuggestions;
-}

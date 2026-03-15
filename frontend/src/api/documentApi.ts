@@ -16,7 +16,7 @@ import {
   type ReviewToggleResponse,
   type VisitScopingMetricsResponse,
   UiError,
-} from "../types/appWorkspace";
+} from "../types";
 
 function resolveFriendlyPayloadMessage(payloadMessage: unknown, fallback: string): string {
   if (typeof payloadMessage === "string" && payloadMessage.trim().length > 0) {

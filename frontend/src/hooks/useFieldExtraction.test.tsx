@@ -1,11 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type {
-  DocumentReviewResponse,
-  ReviewField,
-  StructuredInterpretationData,
-} from "../types/appWorkspace";
+import type { DocumentReviewResponse, ReviewField, StructuredInterpretationData } from "../types";
 import { useFieldExtraction } from "./useFieldExtraction";
 
 function buildInterpretationData(fields: ReviewField[]): StructuredInterpretationData {
