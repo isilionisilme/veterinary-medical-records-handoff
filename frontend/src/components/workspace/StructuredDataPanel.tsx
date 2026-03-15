@@ -1,6 +1,7 @@
 import { FilterX, RefreshCw, Search, X } from "lucide-react";
-import { type ReactNode, type RefObject } from "react";
 
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { type ConfidenceBucket } from "../../lib/structuredDataFilters";
 import { CriticalIcon } from "../app/CriticalBadge";
 import { IconButton } from "../app/IconButton";
 import { Button } from "../ui/button";
@@ -8,80 +9,46 @@ import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { Tooltip } from "../ui/tooltip";
-import { type ReviewPanelState } from "../../types";
-import { type ConfidenceBucket } from "../../lib/structuredDataFilters";
 
-type StructuredDataPanelProps<TSection> = {
-  activeId: string | null;
-  isActiveDocumentProcessing: boolean;
-  isDocumentReviewed: boolean;
-  reviewTogglePending: boolean;
-  onToggleReviewStatus: () => void;
-  reviewPanelState: ReviewPanelState;
-  structuredSearchInput: string;
-  structuredSearchInputRef: RefObject<HTMLInputElement>;
-  setStructuredSearchInput: (value: string) => void;
-  selectedConfidenceBuckets: ConfidenceBucket[];
-  setSelectedConfidenceBuckets: (buckets: ConfidenceBucket[]) => void;
-  activeConfidencePolicy: unknown;
-  detectedFieldsSummary: Record<ConfidenceBucket, number>;
-  showOnlyCritical: boolean;
-  showOnlyWithValue: boolean;
-  showOnlyEmpty: boolean;
-  setShowOnlyCritical: (value: boolean) => void;
-  setShowOnlyWithValue: (value: boolean) => void;
-  setShowOnlyEmpty: (value: boolean) => void;
-  getFilterToggleItemClass: (isActive: boolean) => string;
-  resetStructuredFilters: () => void;
-  reviewMessageInfoClass: string;
-  reviewMessageMutedClass: string;
-  reviewMessageWarningClass: string;
-  reviewPanelMessage: string | null;
-  shouldShowReviewEmptyState: boolean;
-  isRetryingInterpretation: boolean;
-  onRetryInterpretation: () => Promise<void>;
-  hasMalformedCanonicalFieldSlots: boolean;
-  hasNoStructuredFilterResults: boolean;
-  reportSections: TSection[];
-  renderSectionLayout: (section: TSection) => ReactNode;
-  evidenceNotice: string | null;
-};
-
-export function StructuredDataPanel<TSection>({
-  activeId,
-  isActiveDocumentProcessing,
-  isDocumentReviewed,
-  reviewTogglePending,
-  onToggleReviewStatus,
-  reviewPanelState,
-  structuredSearchInput,
-  structuredSearchInputRef,
-  setStructuredSearchInput,
-  selectedConfidenceBuckets,
-  setSelectedConfidenceBuckets,
-  activeConfidencePolicy,
-  detectedFieldsSummary,
-  showOnlyCritical,
-  showOnlyWithValue,
-  showOnlyEmpty,
-  setShowOnlyCritical,
-  setShowOnlyWithValue,
-  setShowOnlyEmpty,
-  getFilterToggleItemClass,
-  resetStructuredFilters,
-  reviewMessageInfoClass,
-  reviewMessageMutedClass,
-  reviewMessageWarningClass,
-  reviewPanelMessage,
-  shouldShowReviewEmptyState,
-  isRetryingInterpretation,
-  onRetryInterpretation,
-  hasMalformedCanonicalFieldSlots,
-  hasNoStructuredFilterResults,
-  reportSections,
-  renderSectionLayout,
-  evidenceNotice,
-}: StructuredDataPanelProps<TSection>) {
+export function StructuredDataPanel() {
+  const {
+    activeId,
+    isActiveDocumentProcessing,
+    isDocumentReviewed,
+    reviewPanelState,
+    structuredSearchInput,
+    structuredSearchInputRef,
+    setStructuredSearchInput,
+    selectedConfidenceBuckets,
+    setSelectedConfidenceBuckets,
+    activeConfidencePolicy,
+    detectedFieldsSummary,
+    showOnlyCritical,
+    showOnlyWithValue,
+    showOnlyEmpty,
+    setShowOnlyCritical,
+    setShowOnlyWithValue,
+    setShowOnlyEmpty,
+    getFilterToggleItemClass,
+    resetStructuredFilters,
+    reviewMessageInfoClass,
+    reviewMessageMutedClass,
+    reviewMessageWarningClass,
+    reviewPanelMessage,
+    shouldShowReviewEmptyState,
+    isRetryingInterpretation,
+    hasMalformedCanonicalFieldSlots,
+    hasNoStructuredFilterResults,
+    reportSections,
+    renderSectionLayout,
+    evidenceNotice,
+    reviewToggleMutation,
+    toggleReviewStatus,
+    handleRetryInterpretation,
+  } = useWorkspace();
+  const reviewTogglePending = reviewToggleMutation.isPending;
+  const onToggleReviewStatus = toggleReviewStatus;
+  const onRetryInterpretation = handleRetryInterpretation;
   return (
     <aside
       data-testid="structured-column-stack"

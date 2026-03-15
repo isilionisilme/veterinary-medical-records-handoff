@@ -1,5 +1,6 @@
-import { lazy, Suspense, type CSSProperties, type DragEventHandler, type ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -10,8 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { type ProcessingHistoryRun } from "../../types";
-import { type VisitScopingMetricsResponse } from "../../types";
 import { RawTextTab } from "./RawTextTab";
 import { TechnicalTab } from "./TechnicalTab";
 import { UploadPanel } from "./UploadPanel";
@@ -21,140 +20,82 @@ const PdfViewer = lazy(() =>
 );
 
 type PdfViewerPanelProps = {
-  activeViewerTab: "document" | "raw_text" | "technical";
-  activeId: string | null;
-  fileUrl: string | ArrayBuffer | null;
-  filename: string | null;
-  isDragOverViewer: boolean;
-  onViewerDragEnter: DragEventHandler<HTMLDivElement>;
-  onViewerDragOver: DragEventHandler<HTMLDivElement>;
-  onViewerDragLeave: DragEventHandler<HTMLDivElement>;
-  onViewerDrop: DragEventHandler<HTMLDivElement>;
-  onOpenUploadArea: () => void;
-  isDocumentListError: boolean;
-  shouldShowLoadPdfErrorBanner: boolean;
-  loadPdfErrorMessage: string;
-  reviewSplitLayoutStyle: CSSProperties;
-  onReviewSplitGridRef: (node: HTMLDivElement | null) => void;
-  onStartReviewSplitDragging: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onResetReviewSplitRatio: () => void;
-  onHandleReviewSplitKeyboard: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
-  effectiveViewMode: string;
-  selectedReviewFieldEvidencePage: number | null;
-  selectedReviewFieldEvidenceSnippet: string | null;
-  fieldNavigationRequestId: number;
+  structuredDataPanel: ReactNode;
+  sourcePanelContent: ReactNode;
   viewerModeToolbarIcons: ReactNode;
   viewerDownloadIcon: ReactNode;
-  structuredDataPanel: ReactNode;
-  isPinnedSourcePanelVisible: boolean;
-  sourcePanelContent: ReactNode;
-  isSourceOpen: boolean;
-  isSourcePinned: boolean;
-  isDesktopForPin: boolean;
-  isReviewMode: boolean;
-  onCloseSourceOverlay: () => void;
-  rawSearch: string;
-  setRawSearch: (value: string) => void;
-  canSearchRawText: boolean;
-  hasRawText: boolean;
-  rawSearchNotice: string | null;
-  isRawTextLoading: boolean;
-  rawTextErrorMessage: string | null;
-  rawTextContent: string;
-  onRawSearch: () => void;
-  canCopyRawText: boolean;
-  isCopyingRawText: boolean;
-  copyFeedback: string | null;
-  onCopyRawText: () => Promise<void>;
-  onDownloadRawText: () => void;
-  isActiveDocumentProcessing: boolean;
-  reprocessPending: boolean;
-  reprocessingDocumentId: string | null;
-  hasObservedProcessingAfterReprocess: boolean;
-  onOpenRetryModal: () => void;
-  showRetryModal: boolean;
-  onShowRetryModalChange: (open: boolean) => void;
-  onConfirmRetry: () => void;
-  processingHistoryIsLoading: boolean;
-  processingHistoryIsError: boolean;
-  processingHistoryErrorMessage: string;
-  processingHistoryRuns: ProcessingHistoryRun[];
-  visitScopingMetrics: VisitScopingMetricsResponse | null;
-  visitScopingIsLoading: boolean;
-  visitScopingIsError: boolean;
-  visitScopingErrorMessage: string;
-  expandedSteps: Record<string, boolean>;
-  onToggleStepDetails: (stepKey: string) => void;
-  formatRunHeader: (run: ProcessingHistoryRun) => string;
 };
 
 export function PdfViewerPanel({
-  activeViewerTab,
-  activeId,
-  fileUrl,
-  filename,
-  isDragOverViewer,
-  onViewerDragEnter,
-  onViewerDragOver,
-  onViewerDragLeave,
-  onViewerDrop,
-  onOpenUploadArea,
-  isDocumentListError,
-  shouldShowLoadPdfErrorBanner,
-  loadPdfErrorMessage,
-  reviewSplitLayoutStyle,
-  onReviewSplitGridRef,
-  onStartReviewSplitDragging,
-  onResetReviewSplitRatio,
-  onHandleReviewSplitKeyboard,
-  effectiveViewMode,
-  selectedReviewFieldEvidencePage,
-  selectedReviewFieldEvidenceSnippet,
-  fieldNavigationRequestId,
+  structuredDataPanel,
+  sourcePanelContent,
   viewerModeToolbarIcons,
   viewerDownloadIcon,
-  structuredDataPanel,
-  isPinnedSourcePanelVisible,
-  sourcePanelContent,
-  isSourceOpen,
-  isSourcePinned,
-  isDesktopForPin,
-  isReviewMode,
-  onCloseSourceOverlay,
-  rawSearch,
-  setRawSearch,
-  canSearchRawText,
-  hasRawText,
-  rawSearchNotice,
-  isRawTextLoading,
-  rawTextErrorMessage,
-  rawTextContent,
-  onRawSearch,
-  canCopyRawText,
-  isCopyingRawText,
-  copyFeedback,
-  onCopyRawText,
-  onDownloadRawText,
-  isActiveDocumentProcessing,
-  reprocessPending,
-  reprocessingDocumentId,
-  hasObservedProcessingAfterReprocess,
-  onOpenRetryModal,
-  showRetryModal,
-  onShowRetryModalChange,
-  onConfirmRetry,
-  processingHistoryIsLoading,
-  processingHistoryIsError,
-  processingHistoryErrorMessage,
-  processingHistoryRuns,
-  visitScopingMetrics,
-  visitScopingIsLoading,
-  visitScopingIsError,
-  visitScopingErrorMessage,
-  expandedSteps,
-  onToggleStepDetails,
-  formatRunHeader,
 }: PdfViewerPanelProps) {
+  const ws = useWorkspace();
+
+  // Aliases matching original prop names to minimise JSX churn
+  const activeViewerTab = ws.activeViewerTab;
+  const activeId = ws.activeId;
+  const fileUrl = ws.fileUrl;
+  const filename = ws.filename;
+  const isDragOverViewer = ws.isDragOverViewer;
+  const onViewerDragEnter = ws.handleViewerDragEnter;
+  const onViewerDragOver = ws.handleViewerDragOver;
+  const onViewerDragLeave = ws.handleViewerDragLeave;
+  const onViewerDrop = ws.handleViewerDrop;
+  const onOpenUploadArea = ws.handleOpenUploadArea;
+  const isDocumentListError = ws.documentList.isError;
+  const shouldShowLoadPdfErrorBanner = ws.shouldShowLoadPdfErrorBanner;
+  const loadPdfErrorMessage = ws.loadPdfErrorMessage;
+  const reviewSplitLayoutStyle = ws.reviewSplitLayoutStyle;
+  const onReviewSplitGridRef = ws.handleReviewSplitGridRef;
+  const onStartReviewSplitDragging = ws.startReviewSplitDragging;
+  const onResetReviewSplitRatio = ws.resetReviewSplitRatio;
+  const onHandleReviewSplitKeyboard = ws.handleReviewSplitKeyboard;
+  const effectiveViewMode = ws.effectiveViewMode;
+  const selectedReviewFieldEvidencePage = ws.selectedReviewField?.evidence?.page ?? null;
+  const selectedReviewFieldEvidenceSnippet = ws.selectedReviewField?.evidence?.snippet ?? null;
+  const fieldNavigationRequestId = ws.fieldNavigationRequestId;
+  const isPinnedSourcePanelVisible = ws.isPinnedSourcePanelVisible;
+  const isSourceOpen = ws.sourcePanel.isSourceOpen;
+  const isSourcePinned = ws.sourcePanel.isSourcePinned;
+  const isDesktopForPin = ws.isDesktopForPin;
+  const isReviewMode = ws.isReviewMode;
+  const onCloseSourceOverlay = ws.sourcePanel.closeOverlay;
+  const rawSearch = ws.rawSearch;
+  const setRawSearch = ws.setRawSearch;
+  const canSearchRawText = ws.canSearchRawText;
+  const hasRawText = ws.hasRawText;
+  const rawSearchNotice = ws.rawSearchNotice;
+  const isRawTextLoading = ws.isRawTextLoading;
+  const rawTextErrorMessage = ws.rawTextErrorMessage;
+  const rawTextContent = ws.rawTextContent ?? "";
+  const onRawSearch = ws.handleRawSearch;
+  const canCopyRawText = ws.canCopyRawText;
+  const isCopyingRawText = ws.isCopyingRawText;
+  const copyFeedback = ws.copyFeedback;
+  const onCopyRawText = ws.handleCopyRawText;
+  const onDownloadRawText = ws.handleDownloadRawText;
+  const isActiveDocumentProcessing = ws.isActiveDocumentProcessing;
+  const reprocessPending = ws.reprocessMutation.isPending;
+  const reprocessingDocumentId = ws.reprocessingDocumentId;
+  const hasObservedProcessingAfterReprocess = ws.hasObservedProcessingAfterReprocess;
+  const onOpenRetryModal = () => ws.setShowRetryModal(true);
+  const showRetryModal = ws.showRetryModal;
+  const onShowRetryModalChange = ws.setShowRetryModal;
+  const onConfirmRetry = ws.handleConfirmRetry;
+  const processingHistoryIsLoading = ws.processingHistory.isLoading;
+  const processingHistoryIsError = ws.processingHistory.isError;
+  const processingHistoryErrorMessage = ws.processingHistoryErrorMessage;
+  const processingHistoryRuns = ws.processingHistory.data?.runs ?? [];
+  const visitScopingMetricsData = ws.visitScopingMetrics.data ?? null;
+  const visitScopingIsLoading = ws.visitScopingMetrics.isLoading;
+  const visitScopingIsError = ws.visitScopingMetrics.isError;
+  const visitScopingErrorMessage = ws.visitScopingErrorMessage;
+  const expandedSteps = ws.expandedSteps;
+  const onToggleStepDetails = ws.toggleStepDetails;
+  const formatRunHeader = ws.formatRunHeader;
   return (
     <>
       {shouldShowLoadPdfErrorBanner && (
@@ -336,7 +277,7 @@ export function PdfViewerPanel({
               expandedSteps={expandedSteps}
               onToggleStepDetails={onToggleStepDetails}
               formatRunHeader={formatRunHeader}
-              visitScopingMetrics={visitScopingMetrics}
+              visitScopingMetrics={visitScopingMetricsData}
               visitScopingIsLoading={visitScopingIsLoading}
               visitScopingIsError={visitScopingIsError}
               visitScopingErrorMessage={visitScopingErrorMessage}
