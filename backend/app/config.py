@@ -52,20 +52,6 @@ def _parse_bounded_float(
     return value
 
 
-def _parse_bounded_float_strict(
-    raw: str | None,
-    *,
-    min_value: float = 0.0,
-    max_value: float = 1.0,
-) -> float | None:
-    return _parse_bounded_float(
-        raw,
-        default=None,
-        min_value=min_value,
-        max_value=max_value,
-    )
-
-
 def _parse_band_cutoffs(
     *,
     low_raw: str | None,
@@ -79,12 +65,12 @@ def _parse_band_cutoffs(
     if normalized_low is None:
         low_max = default_low
     else:
-        low_max = _parse_bounded_float_strict(normalized_low)
+        low_max = _parse_bounded_float(normalized_low, default=None)
 
     if normalized_mid is None:
         mid_max = default_mid
     else:
-        mid_max = _parse_bounded_float_strict(normalized_mid)
+        mid_max = _parse_bounded_float(normalized_mid, default=None)
 
     if low_max is None or mid_max is None:
         if default_low is None or default_mid is None:
@@ -106,31 +92,32 @@ def _resolve_rate_limit(raw: str | None, *, default: str) -> str:
     return default
 
 
+_TRUTHY_STRINGS = {"1", "true", "yes", "on"}
+
+
+def _read_env_bool(raw: str | None, *, default: bool = False) -> bool:
+    if raw is None:
+        return default
+    return raw.strip().lower() in _TRUTHY_STRINGS
+
+
 def processing_enabled() -> bool:
     """Return whether background processing is enabled."""
 
     raw = _current_settings().vet_records_disable_processing
-    if raw is None:
-        return True
-    return raw.strip().lower() not in {"1", "true", "yes", "on"}
+    return not _read_env_bool(raw, default=False)
 
 
 def extraction_observability_enabled() -> bool:
     """Return whether extraction observability debug endpoints are enabled."""
 
-    raw = _current_settings().vet_records_extraction_obs
-    if raw is None:
-        return False
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
+    return _read_env_bool(_current_settings().vet_records_extraction_obs)
 
 
 def debug_endpoints_enabled() -> bool:
     """Return whether review debug endpoints are enabled."""
 
-    raw = _current_settings().vet_records_debug_endpoints
-    if raw is None:
-        return False
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
+    return _read_env_bool(_current_settings().vet_records_debug_endpoints)
 
 
 def auth_token() -> str | None:
