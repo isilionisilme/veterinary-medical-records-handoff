@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from backend.app.application.field_normalizers import normalize_canonical_fields
+from backend.app.application.field_normalizers import (
+    derive_age_from_dob,
+    normalize_canonical_fields,
+)
 
 
 def _normalize_age_from_review_projection(data: dict[str, object]) -> dict[str, object]:
@@ -20,9 +23,9 @@ def _normalize_age_from_review_projection(data: dict[str, object]) -> dict[str, 
 
     normalized_global_schema = normalize_canonical_fields(
         global_schema_for_normalization,
-        visits=projected.get("visits") if isinstance(projected.get("visits"), list) else None,
-        derive_age=True,
     )
+    visits = projected.get("visits") if isinstance(projected.get("visits"), list) else None
+    normalized_global_schema = derive_age_from_dob(normalized_global_schema, visits=visits)
 
     if normalized_global_schema.get("age_origin") is None and age_origin_hint == "human":
         age_value = normalized_global_schema.get("age")

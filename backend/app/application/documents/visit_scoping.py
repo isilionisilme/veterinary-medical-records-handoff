@@ -6,6 +6,8 @@ orchestration from the review lifecycle API.
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 from backend.app.application.documents._shared import (
     _VISIT_GROUP_METADATA_KEY_SET,
     _VISIT_GROUP_METADATA_KEYS,
@@ -31,17 +33,21 @@ from backend.app.application.documents.visit_population import (
 )
 
 
+class FieldClassificationResult(NamedTuple):
+    """Result of classifying raw fields into scopes."""
+
+    fields_to_keep: list[object]
+    visit_scoped_fields: list[dict[str, object]]
+    visit_group_metadata: dict[str, list[object]]
+    detected_visit_dates: list[str]
+    seen_detected_visit_dates: set[str]
+
+
 def _classify_fields_into_scopes(
     raw_fields: list[object],
     *,
     raw_text_detected_visit_dates: list[str],
-) -> tuple[
-    list[object],
-    list[dict[str, object]],
-    dict[str, list[object]],
-    list[str],
-    set[str],
-]:
+) -> FieldClassificationResult:
     """Phase 1: Split fields into document-scoped, visit-scoped, and metadata."""
     fields_to_keep: list[object] = []
     visit_scoped_fields: list[dict[str, object]] = []
@@ -108,12 +114,12 @@ def _classify_fields_into_scopes(
         seen_detected_visit_dates.add(normalized_visit_date)
         detected_visit_dates.append(normalized_visit_date)
 
-    return (
-        fields_to_keep,
-        visit_scoped_fields,
-        visit_group_metadata,
-        detected_visit_dates,
-        seen_detected_visit_dates,
+    return FieldClassificationResult(
+        fields_to_keep=fields_to_keep,
+        visit_scoped_fields=visit_scoped_fields,
+        visit_group_metadata=visit_group_metadata,
+        detected_visit_dates=detected_visit_dates,
+        seen_detected_visit_dates=seen_detected_visit_dates,
     )
 
 
