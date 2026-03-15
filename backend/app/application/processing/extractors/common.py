@@ -17,10 +17,6 @@ from ..constants import (
     COVERAGE_CONFIDENCE_FALLBACK,
     COVERAGE_CONFIDENCE_LABEL,
 )
-from ..date_parsing import (
-    _normalize_person_fragment,
-    _split_owner_before_address_tokens,
-)
 from ..field_patterns import (
     _AMBIGUOUS_ADDRESS_CONTEXT_WINDOW_LINES,
     _CLINIC_ADDRESS_CONTEXT_RE,
@@ -29,6 +25,10 @@ from ..field_patterns import (
     _WEIGHT_EXPLICIT_CONTEXT_RE,
     _WEIGHT_LAB_GUARD_RE,
     _WEIGHT_PRICE_GUARD_RE,
+)
+from ..name_normalization import (
+    _normalize_person_fragment,
+    _split_owner_before_address_tokens,
 )
 
 
