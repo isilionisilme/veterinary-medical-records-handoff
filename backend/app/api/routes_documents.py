@@ -1,10 +1,10 @@
 """Document-related API routes."""
 
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from urllib.parse import quote
 
-from fastapi import APIRouter, File, Query, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse, Response
 
 from backend.app.api.schemas import (
@@ -17,7 +17,7 @@ from backend.app.api.schemas import (
     ProcessingHistoryRunResponse,
     ProcessingStepResponse,
 )
-from backend.app.application.document_service import (
+from backend.app.application.documents import (
     get_document_original_location,
     get_document_status_details,
     get_processing_history,
@@ -31,6 +31,7 @@ from backend.app.infra.rate_limiter import limiter
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .deps import get_repository, get_storage
 from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath
 from .routes_common import _request_content_length, error_response, log_event
 
@@ -73,7 +74,6 @@ def _download_rate_limit() -> str:
     responses={500: {"description": "Unexpected system failure."}},
 )
 def list_documents_route(
-    request: Request,
     limit: int = Query(
         DEFAULT_LIST_LIMIT,
         ge=1,
@@ -84,10 +84,9 @@ def list_documents_route(
         ge=0,
         description="Pagination offset.",
     ),
+    repository: DocumentRepository = Depends(get_repository),
 ) -> DocumentListResponse | JSONResponse:
     """Return a paginated list of documents with derived status labels."""
-
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     try:
         result = list_documents(
             repository=repository,
@@ -143,11 +142,10 @@ def list_documents_route(
     responses={404: {"description": "Document not found (NOT_FOUND)."}},
 )
 def get_document_status(
-    request: Request, document_id: DocumentIdPath
+    document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> DocumentResponse | JSONResponse:
     """Return the document processing status for a given document id."""
-
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     details = get_document_status_details(
         document_id=document_id,
         repository=repository,
@@ -199,11 +197,10 @@ def get_document_status(
     responses={404: {"description": "Document not found (NOT_FOUND)."}},
 )
 def get_document_processing_history(
-    request: Request, document_id: DocumentIdPath
+    document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> ProcessingHistoryResponse | JSONResponse:
     """Return read-only processing history for a document."""
-
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     result = get_processing_history(document_id=document_id, repository=repository)
     if result is None:
         return error_response(
@@ -263,11 +260,10 @@ def get_document_original(
         False,
         description="Return the document as an attachment when true; inline preview otherwise.",
     ),
+    repository: DocumentRepository = Depends(get_repository),
+    storage: FileStorage = Depends(get_storage),
 ) -> Response:
     """Return the original uploaded document file."""
-
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     location = get_document_original_location(
         document_id=document_id,
         repository=repository,
@@ -351,6 +347,8 @@ async def upload_document(
         ...,
         description="Document file to register (validated for type/extension and size).",
     ),
+    repository: DocumentRepository = Depends(get_repository),  # noqa: B008
+    storage: FileStorage = Depends(get_storage),  # noqa: B008
 ) -> DocumentUploadResponse:
     """Register a document upload (Release 1: store original PDF + persist metadata)."""
 
@@ -414,8 +412,6 @@ async def upload_document(
             message="The uploaded file is empty.",
         )
 
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     try:
         result = register_document_upload(
             filename=Path(file.filename).name,

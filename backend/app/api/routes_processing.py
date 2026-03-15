@@ -2,22 +2,21 @@
 
 from __future__ import annotations
 
-from typing import cast
-
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from backend.app.api.schemas import (
     ProcessingRunResponse,
     RawTextArtifactResponse,
 )
-from backend.app.application.document_service import get_document
+from backend.app.application.documents import get_document
 from backend.app.application.processing import enqueue_processing_run
 from backend.app.config import processing_enabled
 from backend.app.domain.models import ProcessingRunState
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .deps import get_repository, get_storage
 from .route_constants import DOCUMENT_NOT_FOUND_MSG, DocumentIdPath, RunIdPath
 from .routes_common import error_response, log_event
 
@@ -33,12 +32,11 @@ router = APIRouter(tags=["Processing"])
     responses={404: {"description": "Document not found (NOT_FOUND)."}},
 )
 def reprocess_document(
-    request: Request,
     document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> ProcessingRunResponse | JSONResponse:
     """Create a new queued processing run for an existing document."""
 
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -79,13 +77,11 @@ def reprocess_document(
     },
 )
 def get_raw_text_artifact(
-    request: Request,
     run_id: RunIdPath,
+    repository: DocumentRepository = Depends(get_repository),
+    storage: FileStorage = Depends(get_storage),
 ) -> RawTextArtifactResponse | JSONResponse:
     """Return extracted raw text for a processing run."""
-
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     run = repository.get_run(run_id)
     if run is None:
         return error_response(

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from backend.app.application.document_service import _resolve_human_edit_candidate_confidence
+from backend.app.application.documents import _resolve_human_edit_candidate_confidence
 from backend.app.config import human_edit_neutral_candidate_confidence
 
 

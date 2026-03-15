@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing import cast
-
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from backend.app.api.schemas import (
@@ -17,7 +15,7 @@ from backend.app.api.schemas import (
     ReviewStatusToggleResponse,
     VisitScopingMetricsResponse,
 )
-from backend.app.application.document_service import (
+from backend.app.application.documents import (
     apply_interpretation_edits,
     get_document,
     get_document_review,
@@ -29,6 +27,7 @@ from backend.app.config import debug_endpoints_enabled
 from backend.app.ports.document_repository import DocumentRepository
 from backend.app.ports.file_storage import FileStorage
 
+from .deps import get_repository, get_storage
 from .review_debug import (
     build_visit_debug_sections,
     build_visit_scoping_metrics,
@@ -106,12 +105,12 @@ def _resolve_review_context(
     },
 )
 def get_document_review_context(
-    request: Request, document_id: DocumentIdPath
+    document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
+    storage: FileStorage = Depends(get_storage),
 ) -> DocumentReviewResponse | JSONResponse:
     """Return review context based on the latest completed run."""
 
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -188,13 +187,13 @@ def get_document_review_context(
     },
 )
 def get_document_review_visit_debug_page(
-    request: Request, document_id: DocumentIdPath
+    document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
+    storage: FileStorage = Depends(get_storage),
 ) -> HTMLResponse | JSONResponse:
     if not debug_endpoints_enabled():
         return _debug_endpoints_disabled_response()
 
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -227,13 +226,13 @@ def get_document_review_visit_debug_page(
     },
 )
 def get_document_review_visit_scoping_observability(
-    request: Request, document_id: DocumentIdPath
+    document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
+    storage: FileStorage = Depends(get_storage),
 ) -> JSONResponse:
     if not debug_endpoints_enabled():
         return _debug_endpoints_disabled_response()
 
-    repository = cast(DocumentRepository, request.app.state.document_repository)
-    storage = cast(FileStorage, request.app.state.file_storage)
     if get_document(document_id=document_id, repository=repository) is None:
         return error_response(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -268,10 +267,9 @@ def get_document_review_visit_scoping_observability(
     },
 )
 def mark_document_reviewed_route(
-    request: Request,
     document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> ReviewStatusToggleResponse | JSONResponse:
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     result = mark_document_reviewed(document_id=document_id, repository=repository)
     if result is None:
         return error_response(
@@ -291,10 +289,9 @@ def mark_document_reviewed_route(
     responses={404: {"description": "Document not found (NOT_FOUND)."}},
 )
 def reopen_document_review_route(
-    request: Request,
     document_id: DocumentIdPath,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> ReviewStatusToggleResponse | JSONResponse:
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     result = reopen_document_review(document_id=document_id, repository=repository)
     if result is None:
         return error_response(
@@ -322,11 +319,10 @@ def reopen_document_review_route(
     },
 )
 def edit_run_interpretation(
-    request: Request,
     run_id: RunIdPath,
     payload: InterpretationEditRequest,
+    repository: DocumentRepository = Depends(get_repository),
 ) -> InterpretationEditResponse | JSONResponse:
-    repository = cast(DocumentRepository, request.app.state.document_repository)
     outcome = apply_interpretation_edits(
         run_id=run_id,
         base_version_number=payload.base_version_number,
