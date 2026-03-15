@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class ProcessingStatus(str, Enum):
+class ProcessingStatus(StrEnum):
     """Derived document status values exposed to clients."""
 
     UPLOADED = "UPLOADED"
@@ -16,7 +16,7 @@ class ProcessingStatus(str, Enum):
     TIMED_OUT = "TIMED_OUT"
 
 
-class ProcessingRunState(str, Enum):
+class ProcessingRunState(StrEnum):
     """Processing run lifecycle states."""
 
     QUEUED = "QUEUED"
@@ -26,14 +26,14 @@ class ProcessingRunState(str, Enum):
     TIMED_OUT = "TIMED_OUT"
 
 
-class StepName(str, Enum):
+class StepName(StrEnum):
     """Processing pipeline step identifiers."""
 
     EXTRACTION = "EXTRACTION"
     INTERPRETATION = "INTERPRETATION"
 
 
-class StepStatus(str, Enum):
+class StepStatus(StrEnum):
     """Per-step lifecycle state stored in STEP_STATUS artifacts."""
 
     NOT_STARTED = "NOT_STARTED"
@@ -42,7 +42,7 @@ class StepStatus(str, Enum):
     FAILED = "FAILED"
 
 
-class ReviewStatus(str, Enum):
+class ReviewStatus(StrEnum):
     """Human review status for a document."""
 
     IN_REVIEW = "IN_REVIEW"
