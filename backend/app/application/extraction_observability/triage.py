@@ -380,6 +380,52 @@ def _log_goal_fields_report(
     _emit_info("\n".join(lines))
 
 
+def _format_triage_section(
+    items: list[Any],
+    formatter: Callable[[dict[str, Any]], str],
+) -> list[str]:
+    """Format a list of triage items into log lines, or ['- none'] if empty."""
+    lines: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        lines.append(formatter(item))
+    return lines or ["- none"]
+
+
+def _format_missing_item(item: dict[str, Any]) -> str:
+    field = item.get("field")
+    candidates = item.get("topCandidates") if isinstance(item.get("topCandidates"), list) else []
+    top1 = candidates[0] if candidates else None
+    return f"- {field}: {_format_top_candidate_for_log(top1)}"
+
+
+def _format_rejected_item(item: dict[str, Any]) -> str:
+    field = item.get("field")
+    reason = item.get("reason")
+    raw_candidate = _as_text(item.get("rawCandidate"))
+    candidates = item.get("topCandidates") if isinstance(item.get("topCandidates"), list) else []
+    top1 = candidates[0] if candidates else None
+    line = f"- {field}: reason={reason} {_format_top_candidate_for_log(top1)}"
+    if raw_candidate:
+        line += f" rawCandidate={raw_candidate!r}"
+    return line
+
+
+def _format_suspicious_item(item: dict[str, Any]) -> str:
+    field = item.get("field")
+    value = _as_text(item.get("value"))
+    flags = item.get("flags") if isinstance(item.get("flags"), list) else []
+    raw_candidate = _as_text(item.get("rawCandidate"))
+    flags_label = ",".join(str(flag) for flag in flags) if flags else "unknown"
+    line = f"- {field}: flags=[{flags_label}]"
+    if value:
+        line += f" value={value!r}"
+    if raw_candidate:
+        line += f" rawCandidate={raw_candidate!r}"
+    return line
+
+
 def _log_triage_report(document_id: str, triage: dict[str, Any]) -> None:
     summary = triage.get("summary") if isinstance(triage.get("summary"), dict) else {}
     missing = triage.get("missing") if isinstance(triage.get("missing"), list) else []
@@ -400,59 +446,11 @@ def _log_triage_report(document_id: str, triage: dict[str, Any]) -> None:
         f"mid={int(summary.get('mid', 0) or 0)} "
         f"high={int(summary.get('high', 0) or 0)}",
         "MISSING:",
+        *_format_triage_section(missing, _format_missing_item),
         "REJECTED:",
+        *_format_triage_section(rejected, _format_rejected_item),
+        "SUSPICIOUS_ACCEPTED:",
+        *_format_triage_section(suspicious, _format_suspicious_item),
     ]
-
-    if not missing:
-        lines.insert(len(lines) - 1, "- none")
-    else:
-        missing_lines: list[str] = []
-        for item in missing:
-            if not isinstance(item, dict):
-                continue
-            field = item.get("field")
-            candidates = (
-                item.get("topCandidates") if isinstance(item.get("topCandidates"), list) else []
-            )
-            top1 = candidates[0] if candidates else None
-            missing_lines.append(f"- {field}: {_format_top_candidate_for_log(top1)}")
-        lines[len(lines) - 1 : len(lines) - 1] = missing_lines
-
-    if not rejected:
-        lines.append("- none")
-    else:
-        for item in rejected:
-            if not isinstance(item, dict):
-                continue
-            field = item.get("field")
-            reason = item.get("reason")
-            raw_candidate = _as_text(item.get("rawCandidate"))
-            candidates = (
-                item.get("topCandidates") if isinstance(item.get("topCandidates"), list) else []
-            )
-            top1 = candidates[0] if candidates else None
-            line = f"- {field}: reason={reason} {_format_top_candidate_for_log(top1)}"
-            if raw_candidate:
-                line += f" rawCandidate={raw_candidate!r}"
-            lines.append(line)
-
-    lines.append("SUSPICIOUS_ACCEPTED:")
-    if not suspicious:
-        lines.append("- none")
-    else:
-        for item in suspicious:
-            if not isinstance(item, dict):
-                continue
-            field = item.get("field")
-            value = _as_text(item.get("value"))
-            flags = item.get("flags") if isinstance(item.get("flags"), list) else []
-            raw_candidate = _as_text(item.get("rawCandidate"))
-            flags_label = ",".join(str(flag) for flag in flags) if flags else "unknown"
-            line = f"- {field}: flags=[{flags_label}]"
-            if value:
-                line += f" value={value!r}"
-            if raw_candidate:
-                line += f" rawCandidate={raw_candidate!r}"
-            lines.append(line)
 
     _emit_info("\n".join(lines))
