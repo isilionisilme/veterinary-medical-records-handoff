@@ -25,6 +25,7 @@
 - [Tech Specs](tech-specs)
 
 **03 Ops**
+- [CI Pipeline](ci-pipeline)
 - [Manual QA Checklist](manual-qa-regression-checklist)
 - [E2E Test Coverage](plan-e2e-test-coverage)
 - [Architecture Audit](architecture-audit-process)
