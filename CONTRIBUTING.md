@@ -27,7 +27,7 @@ workflow and quality gates.
 
 - Branch format: `<category>/<slug>` (e.g., `feature/upload-validation`, `fix/snapshot-cc`).
 - Commit messages: `<type>: <description>` — types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
-- Follow `AGENTS.md` and the runbooks under `.github/prompts/`.
+- Follow `AGENTS.md`.
 
 ## Architecture rules
 
