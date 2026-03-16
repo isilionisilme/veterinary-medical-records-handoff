@@ -1,7 +1,7 @@
 services:
   wiki:
-    build:
-      context: ${DOCS_REPO_PATH:-../veterinary-medical-records-documentation}
-      dockerfile: Dockerfile.docs
+    image: nginx:1.27-alpine
     ports:
-      - "${DOCS_PORT:-8081}:8000"
+      - "${DOCS_PORT:-8081}:80"
+    volumes:
+      - ./scripts/dev/wiki-redirect-nginx.conf:/etc/nginx/conf.d/default.conf:ro
