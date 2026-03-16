@@ -32,6 +32,25 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Validate source wiki before touching published content
+          if [ ! -f wiki/Home.md ]; then
+            echo "Missing required page: wiki/Home.md"
+            exit 1
+          fi
+
+          page_count="$(find wiki -type f -name "*.md" | wc -l | tr -d ' ')"
+          if [ "${page_count}" -lt 3 ]; then
+            echo "Unexpected wiki source size (${page_count} markdown files); aborting sync."
+            exit 1
+          fi
+
+          dupes="$(find wiki -type f -name "*.md" -printf "%f\n" | sort | uniq -d || true)"
+          if [ -n "${dupes}" ]; then
+            echo "Duplicate wiki page basenames detected; flattening would overwrite pages:"
+            echo "${dupes}"
+            exit 1
+          fi
+
           # Clean existing pages and assets for a full, reproducible sync
           find wiki-repo -maxdepth 1 -name "*.md" -delete
           rm -rf wiki-repo/assets
@@ -62,3 +81,4 @@ jobs:
           git push \
             "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" \
             HEAD:master
+
