@@ -87,7 +87,9 @@ This project explores an approach that assists veterinarians during document rev
 ## Repository structure
 
 - `backend/` — FastAPI API + persistence (SQLite + filesystem) + tests
+  - Module guide: `backend/README.md`
 - `frontend/` — React app for document upload/list/review flows
+  - Module guide: `frontend/README.md`
 - `wiki/` — project documentation source that will be published to the GitHub Wiki of this repository
 
 ## Architecture at a glance
