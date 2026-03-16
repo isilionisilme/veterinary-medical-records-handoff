@@ -40,7 +40,7 @@ jobs:
       - name: Fail if docs directory exists
         run: |
           if [ -d "docs" ]; then
-            echo "docs/ directory must not exist."
+            echo "Legacy documentation directory must not exist."
             exit 1
           fi
 

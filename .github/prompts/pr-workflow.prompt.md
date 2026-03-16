@@ -11,7 +11,7 @@ description: Create or update a pull request using the canonical PR workflow.
 
 | Type | File patterns |
 |---|---|
-| **Docs-only** | `docs/**`, `*.md`, `*.txt`, `*.rst`, `*.adoc` only |
+| **Documentation-only** | `*.md`, `*.txt`, `*.rst`, `*.adoc` only |
 | **Code** | Any `*.py`, `*.ts`, `*.tsx`, `*.js`, `*.jsx`, `*.css`, `*.scss`, `*.html`, `*.sql` |
 | **Non-code, non-doc** | `*.json`, `*.yaml`, `*.yml`, `*.toml`, `*.ini`, `*.env` |
 

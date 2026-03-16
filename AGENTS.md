@@ -6,7 +6,6 @@ Start with the matching operational runbook for the current intent. Keep reads m
 - Start new work or create a branch → `.github/prompts/start-work.prompt.md`
 - Create or update a pull request → `.github/prompts/pr-workflow.prompt.md`
 - Code review → `.github/prompts/code-review.prompt.md`
-- Documentation updates or doc maintenance → `.github/prompts/doc-updates.prompt.md`
 - Commit-task scope boundary or handoff → `.github/prompts/scope-boundary.prompt.md`
 
 ## Global Rules

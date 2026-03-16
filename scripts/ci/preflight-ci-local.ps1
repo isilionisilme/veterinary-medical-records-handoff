@@ -546,7 +546,7 @@ if ($ParityMode.IsPresent) {
 
 Invoke-Step "No docs directory guard" {
     if (Test-Path (Join-Path $repoRoot "docs")) {
-        throw "docs/ directory must not exist."
+        throw "Legacy documentation directory must not exist."
     }
 }
 
