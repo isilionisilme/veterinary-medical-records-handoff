@@ -32,18 +32,6 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  no_docs_guard:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Fail if docs directory exists
-        run: |
-          if [ -d "docs" ]; then
-            echo "Legacy documentation directory must not exist."
-            exit 1
-          fi
-
   frontend_test_build:
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true'

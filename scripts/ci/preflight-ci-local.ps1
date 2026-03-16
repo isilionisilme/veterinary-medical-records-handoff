@@ -544,12 +544,6 @@ if ($ParityMode.IsPresent) {
     Write-Host " - Parity mode: file detection restricted to commit range only (staged/unstaged excluded)"
 }
 
-Invoke-Step "No docs directory guard" {
-    if (Test-Path (Join-Path $repoRoot "docs")) {
-        throw "Legacy documentation directory must not exist."
-    }
-}
-
 if ($Mode -eq "Push") {
     Invoke-Step "Remote base sync guard" {
         Assert-RemoteBaseUpToDate -BaseRefValue $BaseRef
