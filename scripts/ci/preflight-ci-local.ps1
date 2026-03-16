@@ -447,24 +447,6 @@ $frontendImpactPatterns = @(
     "Dockerfile.frontend"
 )
 
-$docsPatterns = @(
-    "docs/*",
-    "*.md",
-    "scripts/*"
-)
-
-$docsPatternsCi = @(
-    "docs/*",
-    "*.md",
-    "package.json",
-    "package-lock.json",
-    ".markdownlint.yml",
-    ".markdown-link-check.json",
-    ".ci-config-reference/package.json",
-    "scripts/docs/*",
-    "scripts/quality/validate-frontmatter.py"
-)
-
 $dockerPackagingPatterns = @(
     ".dockerignore",
     ".env.example",
@@ -481,21 +463,16 @@ $dockerPackagingPatterns = @(
 $backendChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $backendPatterns
 $frontendChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $frontendPatterns
 $frontendImpactFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $frontendImpactPatterns
-$docsChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $docsPatterns
-$docsChangedFilesCi = Filter-ChangedFiles -Files $changedFiles -Patterns $docsPatternsCi
 $dockerChangedFiles = Filter-ChangedFiles -Files $changedFiles -Patterns $dockerPackagingPatterns
 
 $backendChanged = [bool]($backendChangedFiles | Select-Object -First 1)
 $frontendChanged = [bool]($frontendChangedFiles | Select-Object -First 1)
 $frontendImpacted = [bool]($frontendImpactFiles | Select-Object -First 1)
-$docsChanged = [bool]($docsChangedFiles | Select-Object -First 1)
-$docsChangedCi = [bool]($docsChangedFilesCi | Select-Object -First 1)
 $dockerChanged = [bool]($dockerChangedFiles | Select-Object -First 1)
 
 $forceFrontendChecks = $ForceFrontend.IsPresent -or $ForceFull.IsPresent
 $forceAllChecks = $All.IsPresent -or $ForceFull.IsPresent
 
-$runDocs = $false
 $runBackendQuick = $false
 $runBackendFull = $false
 $runFrontendQuick = $false
@@ -506,7 +483,6 @@ $runE2E = $false
 
 switch ($Mode) {
     "Quick" {
-        $runDocs = $docsChanged
         $runBackendQuick = $backendChanged
         $runFrontendQuick = $frontendChanged
         $runFrontendGuards = $false
@@ -514,7 +490,6 @@ switch ($Mode) {
         $runE2E = $false
     }
     "Push" {
-        $runDocs = $docsChanged
         $runBackendFull = $backendChanged
         # Mirror remote: frontend_test_build fires when backend OR frontend changed.
         $runFrontendFull = $frontendImpacted -or $backendChanged -or $forceFrontendChecks
@@ -524,7 +499,6 @@ switch ($Mode) {
         $runE2E = $false
     }
     "Full" {
-        $runDocs = $true
         $runBackendFull = $backendChanged -or $forceAllChecks
         # Mirror remote: frontend_test_build and e2e fire when backend OR frontend changed.
         $runFrontendFull = $frontendImpacted -or $backendChanged -or $forceFrontendChecks
@@ -535,7 +509,6 @@ switch ($Mode) {
     }
     "CI" {
         # Dedicated CI parity profile: mirrors .github/workflows/ci.yml gate intent.
-        $runDocs = $docsChangedCi
         $runBackendFull = $backendChanged
         $runFrontendFull = $frontendChanged -or $backendChanged -or $forceFrontendChecks
         $runFrontendGuards = $frontendChanged -or $forceFrontendChecks
@@ -545,7 +518,6 @@ switch ($Mode) {
 }
 
 Write-Host "`nExecution plan:"
-Write-Host " - Docs guards:      $runDocs"
 Write-Host " - Backend quick:    $runBackendQuick"
 Write-Host " - Backend full:     $runBackendFull"
 Write-Host " - Frontend quick:   $runFrontendQuick"
@@ -572,9 +544,9 @@ if ($ParityMode.IsPresent) {
     Write-Host " - Parity mode: file detection restricted to commit range only (staged/unstaged excluded)"
 }
 
-if ($runDocs) {
-    Invoke-Step "Docs QA (lint/format/links/frontmatter)" {
-        & $python "scripts/docs/run_docs_qa.py" "--base-ref" $BaseRef
+Invoke-Step "No docs directory guard" {
+    if (Test-Path (Join-Path $repoRoot "docs")) {
+        throw "docs/ directory must not exist."
     }
 }
 
@@ -826,7 +798,7 @@ if ($runDocker) {
     }
 }
 
-if (-not ($runDocs -or $runBackendQuick -or $runBackendFull -or $runFrontendQuick -or $runFrontendFull -or $runFrontendGuards -or $runDocker -or $runE2E)) {
+if (-not ($runBackendQuick -or $runBackendFull -or $runFrontendQuick -or $runFrontendFull -or $runFrontendGuards -or $runDocker -or $runE2E)) {
     Write-Host "No checks selected for mode $Mode with current changed paths."
 }
 

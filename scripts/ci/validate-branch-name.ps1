@@ -42,6 +42,6 @@ Write-Error (
     "Invalid branch name '$currentBranch'. Expected one of: " +
     "'feature/<id>-<slug>' (for example 'feature/us-42-visit-summary-export'), " +
     "'improvement/<slug>', or '(fix|docs|chore|refactor|ci)/<slug>'. " +
-    "See docs/shared/03-ops/way-of-working.md for canonical branch naming rules."
+    "See AGENTS.md for canonical branch naming rules."
 )
 exit 1

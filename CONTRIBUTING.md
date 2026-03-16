@@ -4,13 +4,8 @@ Thank you for your interest in contributing to this project.
 
 ## Quick links
 
-| Topic | Document |
-|---|---|
-| Coding standards | [`docs/shared/02-tech/coding-standards.md`](docs/shared/02-tech/coding-standards.md) |
-| Way of working | [`docs/shared/03-ops/way-of-working.md`](docs/shared/03-ops/way-of-working.md) |
-| Architecture | [`docs/projects/veterinary-medical-records/02-tech/architecture.md`](docs/projects/veterinary-medical-records/02-tech/architecture.md) |
-| Technical design | [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](docs/projects/veterinary-medical-records/02-tech/technical-design.md) |
-| ADR index | [`docs/projects/veterinary-medical-records/02-tech/adr/index.md`](docs/projects/veterinary-medical-records/02-tech/adr/index.md) |
+Use repository root files and scripts as the source of truth for contributing
+workflow and quality gates.
 
 ## Getting started
 
@@ -32,14 +27,13 @@ Thank you for your interest in contributing to this project.
 
 - Branch format: `<category>/<slug>` (e.g., `feature/upload-validation`, `fix/snapshot-cc`).
 - Commit messages: `<type>: <description>` — types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
-- See [`way-of-working.md`](docs/shared/03-ops/way-of-working.md) for full PR workflow and merge gates.
+- Follow `AGENTS.md` and the runbooks under `.github/prompts/`.
 
 ## Architecture rules
 
 - **Hexagonal architecture**: `domain/` → `ports/` → `application/` → `api/` / `infra/`.
 - Domain layer must have zero outbound cross-layer imports.
 - All persistence goes through port interfaces (`DocumentRepository`, `FileStorage`, `SchedulerPort`).
-- See [`coding-standards.md`](docs/shared/02-tech/coding-standards.md) for the complete rule set.
 
 ## CI gates
 

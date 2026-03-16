@@ -18,7 +18,6 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
-      docs: ${{ steps.filter.outputs.docs }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -32,45 +31,18 @@ jobs:
               - 'pytest.ini'
             frontend:
               - 'frontend/**'
-            docs:
-              - 'docs/**'
-              - '*.md'
-              - 'package.json'
-              - 'package-lock.json'
-              - '.markdownlint.yml'
-              - '.markdown-link-check.json'
-              - '.ci-config-reference/package.json'
-              - 'scripts/docs/**'
-              - 'scripts/quality/validate-frontmatter.py'
 
-  docs_qa:
-    needs: changes
-    if: github.event_name == 'pull_request' && needs.changes.outputs.docs == 'true'
+  no_docs_guard:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: package.json
-      - name: Install docs tooling dependencies
+      - name: Fail if docs directory exists
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install --no-audit --no-fund
+          if [ -d "docs" ]; then
+            echo "docs/ directory must not exist."
+            exit 1
           fi
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Run docs QA checks (changed canonical docs)
-        run: python scripts/docs/run_docs_qa.py --base-ref "${{ github.event.pull_request.base.sha }}"
 
   frontend_test_build:
     needs: changes

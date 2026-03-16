@@ -17,8 +17,7 @@ Source of truth: keep this file behaviorally aligned with `AGENTS.md`. If intent
 ## Global Rules
 
 - No direct commits to `main`; use a feature branch + PR unless the user explicitly authorizes otherwise.
-- New branches must use `<category>/<slug>` and follow `docs/agent_router/01_WORKFLOW/BRANCHING/00_entry.md`.
-- If docs changed, documentation was updated, or the user mentions documentation updates in any language or paraphrase, load `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md` and run the DOC_UPDATES normalization pass once before finishing.
+- New branches must use `<category>/<slug>`.
 - If a required standard cannot be satisfied, stop and escalate the blocker.
 - Include final `How to test` for user-validatable changes.
 
