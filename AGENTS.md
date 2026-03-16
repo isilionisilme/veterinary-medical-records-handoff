@@ -1,12 +1,6 @@
 # AGENTS — Operational Entry Point
 
-Start with the matching operational runbook for the current intent. Keep reads minimal.
-
-## Runbooks
-- Start new work or create a branch → `.github/prompts/start-work.prompt.md`
-- Create or update a pull request → `.github/prompts/pr-workflow.prompt.md`
-- Code review → `.github/prompts/code-review.prompt.md`
-- Commit-task scope boundary or handoff → `.github/prompts/scope-boundary.prompt.md`
+Keep reads minimal and apply the global repository rules.
 
 ## Global Rules
 - No direct commits to `main`; use a feature branch + PR unless the user explicitly authorizes otherwise.
