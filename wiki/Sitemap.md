@@ -1,0 +1,56 @@
+# Sitemap
+- [Home](Home)
+- [_Sidebar](_Sidebar)
+- [Sitemap](Sitemap)
+- **projects/**
+  - **01-product/**
+    - [product-design-executive](product-design-executive)
+    - [product-design](product-design)
+    - [post-mortem](post-mortem)
+    - [user-guide](user-guide)
+    - [staff-engineer-guide](staff-engineer-guide)
+    - **specs/**
+      - [product-specs](product-specs)
+      - [ux-design](ux-design)
+      - [Design-System](Design-System)
+  - **02-tech/**
+    - [architecture](architecture)
+    - [technical-design](technical-design)
+    - [extraction-quality](extraction-quality)
+    - [event-architecture](event-architecture)
+    - [deployment](deployment)
+    - **adr/**
+      - [adr-index](adr-index)
+      - [ADR-modular-monolith](ADR-modular-monolith)
+      - [ADR-sqlite-database](ADR-sqlite-database)
+      - [ADR-raw-sql-repository-pattern](ADR-raw-sql-repository-pattern)
+      - [ADR-in-process-async-processing](ADR-in-process-async-processing)
+      - [ADR-complexity-gate-thresholds](ADR-complexity-gate-thresholds)
+      - [ADR-frontend-stack-react-tanstack-query-vite](ADR-frontend-stack-react-tanstack-query-vite)
+      - [ADR-re-accretion-prevention-governance](ADR-re-accretion-prevention-governance)
+      - [ADR-confidence-scoring-algorithm](ADR-confidence-scoring-algorithm)
+      - [ADR-bootstrap-schema-no-migrations](ADR-bootstrap-schema-no-migrations)
+      - [ADR-structured-logging-no-metrics](ADR-structured-logging-no-metrics)
+      - [ADR-ci-single-python-version](ADR-ci-single-python-version)
+    - **specs/**
+      - [tech-specs](tech-specs)
+      - [technical-design-appendices](technical-design-appendices)
+      - [backend-implementation](backend-implementation)
+      - [frontend-implementation](frontend-implementation)
+  - **03-ops/**
+    - [manual-qa-regression-checklist](manual-qa-regression-checklist)
+    - [plan-e2e-test-coverage](plan-e2e-test-coverage)
+    - [architecture-audit-process](architecture-audit-process)
+  - **04-delivery/**
+    - [implementation-plan](implementation-plan)
+    - [implementation-history](implementation-history)
+    - [quality-audit-history](quality-audit-history)
+    - [future-improvements](future-improvements)
+- **shared/**
+  - **01-product/**
+    - [ux-guidelines](ux-guidelines)
+    - [brand-guidelines](brand-guidelines)
+  - **03-ops/**
+    - [way-of-working](way-of-working)
+    - [coding-standards](coding-standards)
+    - [documentation-guidelines](documentation-guidelines)
