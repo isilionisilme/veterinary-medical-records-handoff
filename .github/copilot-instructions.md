@@ -11,14 +11,12 @@ Source of truth: keep this file behaviorally aligned with `AGENTS.md`. If intent
 | Start new work or create a branch | `.github/prompts/start-work.prompt.md` |
 | Create or update a pull request | `.github/prompts/pr-workflow.prompt.md` |
 | Code review | `.github/prompts/code-review.prompt.md` |
-| Documentation updates or doc maintenance | `.github/prompts/doc-updates.prompt.md` |
 | Commit-task scope boundary or handoff | `.github/prompts/scope-boundary.prompt.md` |
 
 ## Global Rules
 
 - No direct commits to `main`; use a feature branch + PR unless the user explicitly authorizes otherwise.
-- New branches must use `<category>/<slug>` and follow `docs/agent_router/01_WORKFLOW/BRANCHING/00_entry.md`.
-- If docs changed, documentation was updated, or the user mentions documentation updates in any language or paraphrase, load `docs/agent_router/01_WORKFLOW/DOC_UPDATES/00_entry.md` and run the DOC_UPDATES normalization pass once before finishing.
+- New branches must use `<category>/<slug>`.
 - If a required standard cannot be satisfied, stop and escalate the blocker.
 - Include final `How to test` for user-validatable changes.
 

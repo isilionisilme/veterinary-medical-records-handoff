@@ -18,6 +18,3 @@ backend/.pytest_cache
 !.github/
 !.github/workflows/
 !.github/workflows/ci.yml
-!metrics/
-!metrics/llm_benchmarks/
-!metrics/llm_benchmarks/SCENARIOS.md

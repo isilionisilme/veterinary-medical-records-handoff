@@ -13,7 +13,7 @@ description: Start new work on a dedicated branch before editing files.
 |---|---|
 | User story | `feature/<ID>-<short-representative-slug>` |
 | User-facing improvement | `improvement/<short-slug>` |
-| Technical work | `refactor/<short-slug>`, `chore/<short-slug>`, `ci/<short-slug>`, `docs/<short-slug>`, or `fix/<short-slug>` |
+| Technical work | `refactor/<short-slug>`, `chore/<short-slug>`, `ci/<short-slug>`, or `fix/<short-slug>` |
 
 6. Apply slug rules exactly: lowercase letters, numbers, and hyphens only; concise and representative of the work item.
 7. Respect branch strategy: use short-lived dedicated branches, keep `main` runnable and test-passing, and never commit directly to `main`.

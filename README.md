@@ -47,9 +47,6 @@ Stop:
 Note for macOS/Linux first run:
 - `chmod +x ./start-app.sh ./stop-app.sh`
 
-Scope and sequencing source of truth:
-- [`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md)
-
 ---
 
 ## Solution approach
@@ -90,11 +87,9 @@ This project explores an approach that assists veterinarians during document rev
 
 - `backend/` — FastAPI API + persistence (SQLite + filesystem) + tests
 - `frontend/` — React app for document upload/list/review flows
-- [`docs/`](docs/) — authoritative documentation (start at [`docs/README.md`](docs/README.md))
 
 ## Architecture at a glance
 
-For a visual overview with Mermaid diagram, see [**architecture.md**](docs/projects/veterinary-medical-records/02-tech/architecture.md).
 
 - Architectural style: modular monolith with clear application/domain/infrastructure boundaries.
 - Backend pattern: ports-and-adapters with explicit use cases and append-only review/processing artifacts.
@@ -102,79 +97,8 @@ For a visual overview with Mermaid diagram, see [**architecture.md**](docs/proje
 - Runtime model: Docker-first local environment with deterministic evaluation mode and optional dev overlay.
 
 Key design references:
-- [`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](docs/projects/veterinary-medical-records/02-tech/technical-design.md)
-- [`docs/projects/veterinary-medical-records/01-product/product-design.md`](docs/projects/veterinary-medical-records/01-product/product-design.md)
-- [`docs/projects/veterinary-medical-records/01-product/ux-design.md`](docs/projects/veterinary-medical-records/01-product/ux-design.md)
 
 Key technical decisions (ADRs):
-- [`docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0001-modular-monolith.md`](docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0001-modular-monolith.md) — modular monolith over microservices.
-- [`docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0002-sqlite-database.md`](docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0002-sqlite-database.md) — SQLite trade-offs and PostgreSQL migration path.
-- [`docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0003-raw-sql-repository-pattern.md`](docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0003-raw-sql-repository-pattern.md) — raw SQL + repository pattern, no ORM.
-- [`docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0004-in-process-async-processing.md`](docs/projects/veterinary-medical-records/02-tech/adr/ADR-ARCH-0004-in-process-async-processing.md) — in-process async scheduler over external queue.
-- ADR index: [`docs/projects/veterinary-medical-records/02-tech/adr/index.md`](docs/projects/veterinary-medical-records/02-tech/adr/index.md)
-
----
-
-## Documentation overview
-
-The repository documentation is intentionally split by audience and purpose.
-
-Start here:
-
-📄 **[`docs/README.md`](docs/README.md)** — reading order + document authority.
-
----
-
-### Project documentation (authoritative)
-
-📄 **[`docs/projects/veterinary-medical-records/01-product/product-design.md`](docs/projects/veterinary-medical-records/01-product/product-design.md)**  
-Product intent + semantics summary (with canonical Google Doc link).
-
----
-
-📄 **[`docs/projects/veterinary-medical-records/01-product/ux-design.md`](docs/projects/veterinary-medical-records/01-product/ux-design.md)**  
-UX interaction contract (roles, workflow guarantees, confidence UX rules).
-
-📄 **[`docs/shared/01-product/brand-guidelines.md`](docs/shared/01-product/brand-guidelines.md)**  
-Visual identity and tone of user-facing copy.
-
-📄 **[`docs/projects/veterinary-medical-records/02-tech/technical-design.md`](docs/projects/veterinary-medical-records/02-tech/technical-design.md)**  
-Architecture + invariants + authoritative contracts (endpoint map, error semantics, state rules, schemas).
-
----
-
-📄 **[`docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md`](docs/projects/veterinary-medical-records/04-delivery/implementation-plan.md)**  
-Scope + story order + acceptance criteria.
-
-📄 **[`docs/projects/veterinary-medical-records/02-tech/backend-implementation.md`](docs/projects/veterinary-medical-records/02-tech/backend-implementation.md)**  
-Backend implementation details (“how”).
-
-📄 **[`docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md`](docs/projects/veterinary-medical-records/02-tech/frontend-implementation.md)**  
-Frontend implementation details (“how”).
-
----
-
-### Shared engineering rules
-
-📄 **[`docs/shared/02-tech/coding-standards.md`](docs/shared/02-tech/coding-standards.md)**  
-Technical coding standards and architecture rules.
-
-📄 **[`docs/shared/03-ops/way-of-working.md`](docs/shared/03-ops/way-of-working.md)**  
-Workflow lifecycle and working agreements.
-
-📄 **[`docs/shared/01-product/ux-guidelines.md`](docs/shared/01-product/ux-guidelines.md)**  
-Shared UX principles referenced by project UX design.
-
----
-
-### Delivery evidence and audit trail
-
-- **Delivery summary (start here):** [`docs/projects/veterinary-medical-records/04-delivery/delivery-summary.md`](docs/projects/veterinary-medical-records/04-delivery/delivery-summary.md)
-- 12-factor architecture audit: [`docs/projects/veterinary-medical-records/99-archive/12-factor-audit.md`](docs/projects/veterinary-medical-records/99-archive/12-factor-audit.md)
-- Maintainability/codebase audit: [`docs/projects/veterinary-medical-records/99-archive/codebase-audit.md`](docs/projects/veterinary-medical-records/99-archive/codebase-audit.md)
-- Iterative execution log and decisions: [`docs/projects/veterinary-medical-records/04-delivery/implementation-history.md`](docs/projects/veterinary-medical-records/04-delivery/implementation-history.md)
-- Future roadmap (2/4/8 weeks): [`docs/projects/veterinary-medical-records/04-delivery/future-improvements.md`](docs/projects/veterinary-medical-records/04-delivery/future-improvements.md)
-- Project ADR index: [`docs/projects/veterinary-medical-records/02-tech/adr/index.md`](docs/projects/veterinary-medical-records/02-tech/adr/index.md)
 
 ---
 
@@ -360,7 +284,6 @@ Confidence policy:
 - `VET_RECORDS_CONFIDENCE_LOW_MAX`
 - `VET_RECORDS_CONFIDENCE_MID_MAX`
 
-For backend configuration and local runtime details, see [`docs/projects/veterinary-medical-records/02-tech/backend-implementation.md`](docs/projects/veterinary-medical-records/02-tech/backend-implementation.md).
 
 ---
 
@@ -377,6 +300,6 @@ The focus is on **clarity, judgment, and maintainability**, rather than feature 
 ## How to contribute
 
 1. Create a branch from `main` (or continue work in the designated delivery branch).
-2. Keep changes scoped and update docs when behavior/contracts change.
+2. Keep changes scoped and update in-repo guides when behavior/contracts change.
 3. Run local quality gates listed above before opening/updating PR.
 4. Prefer Docker Compose commands in examples to preserve evaluator parity.
