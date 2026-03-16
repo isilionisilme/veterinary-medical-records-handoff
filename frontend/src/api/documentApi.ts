@@ -170,27 +170,24 @@ export async function fetchVisitScopingMetrics(
   documentId: string,
 ): Promise<VisitScopingMetricsResponse> {
   const endpoint = `/documents/${documentId}/review/debug/visit-scoping`;
-  return apiFetch<VisitScopingMetricsResponse>(
-    endpoint,
-    {
-      friendlyMessage: "No pudimos cargar la observabilidad de visitas.",
-      onResponseError: async (response) => {
-        let errorMessage = "No pudimos cargar la observabilidad de visitas.";
-        try {
-          const payload = await response.json();
-          if (response.status === 403 && payload?.error_code === "FORBIDDEN") {
-            errorMessage =
-              "La observabilidad de visitas está deshabilitada en este entorno (VET_RECORDS_DEBUG_ENDPOINTS=false).";
-          } else {
-            errorMessage = resolveFriendlyPayloadMessage(payload?.message, errorMessage);
-          }
-        } catch {
-          // Ignore JSON parse errors for non-JSON responses.
+  return apiFetch<VisitScopingMetricsResponse>(endpoint, {
+    friendlyMessage: "No pudimos cargar la observabilidad de visitas.",
+    onResponseError: async (response) => {
+      let errorMessage = "No pudimos cargar la observabilidad de visitas.";
+      try {
+        const payload = await response.json();
+        if (response.status === 403 && payload?.error_code === "FORBIDDEN") {
+          errorMessage =
+            "La observabilidad de visitas está deshabilitada en este entorno (VET_RECORDS_DEBUG_ENDPOINTS=false).";
+        } else {
+          errorMessage = resolveFriendlyPayloadMessage(payload?.message, errorMessage);
         }
-        throw new UiError(errorMessage, `HTTP ${response.status} calling ${API_BASE_URL}${endpoint}`);
-      },
+      } catch {
+        // Ignore JSON parse errors for non-JSON responses.
+      }
+      throw new UiError(errorMessage, `HTTP ${response.status} calling ${API_BASE_URL}${endpoint}`);
     },
-  );
+  });
 }
 
 export async function triggerReprocess(documentId: string): Promise<LatestRun> {
