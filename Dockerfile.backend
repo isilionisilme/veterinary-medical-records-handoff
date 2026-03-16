@@ -45,7 +45,6 @@ COPY README.md /app/README.md
 COPY .githooks/pre-commit /app/.githooks/pre-commit
 COPY .github/copilot-instructions.md /app/.github/copilot-instructions.md
 COPY .github/workflows/ci.yml /app/.github/workflows/ci.yml
-COPY .github/prompts /app/.github/prompts
 COPY Dockerfile.backend /app/Dockerfile.backend
 COPY Dockerfile.frontend /app/Dockerfile.frontend
 COPY frontend/playwright.config.ts /app/frontend/playwright.config.ts
