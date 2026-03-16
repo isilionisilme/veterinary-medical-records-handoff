@@ -231,6 +231,23 @@ describe("documentApi", () => {
     });
   });
 
+  it("fetchVisitScopingMetrics maps debug-disabled forbidden response", async () => {
+    vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+      jsonResponse(
+        {
+          error_code: "FORBIDDEN",
+          message: "Debug endpoints are disabled.",
+        },
+        403,
+      ),
+    );
+
+    await expect(fetchVisitScopingMetrics("doc-1")).rejects.toMatchObject<Partial<UiError>>({
+      userMessage:
+        "La observabilidad de visitas está deshabilitada en este entorno (VET_RECORDS_DEBUG_ENDPOINTS=false).",
+    });
+  });
+
   it("triggerReprocess throws Error with API message on failure", async () => {
     vi.mocked(globalThis.fetch).mockResolvedValueOnce(jsonResponse({ message: "No queue" }, 503));
 
