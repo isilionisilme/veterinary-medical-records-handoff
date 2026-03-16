@@ -1,6 +1,8 @@
 # Veterinary Medical Records Wiki
 This wiki contains curated project documentation for technical evaluation.
 
+![Veterinary Medical Records App — document review interface](assets/veterinary-medical-records.png)
+
 ## Evaluator Reading Path
 
 | Evaluation axis | Suggested path |
