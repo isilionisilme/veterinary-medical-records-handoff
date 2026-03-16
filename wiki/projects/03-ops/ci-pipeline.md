@@ -16,7 +16,6 @@ changes ──┬── frontend_test_build
            ├── frontend_design_system_guard
            ├── quality
            ├── complexity_gate
-           ├── no_docs_guard  (unconditional)
            ├── docker_packaging_guard ── e2e
            └── e2e
 ```
@@ -34,13 +33,7 @@ Detects which paths changed and sets output flags consumed by all other jobs.
 | `backend` | `backend/**`, `requirements*.txt`, `pyproject.toml`, `pytest.ini` |
 | `frontend` | `frontend/**` |
 
-### 2. `no_docs_guard` — Legacy Directory Guard
-
-**Runs:** unconditionally on every event.
-
-Fails if a `docs/` directory exists in the repository root. This enforces the wiki-only documentation policy.
-
-### 3. `frontend_test_build` — Frontend Quality & Build
+### 2. `frontend_test_build` — Frontend Quality & Build
 
 **Runs when:** frontend or backend paths changed.
 
@@ -52,19 +45,19 @@ Fails if a `docs/` directory exists in the repository root. This enforces the wi
 | Build | `npm run build` | TypeScript compilation and Vite production build |
 | Security audit | `npm audit --audit-level=high` | Known vulnerabilities in npm dependencies |
 
-### 4. `brand_guard` — Brand Compliance
+### 3. `brand_guard` — Brand Compliance
 
 **Runs when:** PR with frontend changes.
 
 Runs `scripts/quality/check_brand_compliance.py` against only the **added lines** in the PR diff. Verifies brand colors and typography tokens conform to design-system standards.
 
-### 5. `frontend_design_system_guard` — Design System Violations
+### 4. `frontend_design_system_guard` — Design System Violations
 
 **Runs when:** PR with frontend changes.
 
 Runs `scripts/quality/check_design_system.mjs`. Detects raw design tokens, inline style escapes, and unlabeled icon usage that bypass the design system.
 
-### 6. `quality` — Backend Lint & Tests
+### 5. `quality` — Backend Lint & Tests
 
 **Runs when:** backend paths changed.
 
@@ -75,7 +68,7 @@ Runs `scripts/quality/check_design_system.mjs`. Detects raw design tokens, inlin
 | Pytest | `pytest -x --tb=short --cov=backend/app --cov-report=term-missing` | Unit + integration tests; **≥ 85 %** coverage (enforced by `pytest.ini`) |
 | Security audit | `pip-audit --requirement backend/requirements.txt --strict` | Known vulnerabilities in Python dependencies |
 
-### 7. `complexity_gate` — Architecture Enforcement
+### 6. `complexity_gate` — Architecture Enforcement
 
 **Runs when:** backend paths changed (PR events).
 
@@ -87,13 +80,13 @@ Runs `scripts/quality/architecture_metrics.py --check` against changed files:
 | Max lines of code per file | **≤ 500** |
 | Warning threshold (CC) | 11 |
 
-### 8. `docker_packaging_guard` — Docker Image Validation
+### 7. `docker_packaging_guard` — Docker Image Validation
 
 **Runs when:** Docker-related files, shared contracts, backend, or frontend paths changed.
 
 Builds both Docker images (`Dockerfile.backend`, `Dockerfile.frontend`) and verifies that `shared/global_schema_contract.json` exists inside each image. This ensures the frontend–backend schema contract ships correctly.
 
-### 9. `e2e` — End-to-End Tests
+### 8. `e2e` — End-to-End Tests
 
 **Runs when:** PR or push to main, with frontend or backend changes. Depends on `docker_packaging_guard`.
 
