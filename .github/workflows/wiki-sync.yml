@@ -1,0 +1,84 @@
+name: Wiki Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki/**"
+      - ".github/workflows/wiki-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone wiki repository
+        run: |
+          git clone \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" \
+            wiki-repo
+
+      - name: Sync wiki pages
+        run: |
+          set -euo pipefail
+
+          # Validate source wiki before touching published content
+          if [ ! -f wiki/Home.md ]; then
+            echo "Missing required page: wiki/Home.md"
+            exit 1
+          fi
+
+          page_count="$(find wiki -type f -name "*.md" | wc -l | tr -d ' ')"
+          if [ "${page_count}" -lt 3 ]; then
+            echo "Unexpected wiki source size (${page_count} markdown files); aborting sync."
+            exit 1
+          fi
+
+          dupes="$(find wiki -type f -name "*.md" -printf "%f\n" | sort | uniq -d || true)"
+          if [ -n "${dupes}" ]; then
+            echo "Duplicate wiki page basenames detected; flattening would overwrite pages:"
+            echo "${dupes}"
+            exit 1
+          fi
+
+          # Clean existing pages and assets for a full, reproducible sync
+          find wiki-repo -maxdepth 1 -name "*.md" -delete
+          rm -rf wiki-repo/assets
+
+          # Flatten: copy every .md from wiki/**/ to wiki-repo root
+          find wiki -name "*.md" | while read -r f; do
+            cp "$f" "wiki-repo/$(basename "$f")"
+          done
+
+          # Copy assets directory (images referenced from wiki pages)
+          if [ -d wiki/assets ]; then
+            cp -r wiki/assets wiki-repo/
+          fi
+
+      - name: Commit and push
+        run: |
+          cd wiki-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No wiki changes detected; skipping push."
+            exit 0
+          fi
+
+          git add .
+          git commit -m "docs(wiki): sync from wiki/ in main"
+          git push \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" \
+            HEAD:master
+
