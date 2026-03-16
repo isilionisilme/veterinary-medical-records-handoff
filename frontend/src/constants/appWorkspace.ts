@@ -3,6 +3,8 @@ import type { MedicalRecordSectionId } from "../types";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 export const DEBUG_CONFIDENCE_POLICY = import.meta.env.VITE_DEBUG_CONFIDENCE === "true";
+export const WIKI_HOME_URL =
+  "https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki";
 export const MAX_UPLOAD_SIZE_BYTES = 20 * 1024 * 1024;
 export const MISSING_VALUE_PLACEHOLDER = "—";
 export const EMPTY_LIST_PLACEHOLDER = "Sin elementos";
