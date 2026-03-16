@@ -33,9 +33,10 @@ Open:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:8000`
 - OpenAPI docs: `http://localhost:8000/docs`
-- Wiki: `http://localhost:8081`
+- Wiki redirect: `http://localhost:8081`
+- Published GitHub Wiki: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki`
 
-The evaluator compose profile also serves the project wiki at `http://localhost:8081`.
+The evaluator compose profile redirects `http://localhost:8081` to the published GitHub Wiki.
 
 Stop:
 - `docker compose down`
@@ -87,6 +88,7 @@ This project explores an approach that assists veterinarians during document rev
 
 - `backend/` — FastAPI API + persistence (SQLite + filesystem) + tests
 - `frontend/` — React app for document upload/list/review flows
+- `wiki/` — project documentation source that will be published to the GitHub Wiki of this repository
 
 ## Architecture at a glance
 
@@ -98,7 +100,19 @@ This project explores an approach that assists veterinarians during document rev
 
 Key design references:
 
+- Product design: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/product-design`
+- Architecture overview: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/architecture`
+- Technical design: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/technical-design`
+- Event architecture: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/event-architecture`
+- Deployment guide: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/deployment`
+
 Key technical decisions (ADRs):
+
+- Modular monolith: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/ADR-modular-monolith`
+- SQLite as primary database: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/ADR-sqlite-database`
+- Raw SQL repository pattern: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/ADR-raw-sql-repository-pattern`
+- In-process async processing: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/ADR-in-process-async-processing`
+- CI complexity thresholds: `https://github.com/isilionisilme/veterinary-medical-records-handoff/wiki/ADR-complexity-gate-thresholds`
 
 ---
 
