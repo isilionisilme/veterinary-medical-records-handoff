@@ -9,7 +9,7 @@
 
 A technical exercise demonstrating **product thinking, architectural judgment, and a scalable approach to document interpretation** for veterinary medical records in a regulated domain.
 
-![App screenshot — veterinary medical records review UI](docs/veterinary-medical-records.png)
+![App screenshot — veterinary medical records review UI](wiki/assets/veterinary-medical-records.png)
 
 ---
 
