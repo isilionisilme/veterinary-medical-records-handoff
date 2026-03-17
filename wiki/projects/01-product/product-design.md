@@ -48,6 +48,22 @@ smarter — without changing how veterinarians work or asking them to take respo
 
 Out of scope for MVP: pet owners, external clinics, administrative staff.
 
+### Example usage
+
+**Veterinarian — daily document review**
+
+A veterinarian receives a referral letter from an external specialist. Instead of reading the full document to extract the relevant data manually, they open the system, upload the PDF, and see the structured interpretation alongside the original. The system has already identified the diagnosis, the medications prescribed, and the follow-up dates — with confidence indicators for each field. The vet scans the output, notices the diagnosis was misclassified, corrects it in one click, and marks the document as reviewed. Total time: under two minutes. Nothing extra is asked of them.
+
+**Reviewer — periodic governance**
+
+The reviewer is a non-clinical role — typically someone in operations or product — responsible for overseeing how the system evolves across all documents and clinics. They never touch individual records; their job is to evaluate whether system-wide patterns are reliable enough to become permanent defaults.
+
+Most of the time, the reviewer is not needed at all. When veterinarians across many records consistently accept the same interpretation, the system promotes that mapping automatically once it crosses a confidence threshold — no approval required.
+
+The reviewer only steps in for changes that carry clinical, financial, or legal weight. For example: if veterinarians are consistently reclassifying a value the system labels "symptom" into "confirmed diagnosis" — a medically significant change — the system flags it for human review rather than self-promoting. The reviewer evaluates the evidence, inspects representative examples, and decides to approve, reject, or adjust. That decision takes effect prospectively; past documents are never rewritten.
+
+This design keeps the reviewer off the critical path for the vast majority of corrections, while preserving human oversight exactly where the cost of error is highest.
+
 ---
 
 ## 2. Product Goal
