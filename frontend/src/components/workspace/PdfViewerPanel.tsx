@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ReactNode } from "react";
 
+import { WIKI_HOME_URL } from "../../constants/appWorkspace";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { Button } from "../ui/button";
 import {
@@ -146,8 +147,16 @@ export function PdfViewerPanel({
                       >
                         <div>
                           <h3 className="text-lg font-semibold text-textSecondary">Informe</h3>
-                          <p className="mt-0.5 text-xs text-textSecondary">
-                            Consulta el documento y navega por la evidencia asociada.
+                          <p className="mt-0.5 flex items-center gap-2 text-xs text-textSecondary">
+                            <span>Consulta el documento y navega por la evidencia asociada.</span>
+                            <a
+                              href={WIKI_HOME_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-auto shrink-0 font-medium text-accent underline decoration-1 underline-offset-2 hover:no-underline"
+                            >
+                              Consulta la documentación
+                            </a>
                           </p>
                         </div>
                         {fileUrl ? (
